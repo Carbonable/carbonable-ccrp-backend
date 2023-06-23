@@ -1,0 +1,9 @@
+type Customer {
+    id: ID!,
+    name: String!,
+    wallet: String!,
+}
+
+type Query {
+    customer(id: String!): String
+}
