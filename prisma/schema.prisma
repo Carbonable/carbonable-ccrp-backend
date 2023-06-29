@@ -9,3 +9,122 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model CarbonCredit {
+  id String @id
+
+  number    String
+  vintage   String             @db.VarChar(4)
+  type      CarbonCreditType
+  origin    CarbonCreditOrigin
+  isRetired Boolean            @default(false)
+  isLocked  Boolean            @default(false)
+
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+
+  @@map("carbon_credits")
+}
+
+model Project {
+  id String @id
+
+  name         String
+  description  String
+  localization String
+  startDate    String             @map("start_date") @db.VarChar(4)
+  endDate      String             @map("end_date") @db.VarChar(4)
+  area         Int                @map("area")
+  type         CarbonCreditType
+  origin       CarbonCreditOrigin
+
+  carbonCredits CarbonCredit[]
+  configuration ProjectConfiguration[]
+  certifier     Certifier?             @relation(fields: [certifierId], references: [id])
+  certifierId   String?                @map("certifier_id")
+  developper    Developper?            @relation(fields: [developperId], references: [id])
+  developperId  String?                @map("developper_id")
+  country       Country                @relation(fields: [countryId], references: id)
+  countryId     String                 @map("country_id")
+
+  @@map("projects")
+}
+
+model ProjectConfiguration {
+  id String @id
+
+  year     String @db.VarChar(4)
+  emission Int
+  target   Int
+
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String  @map("project_id")
+
+  certifier   Certifier @relation(fields: [certifierId], references: [id])
+  certifierId String    @map("certifier_id")
+
+  @@map("project_configuration")
+}
+
+model Company {
+  id String @id
+
+  name String
+  slug String @unique
+
+  configuration CompanyConfiguration[]
+
+  @@map("company")
+}
+
+model CompanyConfiguration {
+  id String @id
+
+  key   String
+  value String
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String  @map("company_id")
+
+  @@map("company_configuration")
+}
+
+model Certifier {
+  id String @id
+
+  project              Project[]
+  ProjectConfiguration ProjectConfiguration[]
+
+  @@map("certifier")
+}
+
+model Developper {
+  id   String @id
+  name String
+  slug String
+
+  projects Project[]
+
+  @@map("developper")
+}
+
+model Country {
+  id   String @id
+  name String
+  code String
+  data Json
+
+  projects Project[]
+
+  @@map("country")
+}
+
+enum CarbonCreditOrigin {
+  FORWARD_FINANCE
+  DIRECT_PURCHASE
+}
+
+enum CarbonCreditType {
+  RESTORATION
+  CONCERVATION
+}
