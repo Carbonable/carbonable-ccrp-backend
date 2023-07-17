@@ -2,7 +2,9 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["linux-musl-openssl-3.0.x", "darwin-arm64", "native"]
+  engineType    = "binary"
 }
 
 datasource db {
@@ -13,15 +15,17 @@ datasource db {
 model CarbonCredit {
   id String @id
 
-  number    String
-  vintage   String             @db.VarChar(4)
-  type      CarbonCreditType
-  origin    CarbonCreditOrigin
-  isRetired Boolean            @default(false)
-  isLocked  Boolean            @default(false)
+  number        String
+  vintage       String             @db.VarChar(4)
+  type          CarbonCreditType
+  origin        CarbonCreditOrigin
+  purchasePrice BigInt?            @map("purchase_price")
+  isRetired     Boolean            @default(false) @map("is_retired")
+  isLocked      Boolean            @default(false) @map("is_locked")
+  isPurchased   Boolean            @default(false) @map("is_purchased")
 
   project   Project @relation(fields: [projectId], references: [id])
-  projectId String
+  projectId String  @map("project_id")
 
   @@map("carbon_credits")
 }
@@ -29,25 +33,43 @@ model CarbonCredit {
 model Project {
   id String @id
 
-  name         String
-  description  String
-  localization String
-  startDate    String             @map("start_date") @db.VarChar(4)
-  endDate      String             @map("end_date") @db.VarChar(4)
-  area         Int                @map("area")
-  type         CarbonCreditType
-  origin       CarbonCreditOrigin
+  name             String
+  description      String
+  localization     String
+  startDate        String             @map("start_date") @db.VarChar(4)
+  endDate          String             @map("end_date") @db.VarChar(4)
+  area             Int                @map("area")
+  type             CarbonCreditType
+  origin           CarbonCreditOrigin
+  fundingAmount    BigInt             @map("funding_amount")
+  color            ProjectColor
+  protectedSpecies Int                @map("protected_species")
+  protectedForest  Int                @map("protected_forest")
+  allocation       Int
 
   carbonCredits CarbonCredit[]
   configuration ProjectConfiguration[]
+  curvePoints   CurvePoint[]
   certifier     Certifier?             @relation(fields: [certifierId], references: [id])
   certifierId   String?                @map("certifier_id")
   developper    Developper?            @relation(fields: [developperId], references: [id])
   developperId  String?                @map("developper_id")
   country       Country                @relation(fields: [countryId], references: id)
   countryId     String                 @map("country_id")
+  ProjectsSdgs  ProjectsSdgs[]
 
   @@map("projects")
+}
+
+model CurvePoint {
+  id         String   @id
+  time       DateTime @db.Timestamptz
+  absorption BigInt
+
+  project   Project @relation(fields: [projectId], references: id)
+  projectId String  @map("project_id")
+
+  @@map("curve_point")
 }
 
 model ProjectConfiguration {
@@ -90,7 +112,9 @@ model CompanyConfiguration {
 }
 
 model Certifier {
-  id String @id
+  id   String @id
+  name String
+  slug String @unique
 
   project              Project[]
   ProjectConfiguration ProjectConfiguration[]
@@ -101,7 +125,7 @@ model Certifier {
 model Developper {
   id   String @id
   name String
-  slug String
+  slug String @unique
 
   projects Project[]
 
@@ -119,6 +143,25 @@ model Country {
   @@map("country")
 }
 
+model Sdg {
+  id           String         @id
+  number       Int
+  name         String
+  ProjectsSdgs ProjectsSdgs[]
+
+  @@map("sdg")
+}
+
+model ProjectsSdgs {
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String  @map("project_id")
+  sdg       Sdg     @relation(fields: [sdgId], references: [id])
+  sdgId     String  @map("sdg_id")
+
+  @@id([projectId, sdgId])
+  @@map("projects_sdgs")
+}
+
 enum CarbonCreditOrigin {
   FORWARD_FINANCE
   DIRECT_PURCHASE
@@ -127,4 +170,10 @@ enum CarbonCreditOrigin {
 enum CarbonCreditType {
   RESTORATION
   CONCERVATION
+}
+
+enum ProjectColor {
+  BLUE
+  ORANGE
+  GREEN
 }

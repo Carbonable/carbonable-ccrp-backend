@@ -6,6 +6,9 @@
 app = "carbonable-staging-ccrp-backend"
 primary_region = "cdg"
 
+# [deploy]
+#   release_command = "npx prisma migrate deploy && npx prisma seed"
+
 [http_service]
   internal_port = 8080
   force_https = true

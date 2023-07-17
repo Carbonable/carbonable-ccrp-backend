@@ -1,0 +1,7 @@
+type Certifier {
+    id: ID!,
+    name: String!,
+    slug: String!,
+    projects: [Project!]
+}
+

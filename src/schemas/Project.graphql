@@ -1,0 +1,26 @@
+type Project {
+    id: ID!,
+  name:         String
+  description:  String
+  localization: String
+  startDate:    String
+  endDate:      String
+  area:         Int
+  type:         CarbonCreditType
+  origin:       CarbonCreditOrigin
+  carbon_credits: [CarbonCredit!]
+  certifier: Certifier!
+  developper: Developper
+  country: Country
+}
+
+type ProjectColorRepartition {
+    green: Map!
+    orange: Map!
+    blue: Map!
+}
+
+type ProjectTypeRepartition {
+    removal: String!,
+    avoidance: String!,
+}

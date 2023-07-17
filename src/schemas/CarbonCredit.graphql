@@ -1,0 +1,30 @@
+type CarbonCredit {
+  id: ID!
+  number: String
+  vintage: String
+  type: CarbonCreditType!
+  origin: CarbonCreditOrigin!
+  project: Project
+  isRetired: Boolean!
+  isLocked: Boolean!
+}
+
+enum CarbonCreditOrigin {
+  FORWARD_FINANCE
+  DIRECT_PURCHASE
+}
+
+enum CarbonCreditType {
+  RESTORATION
+  CONCERVATION
+}
+
+enum ProjectType {
+  ARR
+  REDD_PLUS
+}
+
+enum OffsetType {
+  EX_POST
+  EX_ANTE
+}
