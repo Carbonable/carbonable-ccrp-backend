@@ -1,0 +1,78 @@
+type Query {
+    countries: [Country]
+    countryBy(field: String!, value: String!): Country
+
+    certifierBy(field: String!, value: String!): Certifier
+    projectBy(field: String!, value: String!): Project
+
+    getGlobalData: GlobalData,
+    getProjectedDecarbonation(viewType: ProjectedDecarbonationViewType): [ProjectedDecarbonation]
+    getProjectedDecarbonationTable(pagination: Pagination): [ProjectedDecarbonation]
+    getProjectFundingAllocation(pagination: Pagination): [ProjectFundingAllocation]
+    getProjectMetrics: ProjectMetrics!
+    getImpactMetrics: ImpactMetrics!
+}
+
+type Map {
+    key: String!
+    value: String!
+}
+
+type Sdg {
+    number: Int!
+    name: String!
+}
+
+enum ProjectedDecarbonationViewType {
+    OFFSET_TYPE
+    PROJECT_TYPE
+    INVESTMENT_TYPE
+}
+
+type GlobalData {
+    total_invested: String!
+    generated_cc: String!
+    forecasted_cc: String!
+    retired_cc: String!
+}
+
+type ProjectedDecarbonation {
+    year: String!
+    emissions: String!
+    received_cc: String!
+    purchased_cc: String!
+    forward_cc: String!
+    retired_cc: String!
+    target: String!
+    delta: String
+}
+
+type ProjectFundingAllocation {
+    id: ID!
+    name: String!
+    allocation:  String!
+    generated_cc: String!
+    forwarded_cc: String!
+    comitted_cc: String!
+    retired_cc: String!
+}
+
+type ProjectMetrics {
+    colors: ProjectColorRepartition!
+    types: ProjectTypeRepartition!
+    standards: [Map!]!
+    localization: [Map!]!
+}
+
+type ImpactMetrics {
+    sdgs: [Sdg!]!
+    removed_tons: String!
+    protected_forest: String!
+    protected_species: String!
+}
+
+
+input Pagination {
+    page: Int
+    count: Int
+}

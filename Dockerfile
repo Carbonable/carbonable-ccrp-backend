@@ -22,7 +22,8 @@ COPY --chown=carbonable:carbonable --from=builder /srv/www/pnpm-lock.yaml ./pnpm
 COPY --chown=carbonable:carbonable --from=builder /srv/www/node_modules ./node_modules
 COPY --chown=carbonable:carbonable --from=builder /srv/www/dist ./dist
 COPY --chown=carbonable:carbonable --from=builder /srv/www/src/schemas ./src/schemas
+COPY --chown=carbonable:carbonable --from=builder /srv/www/prisma ./prisma
 
 EXPOSE 8080
 
-ENTRYPOINT ["node_modules/.bin/pm2-runtime", "start", "dist/main.js", "--name", "ccrp-backend"]
+ENTRYPOINT ["node_modules/.bin/pm2-runtime", "start", "dist/src/main.js", "--name", "ccrp-backend"]

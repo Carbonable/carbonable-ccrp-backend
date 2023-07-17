@@ -1,0 +1,8 @@
+scalar JSON
+
+type Country {
+  id: ID!
+  name: String!
+  code: String!
+  data: JSON!
+}
