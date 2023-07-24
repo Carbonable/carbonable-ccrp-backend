@@ -16,6 +16,14 @@ type CarbonCreditProjection = {
 };
 
 type ProjectedDecarbonation = DecarbonationVintage & CarbonCreditProjection;
+type ProjectedDecarbonationWithPagination = {
+    data: ProjectedDecarbonation[],
+    pagination: {
+        max_page: number,
+        page_number: number,
+        count: number,
+    }
+};
 
 type DataFilter = { filter?: string, page?: number, count?: number };
 
@@ -26,15 +34,15 @@ export class ProjectedDecarbonationService {
     constructor(private prisma: PrismaService) { }
 
     async get(filter: string): Promise<ProjectedDecarbonation[]> {
-        return await this.getData({ filter: filter });
+        return (await this.getData({ filter: filter })).data;
     }
-    async getTable(pagination: PaginationDTO): Promise<ProjectedDecarbonation[]> {
+    async getTable(pagination: PaginationDTO): Promise<ProjectedDecarbonationWithPagination> {
         return await this.getData({ ...pagination });
     }
 
     // This is kinda not very optimised but we're limited by sql for the moment
     // TODO: have some kind of aggregation table.
-    private async getData({ filter, page = 1, count = 50 }: DataFilter): Promise<ProjectedDecarbonation[]> {
+    private async getData({ filter, page = 1, count = 50 }: DataFilter): Promise<ProjectedDecarbonationWithPagination> {
         let offset = (page - 1) * count;
         let years = await this.prisma.$queryRaw<DecarbonationVintage[]>`
 SELECT
@@ -74,6 +82,19 @@ SELECT
             }];
         }
 
-        return computedYears;
+        let project_configuration_count = await this.prisma.$queryRaw<{ count: number }[]>`
+SELECT COUNT(pc.year)
+FROM project_configuration pc
+INNER JOIN projects p on pc.project_id = p.id
+GROUP BY pc.year
+        `;
+        let paginationObject = {
+            max_page: Math.ceil(project_configuration_count.length / count),
+            page_number: page,
+            count: count,
+        };
+
+
+        return { data: computedYears, pagination: paginationObject };
     }
 }

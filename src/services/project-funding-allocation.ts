@@ -24,6 +24,7 @@ export class ProjectFundingAllocationService {
 SELECT
     p.id,
     p.allocation,
+    p.color,
     p.name,
     (SELECT SUM(cp.absorption) from curve_point cp where cp.project_id = p.id and cp.time < now()) as generated_cc,
     (SELECT SUM(cp.absorption) from curve_point cp where cp.project_id = p.id and cp.time > now()) as forwarded_cc,
@@ -34,7 +35,14 @@ LIMIT ${count} OFFSET ${(page - 1) * count}
 ;
         `;
 
-        return allocations.map(a => ({
+        let project_count = await this.prismaClient.project.count();
+        let paginationObject = {
+            max_page: Math.ceil(project_count / count),
+            page_number: page,
+            count,
+        }
+
+        let data = allocations.map(a => ({
             ...a,
             allocation: Utils.formatString({ value: a.allocation, suffix: '%' }),
             generated_cc: Utils.formatString({ value: a.generated_cc, suffix: 'cc' }),
@@ -42,5 +50,7 @@ LIMIT ${count} OFFSET ${(page - 1) * count}
             retired_cc: Utils.formatString({ value: a.retired_cc, suffix: 'cc' }),
             comitted_cc: Utils.formatString({ value: a.comitted_cc, suffix: 'cc' }),
         }));
+
+        return { data, pagination: paginationObject };
     }
 }

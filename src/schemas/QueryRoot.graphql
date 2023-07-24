@@ -7,8 +7,8 @@ type Query {
 
     getGlobalData: GlobalData,
     getProjectedDecarbonation(viewType: ProjectedDecarbonationViewType): [ProjectedDecarbonation]
-    getProjectedDecarbonationTable(pagination: Pagination): [ProjectedDecarbonation]
-    getProjectFundingAllocation(pagination: Pagination): [ProjectFundingAllocation]
+    getProjectedDecarbonationTable(pagination: Pagination): ProjectedDecarbonationWithPagination
+    getProjectFundingAllocation(pagination: Pagination): ProjectedFundingAllocationWithPagination
     getProjectMetrics: ProjectMetrics!
     getImpactMetrics: ImpactMetrics!
 }
@@ -47,14 +47,25 @@ type ProjectedDecarbonation {
     delta: String
 }
 
+type ProjectedDecarbonationWithPagination {
+    data: [ProjectedDecarbonation!]!
+    pagination: PaginationObject
+}
+
 type ProjectFundingAllocation {
     id: ID!
     name: String!
+    color: String!
     allocation:  String!
     generated_cc: String!
     forwarded_cc: String!
     comitted_cc: String!
     retired_cc: String!
+}
+
+type ProjectedFundingAllocationWithPagination {
+    data: [ProjectFundingAllocation!]!
+    pagination: PaginationObject
 }
 
 type ProjectMetrics {
@@ -71,6 +82,11 @@ type ImpactMetrics {
     protected_species: String!
 }
 
+type PaginationObject {
+    max_page: Int!
+    page_number: Int!
+    count: Int!
+}
 
 input Pagination {
     page: Int
