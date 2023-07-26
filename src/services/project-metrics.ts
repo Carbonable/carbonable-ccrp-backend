@@ -15,6 +15,13 @@ type KVPercent = {
     value_percent: string,
 };
 
+type LocalizationRepartition = {
+    name: string,
+    iso: string,
+    flag: string,
+    value_percent: string,
+};
+
 @Injectable()
 export class ProjectMetricsService {
     constructor(private prismaClient: PrismaService) { }
@@ -40,17 +47,17 @@ GROUP BY tablestat.total, c.name
 ;
         `;
 
-        let countriesArr = await this.prismaClient.$queryRaw<KVPercent[]>`
-SELECT c.name as key, (count(*) / tablestat.total::float) * 100 AS value_percent
+        let countriesArr = await this.prismaClient.$queryRaw<LocalizationRepartition[]>`
+SELECT c.name as name, c.data->'cca2' as iso, c.data->'flag' as flag, (count(*) / tablestat.total::float) * 100 AS value_percent
 FROM projects p
 INNER JOIN country c on c.id = p.country_id
 CROSS JOIN (SELECT count(*) AS total FROM projects p) AS tablestat
-GROUP BY tablestat.total, c.name
+GROUP BY tablestat.total, c.name, c.data
 ;
         `;
         let percentages = percentagesArr.shift();
         let standards = certifiersArr.map(c => ({ ...c, value: Utils.formatString({ value: c.value_percent, suffix: '%' }) }));
-        let localization = countriesArr.map(c => ({ ...c, value: Utils.formatString({ value: c.value_percent, suffix: '%' }) }));
+        let localization = countriesArr.map(c => ({ country: { name: c.name, iso: c.iso, flag: c.flag }, value: Utils.formatString({ value: c.value_percent, suffix: '%' }) }));
         return {
             colors: {
                 green: {
