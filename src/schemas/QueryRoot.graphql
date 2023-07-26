@@ -72,7 +72,18 @@ type ProjectMetrics {
     colors: ProjectColorRepartition!
     types: ProjectTypeRepartition!
     standards: [Map!]!
-    localization: [Map!]!
+    localization: [LocalizationRepartition!]!
+}
+
+type LocalizationRepartition {
+    country: ShortCountry!
+    value: String!
+}
+
+type ShortCountry {
+    name: String!
+    iso: String!
+    flag: String!
 }
 
 type ImpactMetrics {
