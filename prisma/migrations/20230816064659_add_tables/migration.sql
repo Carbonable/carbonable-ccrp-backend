@@ -7,6 +7,9 @@ CREATE TYPE "CarbonCreditType" AS ENUM ('RESTORATION', 'CONCERVATION');
 -- CreateEnum
 CREATE TYPE "ProjectColor" AS ENUM ('BLUE', 'ORANGE', 'GREEN');
 
+-- CreateEnum
+CREATE TYPE "CarbonCreditAuditStatus" AS ENUM ('INITIAL', 'AUDITED');
+
 -- CreateTable
 CREATE TABLE "carbon_credits" (
     "id" TEXT NOT NULL,
@@ -18,6 +21,7 @@ CREATE TABLE "carbon_credits" (
     "is_retired" BOOLEAN NOT NULL DEFAULT false,
     "is_locked" BOOLEAN NOT NULL DEFAULT false,
     "is_purchased" BOOLEAN NOT NULL DEFAULT false,
+    "audit_status" "CarbonCreditAuditStatus" NOT NULL DEFAULT 'INITIAL',
     "project_id" TEXT NOT NULL,
 
     CONSTRAINT "carbon_credits_pkey" PRIMARY KEY ("id")
@@ -42,6 +46,7 @@ CREATE TABLE "projects" (
     "certifier_id" TEXT,
     "developper_id" TEXT,
     "country_id" TEXT NOT NULL,
+    "company_id" TEXT NOT NULL,
 
     CONSTRAINT "projects_pkey" PRIMARY KEY ("id")
 );
@@ -50,22 +55,10 @@ CREATE TABLE "projects" (
 CREATE TABLE "curve_point" (
     "id" TEXT NOT NULL,
     "time" TIMESTAMPTZ NOT NULL,
-    "absorption" BIGINT NOT NULL,
+    "absorption" DOUBLE PRECISION NOT NULL,
     "project_id" TEXT NOT NULL,
 
     CONSTRAINT "curve_point_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "project_configuration" (
-    "id" TEXT NOT NULL,
-    "year" VARCHAR(4) NOT NULL,
-    "emission" INTEGER NOT NULL,
-    "target" INTEGER NOT NULL,
-    "project_id" TEXT NOT NULL,
-    "certifier_id" TEXT NOT NULL,
-
-    CONSTRAINT "project_configuration_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -75,6 +68,17 @@ CREATE TABLE "company" (
     "slug" TEXT NOT NULL,
 
     CONSTRAINT "company_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "company_emission" (
+    "id" TEXT NOT NULL,
+    "year" VARCHAR(4) NOT NULL,
+    "emission" INTEGER NOT NULL,
+    "target" INTEGER NOT NULL,
+    "company_id" TEXT NOT NULL,
+
+    CONSTRAINT "company_emission_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -154,13 +158,13 @@ ALTER TABLE "projects" ADD CONSTRAINT "projects_developper_id_fkey" FOREIGN KEY 
 ALTER TABLE "projects" ADD CONSTRAINT "projects_country_id_fkey" FOREIGN KEY ("country_id") REFERENCES "country"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "projects" ADD CONSTRAINT "projects_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "curve_point" ADD CONSTRAINT "curve_point_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "projects"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "project_configuration" ADD CONSTRAINT "project_configuration_project_id_fkey" FOREIGN KEY ("project_id") REFERENCES "projects"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "project_configuration" ADD CONSTRAINT "project_configuration_certifier_id_fkey" FOREIGN KEY ("certifier_id") REFERENCES "certifier"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "company_emission" ADD CONSTRAINT "company_emission_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "company_configuration" ADD CONSTRAINT "company_configuration_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

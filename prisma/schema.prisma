@@ -24,6 +24,8 @@ model CarbonCredit {
   isLocked      Boolean            @default(false) @map("is_locked")
   isPurchased   Boolean            @default(false) @map("is_purchased")
 
+  auditStatus CarbonCreditAuditStatus @default(value: INITIAL) @map("audit_status")
+
   project   Project @relation(fields: [projectId], references: [id])
   projectId String  @map("project_id")
 
@@ -48,14 +50,15 @@ model Project {
   allocation       Int
 
   carbonCredits CarbonCredit[]
-  configuration ProjectConfiguration[]
   curvePoints   CurvePoint[]
-  certifier     Certifier?             @relation(fields: [certifierId], references: [id])
-  certifierId   String?                @map("certifier_id")
-  developper    Developper?            @relation(fields: [developperId], references: [id])
-  developperId  String?                @map("developper_id")
-  country       Country                @relation(fields: [countryId], references: id)
-  countryId     String                 @map("country_id")
+  certifier     Certifier?     @relation(fields: [certifierId], references: [id])
+  certifierId   String?        @map("certifier_id")
+  developper    Developper?    @relation(fields: [developperId], references: [id])
+  developperId  String?        @map("developper_id")
+  country       Country        @relation(fields: [countryId], references: [id])
+  countryId     String         @map("country_id")
+  company       Company        @relation(fields: [companyId], references: [id])
+  companyId     String         @map("company_id")
   ProjectsSdgs  ProjectsSdgs[]
 
   @@map("projects")
@@ -64,28 +67,12 @@ model Project {
 model CurvePoint {
   id         String   @id
   time       DateTime @db.Timestamptz
-  absorption BigInt
+  absorption Float
 
   project   Project @relation(fields: [projectId], references: id)
   projectId String  @map("project_id")
 
   @@map("curve_point")
-}
-
-model ProjectConfiguration {
-  id String @id
-
-  year     String @db.VarChar(4)
-  emission Int
-  target   Int
-
-  project   Project @relation(fields: [projectId], references: [id])
-  projectId String  @map("project_id")
-
-  certifier   Certifier @relation(fields: [certifierId], references: [id])
-  certifierId String    @map("certifier_id")
-
-  @@map("project_configuration")
 }
 
 model Company {
@@ -95,8 +82,23 @@ model Company {
   slug String @unique
 
   configuration CompanyConfiguration[]
+  emissions     CompanyEmission[]
+  projects      Project[]
 
   @@map("company")
+}
+
+model CompanyEmission {
+  id String @id
+
+  year     String @db.VarChar(4)
+  emission Int
+  target   Int
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String  @map("company_id")
+
+  @@map("company_emission")
 }
 
 model CompanyConfiguration {
@@ -116,8 +118,7 @@ model Certifier {
   name String
   slug String @unique
 
-  project              Project[]
-  ProjectConfiguration ProjectConfiguration[]
+  project Project[]
 
   @@map("certifier")
 }
@@ -176,4 +177,9 @@ enum ProjectColor {
   BLUE
   ORANGE
   GREEN
+}
+
+enum CarbonCreditAuditStatus {
+  INITIAL
+  AUDITED
 }

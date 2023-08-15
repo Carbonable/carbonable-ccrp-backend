@@ -6,7 +6,7 @@ type Query {
     projectBy(field: String!, value: String!): Project
 
     getGlobalData: GlobalData,
-    getProjectedDecarbonation(viewType: ProjectedDecarbonationViewType): [ProjectedDecarbonation]
+    getProjectedDecarbonation(viewType: ProjectedDecarbonationViewType): [ProjectedDecarbonationGraph]
     getProjectedDecarbonationTable(pagination: Pagination): ProjectedDecarbonationWithPagination
     getProjectFundingAllocation(pagination: Pagination): ProjectedFundingAllocationWithPagination
     getProjectMetrics: ProjectMetrics!
@@ -16,6 +16,11 @@ type Query {
 type Map {
     key: String!
     value: String!
+}
+
+type StrIntMap {
+    key: String!
+    value: Int!
 }
 
 type Sdg {
@@ -45,6 +50,13 @@ type ProjectedDecarbonation {
     retired_cc: String!
     target: String!
     delta: String
+}
+
+type ProjectedDecarbonationGraph {
+    year: String!
+    emissions: Int!
+    target: Int!
+    data: [StrIntMap]!
 }
 
 type ProjectedDecarbonationWithPagination {

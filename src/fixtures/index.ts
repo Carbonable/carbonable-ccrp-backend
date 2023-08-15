@@ -1,4 +1,6 @@
-import { PrismaClient, Prisma, CarbonCreditType, CarbonCreditOrigin, ProjectColor } from "@prisma/client";
+import { PrismaClient, Prisma, CarbonCreditType, CarbonCreditOrigin, ProjectColor, CarbonCreditAuditStatus } from "@prisma/client";
+import { LasDeliciasCurvePoints, LasDeliciasCarbonCredits } from "./las-delicias";
+import { BanegasFarmCurvePoints, BanegasFarmCarbonCredits } from "./banegas-farm";
 import { monotonicFactory } from 'ulid';
 import { faker } from '@faker-js/faker';
 import slugify from 'slugify';
@@ -35,20 +37,48 @@ let CertifierDataFixtures: DataFixture<Omit<Prisma.CertifierCreateManyInput, 'id
         return { name, slug: slugify(name.toLowerCase()) };
     },
     data: [
-        { name: 'Vera', slug: 'vera' },
         { name: 'Wildsense', slug: 'Wildsense' },
     ],
 };
+
 // @ts-ignore
-let DevelopperDataFixtures: DataFixture<Omit<Prisma.DevelopperCreateManyInput, 'id'>, Prisma.DevelopperDelegate<Prisma.RejectOnNotFound, Prisma.DevelopperArgs>> = {
+let CompanyDataFixtures: DataFixture<Prisma.CompanyCreateManyInput, Prisma.CompanyDelegate<Prisma.RejectOnNotFound, Prisma.CompanyArgs>> = {
+    name: 'company',
+    count: 0,
+    object: prismaClient.company,
+    data: [
+        { id: '01H5739RTVV0JV8M3DAN0C10ME', name: 'Carbonable', slug: 'carbonable' },
+    ],
+};
+
+// @ts-ignore
+let CompanyEmissionDataFixtures: DataFixture<Omit<Prisma.CompanyEmissionCreateManyInput, 'id'>, Prisma.CompanyEmissionDelegate<Prisma.RejectOnNotFound, Prisma.CompanyEmissionArgs>> = {
+    name: 'companyEmission',
+    count: 0,
+    object: prismaClient.companyEmission,
+    data: [
+        { year: '2023', emission: 150, target: 100, companyId: '01H5739RTVV0JV8M3DAN0C10ME' },
+        { year: '2024', emission: 150, target: 100, companyId: '01H5739RTVV0JV8M3DAN0C10ME' },
+        { year: '2025', emission: 150, target: 100, companyId: '01H5739RTVV0JV8M3DAN0C10ME' },
+        { year: '2026', emission: 150, target: 100, companyId: '01H5739RTVV0JV8M3DAN0C10ME' },
+        { year: '2027', emission: 150, target: 100, companyId: '01H5739RTVV0JV8M3DAN0C10ME' },
+        { year: '2028', emission: 150, target: 100, companyId: '01H5739RTVV0JV8M3DAN0C10ME' },
+        { year: '2029', emission: 150, target: 100, companyId: '01H5739RTVV0JV8M3DAN0C10ME' },
+        { year: '2030', emission: 150, target: 100, companyId: '01H5739RTVV0JV8M3DAN0C10ME' },
+        { year: '2031', emission: 150, target: 100, companyId: '01H5739RTVV0JV8M3DAN0C10ME' },
+        { year: '2032', emission: 150, target: 100, companyId: '01H5739RTVV0JV8M3DAN0C10ME' },
+    ],
+};
+
+// @ts-ignore
+let DevelopperDataFixtures: DataFixture<Prisma.DevelopperCreateManyInput, Prisma.DevelopperDelegate<Prisma.RejectOnNotFound, Prisma.DevelopperArgs>> = {
     name: 'developper',
-    count: 10,
+    count: 0,
     object: prismaClient.developper,
-    model: async ({ }) => {
-        let name = faker.company.name();
-        return { name, slug: slugify(name.toLowerCase()) };
-    },
-    data: [],
+    data: [
+        { id: '00H5739MT3KXJ3RBQAATGWQ0RR', name: 'Fundacion Naturaleza Panama', slug: 'fundacion-naturaleza-panama' },
+        { id: '01H5739RV1QHJCSE2GQTJ9B8PX', name: 'Corcovado Foundation', slug: 'corcovado-foundation' },
+    ],
 };
 
 // @ts-ignore
@@ -79,99 +109,105 @@ let SdgDataFixtures: DataFixture<Omit<Prisma.SdgCreateManyInput, 'id'>, Prisma.S
 };
 
 // @ts-ignore
-let ProjectDataFixtures: DataFixture<Omit<Prisma.ProjectCreateManyInput, 'id'>, Prisma.ProjectDelegate<Prisma.RejectOnNotFound, Prisma.ProjectArgs>> = {
+let ProjectDataFixtures: DataFixture<Prisma.ProjectCreateManyInput, Prisma.ProjectDelegate<Prisma.RejectOnNotFound, Prisma.ProjectArgs>> = {
     name: 'project',
-    count: 20,
+    count: 0,
     object: prismaClient.project,
-    model: async ({ references }) => {
-        // @ts-ignore
-        let developperId = faker.helpers.arrayElement(references['developper']).id;
-        // @ts-ignore
-        let certifierId = faker.helpers.arrayElement(references['certifier']).id;
-        // @ts-ignore
-        let countryId = faker.helpers.arrayElement(references['country']).id;
-        let startDate = faker.date.past().getFullYear();
-        let endDate = faker.date.future({ years: 30 }).getFullYear();
-
-        return {
-            name: faker.word.sample({ length: { min: 1, max: 5 } }),
-            type: faker.helpers.arrayElement([CarbonCreditType.RESTORATION, CarbonCreditType.CONCERVATION]),
-            origin: faker.helpers.arrayElement([CarbonCreditOrigin.DIRECT_PURCHASE, CarbonCreditOrigin.FORWARD_FINANCE]),
-            startDate: startDate.toString(),
-            endDate: endDate.toString(),
-            area: parseInt(faker.string.numeric(5)),
-            description: faker.lorem.paragraph(),
-            localization: `${faker.location.latitude()}, ${faker.location.longitude()}`,
-            fundingAmount: faker.number.int({ min: 300_000, max: 3_000_000 }),
-            color: faker.helpers.arrayElement([ProjectColor.GREEN, ProjectColor.ORANGE, ProjectColor.BLUE]),
+    // model: async ({ references }) => {
+    //     // @ts-ignore
+    //     let developperId = faker.helpers.arrayElement(references['developper']).id;
+    //     // @ts-ignore
+    //     let certifierId = faker.helpers.arrayElement(references['certifier']).id;
+    //     // @ts-ignore
+    //     let countryId = faker.helpers.arrayElement(references['country']).id;
+    //     let startDate = faker.date.past().getFullYear();
+    //     let endDate = faker.date.future({ years: 30 }).getFullYear();
+    //
+    //     return {
+    //         name: faker.word.sample({ length: { min: 1, max: 5 } }),
+    //         type: faker.helpers.arrayElement([CarbonCreditType.RESTORATION, CarbonCreditType.CONCERVATION]),
+    //         origin: faker.helpers.arrayElement([CarbonCreditOrigin.DIRECT_PURCHASE, CarbonCreditOrigin.FORWARD_FINANCE]),
+    //         startDate: startDate.toString(),
+    //         endDate: endDate.toString(),
+    //         area: parseInt(faker.string.numeric(5)),
+    //         description: faker.lorem.paragraph(),
+    //         localization: `${faker.location.latitude()}, ${faker.location.longitude()}`,
+    //         fundingAmount: faker.number.int({ min: 300_000, max: 3_000_000 }),
+    //         color: faker.helpers.arrayElement([ProjectColor.GREEN, ProjectColor.ORANGE, ProjectColor.BLUE]),
+    //         protectedForest: parseInt(faker.string.numeric(5)),
+    //         protectedSpecies: parseInt(faker.string.numeric(2)),
+    //         allocation: parseInt(faker.string.numeric(2)),
+    //         developperId,
+    //         certifierId,
+    //         countryId,
+    //     };
+    // },
+    data: [
+        {
+            id: '01H5739RVDH5MFVTHD90TBR92J',
+            name: 'Banegas Farm',
+            description: 'the Banegas site is a patch of dirt and shrubs that was degraded over time due to overgrazing.',
+            localization: '8.701643683464424, -83.5534715922547',
+            startDate: '2022',
+            endDate: '2052',
+            area: 0.0250,
+            type: CarbonCreditType.RESTORATION,
+            origin: CarbonCreditOrigin.FORWARD_FINANCE,
+            fundingAmount: 17600,
+            color: ProjectColor.GREEN,
             protectedForest: parseInt(faker.string.numeric(5)),
             protectedSpecies: parseInt(faker.string.numeric(2)),
             allocation: parseInt(faker.string.numeric(2)),
-            developperId,
-            certifierId,
-            countryId,
-        };
-    },
-    data: [],
-};
-
-// @ts-ignore
-let ProjectConfigurationDataFixtures: DataFixture<Omit<Prisma.ProjectConfigurationCreateManyInput, 'id'>, Prisma.ProjectConfigurationDelegate<Prisma.RejectOnNotFound, Prisma.ProjectConfigurationArgs>> = {
-    name: 'projectConfiguration',
-    count: 1,
-    object: prismaClient.projectConfiguration,
-    // @ts-ignore
-    model: async function*({ references }) {
-        let projects = references['project'];
-
-        for (let project of projects) {
-
-            let startDate = parseInt(project.startDate);
-            let diff = parseInt(project.endDate) - startDate;
-            for (let i = 0; i < diff; i++) {
-                yield {
-                    id: ulid().toString(),
-                    year: (startDate + i).toString(),
-                    emission: parseInt(faker.string.numeric(3)),
-                    target: parseInt(faker.string.numeric(2)),
-                    projectId: project.id,
-                    certifierId: project.certifierId,
-                };
+            developperId: '01H5739RV1QHJCSE2GQTJ9B8PX',
+            companyId: '01H5739RTVV0JV8M3DAN0C10ME',
+            // @ts-ignore
+            certifierId: (references: any) => {
+                // @ts-ignore
+                return references['certifier'].find((c) => c.name === 'Wildsense').id;
+            },
+            // @ts-ignore
+            countryId: (references: any) => {
+                // @ts-ignore
+                return references['country'].find((c) => c.name === 'Costa Rica').id;
             }
-        }
-    },
-    data: [],
+        },
+        {
+            id: '01H5739RVSRKHFVNM47AE4NHMK',
+            name: 'Las Delicias',
+            description: 'Las Delicias is a mangrove restoration project located right outside of the municipality of Colón Island in the Bocas del Toro archipiélago, Panama.',
+            localization: '9.402630368441974, -82.30576308181759',
+            startDate: '2022',
+            endDate: '2042',
+            area: 0.0500,
+            type: CarbonCreditType.RESTORATION,
+            origin: CarbonCreditOrigin.FORWARD_FINANCE,
+            fundingAmount: 39600,
+            color: ProjectColor.GREEN,
+            protectedForest: parseInt(faker.string.numeric(5)),
+            protectedSpecies: parseInt(faker.string.numeric(2)),
+            allocation: parseInt(faker.string.numeric(2)),
+            developperId: '00H5739MT3KXJ3RBQAATGWQ0RR',
+            companyId: '01H5739RTVV0JV8M3DAN0C10ME',
+            // @ts-ignore
+            certifierId: (references: any) => {
+                // @ts-ignore
+                return references['certifier'].find((c) => c.name === 'Wildsense').id;
+            },
+            // @ts-ignore
+            countryId: (references: any) => {
+                // @ts-ignore
+                return references['country'].find((c) => c.name === 'Panama').id;
+            }
+        },
+    ],
 };
 
 // @ts-ignore
 let CurvePointDataFixtures: DataFixture<Omit<Prisma.CurvePointCreateManyInput, 'id'>, Prisma.CurvePointDelegate<Prisma.RejectOnNotFound, Prisma.CurvePointArgs>> = {
     name: 'curvePoint',
-    count: 1,
+    count: 0,
     object: prismaClient.curvePoint,
-    // @ts-ignore
-    model: async function*({ references }) {
-        let projects = references['project'];
-
-        for (let project of projects) {
-
-            let startDate = parseInt(project.startDate);
-            let diff = parseInt(project.endDate) - startDate;
-
-            let date = new Date(project.startDate);
-
-            for (let i = 0; i < diff; i++) {
-                let timeCopy = new Date(date).setFullYear(date.getFullYear() + i)
-                let time = new Date(timeCopy);
-                yield {
-                    id: ulid().toString(),
-                    time: time,
-                    absorption: 1000 * i,
-                    projectId: project.id,
-                };
-            }
-        }
-    },
-    data: [],
+    data: [...LasDeliciasCurvePoints, ...BanegasFarmCurvePoints],
 };
 
 let ProjectsSdgsDataFixtures: DataFixture<Omit<Prisma.ProjectsSdgsCreateManyInput, 'id'>, Prisma.ProjectsSdgsDelegate> = {
@@ -197,51 +233,44 @@ let ProjectsSdgsDataFixtures: DataFixture<Omit<Prisma.ProjectsSdgsCreateManyInpu
     data: [],
 };
 
-
 // @ts-ignore
 let CarbonCreditsDataFixtures: DataFixture<Omit<Prisma.CarbonCreditCreateManyInput, 'id'>, Prisma.CarbonCreditDelegate<Prisma.RejectOnNotFound, Prisma.CarbonCreditArgs>> = {
     name: 'carbonCredit',
-    count: 100000,
+    count: 0,
     object: prismaClient.carbonCredit,
-    model: async ({ references }) => {
-        let project = faker.helpers.arrayElement(references['project']);
-        let isPurchased = faker.datatype.boolean({ probability: 0.2 });
-        let purchasePrice = isPurchased ? faker.number.int({ min: 20, max: 150 }) : null;
-
-        return {
-            // @ts-ignore
-            type: project.type,
-            // @ts-ignore
-            origin: project.origin,
-            number: ulid().toString(),
-            // @ts-ignore
-            vintage: faker.helpers.rangeToNumber(parseInt(project.startDate), parseInt(project.endDate)).toString(),
-            isRetired: faker.datatype.boolean(),
-            isLocked: faker.datatype.boolean(),
-            isPurchased,
-            purchasePrice,
-            // @ts-ignore
-            projectId: project.id,
-        }
-    },
-    data: [],
+    data: [...LasDeliciasCarbonCredits, ...BanegasFarmCarbonCredits],
 }
 
 function addId(name: string, object: any) {
-    if ('projectSdgs' === name) {
+    if ('projectSdgs' === name || object.hasOwnProperty('id')) {
         return object;
-    };
+    }
+
     return {
         ...object, id: ulid().toString(),
     }
 }
+
+function resolveReferences(object: any, references: Array<any>) {
+    for (let [key, value] of Object.entries(object)) {
+        if ('function' !== typeof value) {
+            continue;
+        }
+
+        object[key] = value(references);
+    }
+
+    return object;
+}
+
 async function addFixtures({ connection }) {
     let fixturesManagers = [
         CertifierDataFixtures,
+        CompanyDataFixtures,
+        CompanyEmissionDataFixtures,
         DevelopperDataFixtures,
         SdgDataFixtures,
         ProjectDataFixtures,
-        ProjectConfigurationDataFixtures,
         ProjectsSdgsDataFixtures,
         CurvePointDataFixtures,
         CarbonCreditsDataFixtures,
@@ -259,6 +288,7 @@ async function addFixtures({ connection }) {
             let txData = [];
             for (let d of fixture.data) {
                 d = addId(fixture.name, d);
+                d = resolveReferences(d, references);
                 references[fixture.name].push(d);
                 txData = [...txData, d];
             }
