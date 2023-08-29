@@ -1,58 +1,86 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { PrismaService } from "src/prisma.service";
-import Utils from "src/utils";
+import { Injectable, Logger } from '@nestjs/common';
+import { PrismaService } from '../prisma.service';
+import Utils from '../utils';
 
 export const ProjectedDecarbonationViewType = {
-    OFFSET_TYPE: 'OFFSET_TYPE',
-    PROJECT_TYPE: 'PROJECT_TYPE',
-    INVESTMENT_TYPE: 'INVESTMENT_TYPE',
+  OFFSET_TYPE: 'OFFSET_TYPE',
+  PROJECT_TYPE: 'PROJECT_TYPE',
+  INVESTMENT_TYPE: 'INVESTMENT_TYPE',
 };
 
 type GlobalData = {
-    total_invested: string,
-    generated_cc: string,
-    forecasted_cc: string,
-    retired_cc: string,
+  total_invested: string;
+  generated_cc: string;
+  forecasted_cc: string;
+  retired_cc: string;
 };
 
 function defaultGlobalData(): GlobalData {
-    return {
-        total_invested: '$ -',
-        generated_cc: '- t',
-        forecasted_cc: '- t',
-        retired_cc: '- t',
-    };
+  return {
+    total_invested: '$ -',
+    generated_cc: '- t',
+    forecasted_cc: '- t',
+    retired_cc: '- t',
+  };
 }
 
 @Injectable()
 export class GlobalDataService {
-    private readonly logger = new Logger(GlobalDataService.name);
+  private readonly logger = new Logger(GlobalDataService.name);
 
-    constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
-    async get(): Promise<GlobalData> {
-        let data = await this.prisma.$queryRaw<GlobalData[]>`
+  async get(): Promise<GlobalData> {
+    // TODO: generated_cc only forward finance project
+    const data = await this.prisma.$queryRaw<GlobalData[]>`
 SELECT
-    SUM(p.funding_amount) + (SELECT SUM(cc.purchase_price) FROM carbon_credits cc) as total_invested,
-    SUM(absorbed_cp.absorption) as generated_cc,
-    SUM(forwarded_cp.absorption) as forecasted_cc,
+    SUM(p.funding_amount) + coalesce((SELECT SUM(cc.purchase_price) FROM carbon_credits cc where cc.is_purchased = true), 0) as total_invested,
+    (SELECT SUM(cp.absorption) from curve_point cp where cp.project_id = p.id and cp.time < now() and p.origin = 'FORWARD_FINANCE') as generated_cc,
+    (SELECT SUM(cp.absorption) from curve_point cp where cp.project_id = p.id and cp.time > now()) as forecasted_cc,
     (SELECT COUNT(cc.id) FROM carbon_credits cc WHERE cc.is_retired) as retired_cc
 FROM projects p
-INNER JOIN curve_point absorbed_cp on p.id = absorbed_cp.project_id and absorbed_cp.time < now()
-INNER JOIN curve_point forwarded_cp on p.id = forwarded_cp.project_id and forwarded_cp.time > now()
+GROUP BY p.id
 ;
         `;
-        if (0 === data.length) {
-            this.logger.error('Failed to get global data (no rows returned)');
-            return defaultGlobalData();
-        }
-
-        let globalData = data[0];
-        return {
-            total_invested: Utils.formatString({ value: globalData.total_invested, prefix: '$' }),
-            generated_cc: Utils.formatString({ value: globalData.generated_cc, suffix: 't' }),
-            forecasted_cc: Utils.formatString({ value: globalData.forecasted_cc, suffix: 't' }),
-            retired_cc: Utils.formatString({ value: globalData.retired_cc, suffix: 't' }),
-        };
+    if (0 === data.length) {
+      this.logger.error('Failed to get global data (no rows returned)');
+      return defaultGlobalData();
     }
+
+    const globalData = data.reduce(
+      (acc: any, row: any) => ({
+        total_invested:
+          parseInt(acc.total_invested) + parseInt(row.total_invested),
+        generated_cc: parseInt(acc.generated_cc) + parseInt(row.generated_cc),
+        forecasted_cc:
+          parseInt(acc.forecasted_cc) + parseInt(row.forecasted_cc),
+        retired_cc: parseInt(acc.retired_cc) + parseInt(row.retired_cc),
+      }),
+      {
+        total_invested: 0,
+        generated_cc: 0,
+        forecasted_cc: 0,
+        retired_cc: 0,
+      },
+    );
+
+    return {
+      total_invested: Utils.formatString({
+        value: globalData.total_invested.toString(),
+        prefix: '$',
+      }),
+      generated_cc: Utils.formatString({
+        value: globalData.generated_cc.toString(),
+        suffix: 't',
+      }),
+      forecasted_cc: Utils.formatString({
+        value: globalData.forecasted_cc.toString(),
+        suffix: 't',
+      }),
+      retired_cc: Utils.formatString({
+        value: globalData.retired_cc.toString(),
+        suffix: 't',
+      }),
+    };
+  }
 }
