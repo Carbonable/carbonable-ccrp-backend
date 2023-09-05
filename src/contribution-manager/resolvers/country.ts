@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { Query, Args, Resolver } from '@nestjs/graphql';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../../infrastructure/prisma.service';
 
 @Resolver('Country')
 export class CountryResolver {

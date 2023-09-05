@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../../infrastructure/prisma.service';
 import { PaginationDTO } from '../resolvers/carbon-credits';
-import Utils from '../utils';
+import Utils from '../../utils';
 
 type Allocation = {
   id: string;

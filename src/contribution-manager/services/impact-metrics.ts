@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
-import Utils from '../utils';
+import { PrismaService } from '../../infrastructure/prisma.service';
+import Utils from '../../utils';
 
 type Sdg = {
   number: string;
