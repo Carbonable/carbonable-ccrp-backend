@@ -5,21 +5,10 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import * as path from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaService } from '../src/prisma.service';
-import {
-  CertifierResolver,
-  CountryResolver,
-  ProjectResolver,
-  DevelopperResolver,
-  CarbonCreditResolver,
-} from './resolvers';
-import {
-  GlobalDataService,
-  ProjectedDecarbonationService,
-  ImpactMetricsService,
-  ProjectMetricsService,
-  ProjectFundingAllocationService,
-} from './services';
+import { PrismaService } from './infrastructure/prisma.service';
+import { RegistryModule } from './registry/registry.module';
+import { ContributionManagerModule } from './contribution-manager/contribution-manager.module';
+import { ConsoleModule } from './console/console.module';
 
 @Module({
   imports: [
@@ -29,21 +18,11 @@ import {
       typePaths: [path.join('src/schemas/*.graphql')],
       resolvers: { JSON: GraphQLJSON },
     }),
+    RegistryModule,
+    ContributionManagerModule,
+    ConsoleModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-    PrismaService,
-    CertifierResolver,
-    CountryResolver,
-    ProjectResolver,
-    DevelopperResolver,
-    CarbonCreditResolver,
-    GlobalDataService,
-    ProjectedDecarbonationService,
-    ImpactMetricsService,
-    ProjectMetricsService,
-    ProjectFundingAllocationService,
-  ],
+  providers: [AppService, PrismaService],
 })
 export class AppModule {}

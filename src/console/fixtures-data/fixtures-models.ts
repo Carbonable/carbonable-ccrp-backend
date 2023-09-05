@@ -1,27 +1,23 @@
+import { faker } from '@faker-js/faker';
 import {
-  PrismaClient,
-  Prisma,
-  CarbonCreditType,
   CarbonCreditOrigin,
+  CarbonCreditType,
+  Prisma,
+  PrismaClient,
+  Project,
   ProjectColor,
   Sdg,
-  Project,
 } from '@prisma/client';
+import slugify from 'slugify';
 import {
-  LasDeliciasCurvePoints,
   LasDeliciasCarbonCredits,
+  LasDeliciasCurvePoints,
 } from './las-delicias';
 import {
-  BanegasFarmCurvePoints,
   BanegasFarmCarbonCredits,
+  BanegasFarmCurvePoints,
 } from './banegas-farm';
-import { monotonicFactory } from 'ulid';
-import { faker } from '@faker-js/faker';
-import slugify from 'slugify';
-
-const ulid = monotonicFactory();
-
-const prismaClient = new PrismaClient();
+import { PrismaService } from '../../infrastructure/prisma.service';
 
 type Reference<T> = {
   name: string;
@@ -41,10 +37,14 @@ type DataFixture<T, U> = {
   data: Array<T>;
 };
 
-const CertifierDataFixtures: DataFixture<
+type DataFixtureFn = { prismaClient: PrismaService };
+
+export const CertifierDataFixtures = ({
+  prismaClient,
+}: DataFixtureFn): DataFixture<
   Omit<Prisma.CertifierCreateManyInput, 'id'>,
   Prisma.CertifierDelegate
-> = {
+> => ({
   name: 'certifier',
   count: 10,
   object: prismaClient.certifier,
@@ -53,12 +53,14 @@ const CertifierDataFixtures: DataFixture<
     return { name, slug: slugify(name.toLowerCase()) };
   },
   data: [{ name: 'Wildsense', slug: 'Wildsense' }],
-};
+});
 
-const CompanyDataFixtures: DataFixture<
+export const CompanyDataFixtures = ({
+  prismaClient,
+}: DataFixtureFn): DataFixture<
   Prisma.CompanyCreateManyInput,
   Prisma.CompanyDelegate
-> = {
+> => ({
   name: 'company',
   count: 0,
   object: prismaClient.company,
@@ -69,12 +71,14 @@ const CompanyDataFixtures: DataFixture<
       slug: 'carbonable',
     },
   ],
-};
+});
 
-const CompanyEmissionDataFixtures: DataFixture<
+export const CompanyEmissionDataFixtures = ({
+  prismaClient,
+}: DataFixtureFn): DataFixture<
   Omit<Prisma.CompanyEmissionCreateManyInput, 'id'>,
   Prisma.CompanyEmissionDelegate
-> = {
+> => ({
   name: 'companyEmission',
   count: 0,
   object: prismaClient.companyEmission,
@@ -140,12 +144,14 @@ const CompanyEmissionDataFixtures: DataFixture<
       companyId: '01H5739RTVV0JV8M3DAN0C10ME',
     },
   ],
-};
+});
 
-const DevelopperDataFixtures: DataFixture<
+export const DevelopperDataFixtures = ({
+  prismaClient,
+}: DataFixtureFn): DataFixture<
   Prisma.DevelopperCreateManyInput,
   Prisma.DevelopperDelegate
-> = {
+> => ({
   name: 'developper',
   count: 0,
   object: prismaClient.developper,
@@ -161,12 +167,14 @@ const DevelopperDataFixtures: DataFixture<
       slug: 'corcovado-foundation',
     },
   ],
-};
+});
 
-const SdgDataFixtures: DataFixture<
+export const SdgDataFixtures = ({
+  prismaClient,
+}: DataFixtureFn): DataFixture<
   Omit<Prisma.SdgCreateManyInput, 'id'>,
   Prisma.SdgDelegate
-> = {
+> => ({
   name: 'sdg',
   count: 0,
   object: prismaClient.sdg,
@@ -190,12 +198,14 @@ const SdgDataFixtures: DataFixture<
     { number: 16, name: 'Peace and Justice Strong Institutions' },
     { number: 17, name: 'Partnerships to achieve the Goal' },
   ],
-};
+});
 
-const ProjectDataFixtures: DataFixture<
+export const ProjectDataFixtures = ({
+  prismaClient,
+}: DataFixtureFn): DataFixture<
   Prisma.ProjectCreateManyInput,
   Prisma.ProjectDelegate
-> = {
+> => ({
   name: 'project',
   count: 0,
   object: prismaClient.project,
@@ -260,22 +270,26 @@ const ProjectDataFixtures: DataFixture<
       },
     },
   ],
-};
+});
 
-const CurvePointDataFixtures: DataFixture<
+export const CurvePointDataFixtures = ({
+  prismaClient,
+}: DataFixtureFn): DataFixture<
   Omit<Prisma.CurvePointCreateManyInput, 'id'>,
   Prisma.CurvePointDelegate
-> = {
+> => ({
   name: 'curvePoint',
   count: 0,
   object: prismaClient.curvePoint,
   data: [...LasDeliciasCurvePoints, ...BanegasFarmCurvePoints],
-};
+});
 
-const ProjectsSdgsDataFixtures: DataFixture<
+export const ProjectsSdgsDataFixtures = ({
+  prismaClient,
+}: DataFixtureFn): DataFixture<
   Omit<Prisma.ProjectsSdgsCreateManyInput, 'id'>,
   Prisma.ProjectsSdgsDelegate
-> = {
+> => ({
   name: 'projectSdgs',
   count: 1,
   object: prismaClient.projectsSdgs,
@@ -296,163 +310,16 @@ const ProjectsSdgsDataFixtures: DataFixture<
     }
   },
   data: [],
-};
+});
 
-const CarbonCreditsDataFixtures: DataFixture<
+export const CarbonCreditsDataFixtures = ({
+  prismaClient,
+}: DataFixtureFn): DataFixture<
   Omit<Prisma.CarbonCreditCreateManyInput, 'id'>,
   Prisma.CarbonCreditDelegate
-> = {
+> => ({
   name: 'carbonCredit',
   count: 0,
   object: prismaClient.carbonCredit,
   data: [...LasDeliciasCarbonCredits, ...BanegasFarmCarbonCredits],
-};
-
-function addId(name: string, object: any) {
-  if ('projectSdgs' === name || object.hasOwnProperty('id')) {
-    return object;
-  }
-
-  return {
-    ...object,
-    id: ulid().toString(),
-  };
-}
-
-function resolveReferences(object: any, references: Array<any>) {
-  for (const [key, value] of Object.entries(object)) {
-    if ('function' !== typeof value) {
-      continue;
-    }
-
-    object[key] = value(references);
-  }
-
-  return object;
-}
-
-async function addFixtures({ connection }) {
-  const fixturesManagers = [
-    CertifierDataFixtures,
-    CompanyDataFixtures,
-    CompanyEmissionDataFixtures,
-    DevelopperDataFixtures,
-    SdgDataFixtures,
-    ProjectDataFixtures,
-    ProjectsSdgsDataFixtures,
-    CurvePointDataFixtures,
-    CarbonCreditsDataFixtures,
-  ];
-
-  const references = [];
-
-  const countries = await prismaClient.country.findMany({
-    select: { id: true, name: true },
-  });
-  references['country'] = countries;
-
-  for (const fixture of fixturesManagers) {
-    references[fixture.name] = [];
-
-    if (0 !== fixture.data.length) {
-      let txData = [];
-      for (let d of fixture.data) {
-        d = addId(fixture.name, d);
-        d = resolveReferences(d, references);
-        references[fixture.name].push(d);
-        txData = [...txData, d];
-      }
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      await fixture.object.createMany({ data: txData });
-    }
-
-    let fixturesData = [];
-    const batchSize = 100;
-    for (
-      let count = fixture.data.length;
-      count < fixture.count + fixture.data.length;
-      count++
-    ) {
-      let item = await fixture.model({ connection, references });
-      if (fixture.model.constructor.name === 'AsyncGeneratorFunction') {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        for await (let i of item) {
-          i = addId(fixture.name, i);
-          fixturesData = [...fixturesData, i];
-        }
-
-        fixturesData = await flush(fixture, count, batchSize, fixturesData);
-
-        continue;
-      }
-
-      item = addId(fixture.name, item);
-      references[fixture.name].push(item);
-      fixturesData = [...fixturesData, item];
-
-      fixturesData = await flush(fixture, count, batchSize, fixturesData);
-    }
-
-    try {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      await fixture.object.createMany({ data: fixturesData });
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-  }
-}
-
-async function flush<F, T>(
-  fixture: F,
-  count: number,
-  batchSize: number,
-  data: Array<T>,
-): Promise<Array<T>> {
-  if (count % batchSize === 0) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    await fixture.object.createMany({ data });
-    return [];
-  }
-  return data;
-}
-
-async function seedCountries() {
-  const countries = await getCountries();
-  for (const country of countries) {
-    await prismaClient.country.create({
-      data: {
-        id: ulid().toString(),
-        name: country.name.common,
-        code: country.cca2,
-        data: country,
-      },
-    });
-  }
-}
-
-async function getCountries(): Promise<any[]> {
-  const res = await fetch(
-    'https://raw.githubusercontent.com/mledoze/countries/master/countries.json',
-  );
-  return await res.json();
-}
-
-(async () => {
-  try {
-    const connection = await prismaClient.$connect();
-
-    await seedCountries();
-    await addFixtures({ connection });
-
-    console.log('Fixtures added successfully');
-  } catch (e) {
-    console.error(e);
-  } finally {
-    await prismaClient.$disconnect();
-  }
-})();
+});

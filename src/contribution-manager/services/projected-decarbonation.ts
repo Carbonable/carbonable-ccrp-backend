@@ -1,7 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../../infrastructure/prisma.service';
 import { PaginationDTO } from '../resolvers/carbon-credits';
-import Utils from '../utils';
+import Utils from '../../utils';
+import {
+  HistoricalProjectionSnapshot,
+  ProjectionSnapshot,
+} from '@prisma/client';
 
 type DecarbonationVintage = {
   year: string;
@@ -15,9 +19,48 @@ type CarbonCreditProjection = {
   retired_cc: number;
 };
 
-type ProjectedDecarbonation = DecarbonationVintage & CarbonCreditProjection;
+type AnualProjectedDecarbonation = {
+  timePeriod: string;
+  emissions: string;
+  exPostIssued: number;
+  exPostPurchased: number;
+  exPostRetired: number;
+  neutralityTarget: number;
+  actualRate: number;
+  delta: number;
+  debt: number;
+  exPostStock: number;
+  exAnteStock: number;
+};
+
+type CumulativeProjectedDecarbonation = {
+  timePeriod: string;
+  emissions: string;
+  exPostIssued: number;
+  exPostPurchased: number;
+  exPostRetired: number;
+  delta: number;
+  emissionDebt: number;
+};
+
+type FinancialAnalysisProjectedDecarbonation = {
+  timePeriod: string;
+  averagePurchasePrice: number;
+  cumulativeAveragePurchasePrice: number;
+  totalPurchasedAmount: number;
+  cumulativePurchasedAmount: number;
+  averageIssuedPrice: number;
+  cumulativeAverageIssuedPrice: number;
+  totalIssuedAmount: number;
+  cumulativeTotalIssuedAmount: number;
+  granTotalAmount: number;
+  cumulativeGranTotalAmount: number;
+  emissionDebtEstimatedAmount: number;
+  cumulativeEmissionDebtEstimatedAmount: number;
+};
+
 type ProjectedDecarbonationWithPagination = {
-  data: ProjectedDecarbonation[];
+  data: string[];
   pagination: {
     max_page: number;
     page_number: number;
@@ -45,34 +88,13 @@ export class ProjectedDecarbonationService {
 
   async get(filter: string): Promise<ProjectedDecarbonationGraph[]> {
     // TODO: Change this to be based on min and max vintage of CC
-    const years = await this.prisma.$queryRaw<DecarbonationVintage[]>`
-SELECT
-    ce.year,
-    SUM(ce.emission) as emissions,
-    SUM(ce.target) / COUNT(ce.id) as target
-FROM company_emission ce
-INNER JOIN company c on c.id = ce.company_id
-INNER JOIN projects p on p.company_id = c.id
-GROUP BY ce.year ORDER BY ce.year
-;
-        `;
+    const historicalSnapshots =
+      await this.prisma.historicalProjectionSnapshot.findMany();
+    const snapshots = await this.prisma.projectionSnapshot.findMany();
 
-    let computedYears = [];
-    for (const year of years) {
-      const cc_data = await this.resolveFilterQuery(filter, year.year);
+    const mergedSnapshots = [...historicalSnapshots, ...snapshots];
 
-      computedYears = [
-        ...computedYears,
-        {
-          ...year,
-          emissions: parseInt(year.emissions),
-          target: parseInt(year.target),
-          data: cc_data,
-        },
-      ];
-    }
-
-    return computedYears;
+    return mergedSnapshots.map((s) => toProjectedDecarbonationGraph(s));
   }
 
   async getTable(
@@ -115,7 +137,6 @@ SELECT
             `;
 
       const d = cc_data.pop();
-      console.log(d);
       computedYears = [
         ...computedYears,
         {
@@ -196,13 +217,17 @@ SELECT
   }
 
   async resolveOffset(year: string) {
-    const currentYear = new Date().getFullYear();
     const cc_data = await this.prisma.$queryRaw<
-      { ex_post_count: number; ex_ante_count: number }[]
+      {
+        ex_post_count: number;
+        ex_ante_count: number;
+        confirmed_count: number;
+      }[]
     >`
 SELECT
-    (SELECT COUNT(cc.id) FROM carbon_credits cc where cast(cc.vintage as int) <= ${currentYear} and cc.vintage = ${year}) as ex_post_count,
-    (SELECT COUNT(cc.id) FROM carbon_credits cc where cast(cc.vintage as int) > ${currentYear} and cc.vintage = ${year}) as ex_ante_count
+    (SELECT COUNT(cc.id) FROM carbon_credits cc where cc.audit_status = 'AUDITED') as ex_post_count,
+    (SELECT COUNT(cc.id) FROM carbon_credits cc where cc.audit_status = 'CONFIRMED') as confirmed_count,
+    (SELECT COUNT(cc.id) FROM carbon_credits cc where cc.audit_status = 'PROJECTED') as ex_ante_count
 ;
             `;
 
@@ -210,6 +235,7 @@ SELECT
 
     return [
       { key: 'ExPost', value: parseInt(value.ex_post_count.toString()) },
+      { key: 'Confirmed', value: parseInt(value.confirmed_count.toString()) },
       { key: 'ExAnte', value: parseInt(value.ex_ante_count.toString()) },
     ];
   }
@@ -235,4 +261,20 @@ SELECT
       },
     ];
   }
+}
+
+function toProjectedDecarbonationGraph(
+  snapshot: ProjectionSnapshot | HistoricalProjectionSnapshot,
+): ProjectedDecarbonationGraph {
+  return {
+    year: snapshot.vintage,
+    emissions: snapshot.emissions.toString(),
+    // @ts-ignore
+    target: Number(snapshot.target),
+    data: [
+      { key: 'ExPost', value: Number(snapshot.exPostCount) },
+      { key: 'Confirmed', value: Number(snapshot.confirmedCount) },
+      { key: 'ExAnte', value: Number(snapshot.exAnteCount) },
+    ],
+  };
 }

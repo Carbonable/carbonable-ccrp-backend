@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { Certifier } from '@prisma/client';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../../infrastructure/prisma.service';
 
 @Resolver('Certifier')
 export class CertifierResolver {
