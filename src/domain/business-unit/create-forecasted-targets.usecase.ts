@@ -26,7 +26,12 @@ export class CreateForecastedTargetsUseCase
       request.businessUnitId,
     );
 
-    businessUnit.addTargets(request.forecastTargets);
+    const targets = request.forecastTargets.map((ft) => ({
+      ...ft,
+      id: this.idGenerator.generate(),
+      businessUnitId: businessUnit.id,
+    }));
+    businessUnit.addTargets(targets);
     await this.businessUnitRepository.save(businessUnit);
 
     const orders = Order.fromTargetsRequest(request, this.idGenerator.generate);

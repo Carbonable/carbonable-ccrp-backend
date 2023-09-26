@@ -6,7 +6,12 @@ export class Order {
     public readonly quantity: number,
     public readonly year: number,
     public readonly businessUnitId: string,
+    private deficit: number | null = null,
   ) {}
+
+  getDeficit(): number | null {
+    return this.deficit;
+  }
 
   static fromTargetsRequest(
     req: CreateForecastedTargetsRequest,

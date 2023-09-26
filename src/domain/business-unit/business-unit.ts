@@ -10,9 +10,10 @@ export class BusinessUnit {
     public readonly id: string,
     public readonly name: string,
     public readonly description: string,
-    public readonly forecastEmission: number,
-    public readonly target: number,
+    public readonly defaultEmission: number,
+    public readonly defaultTarget: number,
     public readonly debt: number,
+    public readonly companyId: string,
     private metadata: Array<Metadata<string, string>>,
   ) {}
 
@@ -32,6 +33,10 @@ export class BusinessUnit {
     return this.forecastTargets;
   }
 
+  getMetatada(): Array<Metadata<string, string>> {
+    return this.metadata;
+  }
+
   static fromRequest(request: CreateBusinessUnitRequest): BusinessUnit {
     return new BusinessUnit(
       request.id,
@@ -40,6 +45,7 @@ export class BusinessUnit {
       request.forecastEmission,
       request.target,
       request.debt,
+      request.companyId,
       request.metadata,
     );
   }

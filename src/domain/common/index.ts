@@ -1,2 +1,6 @@
 export { MetadataParser } from './metadata-parser';
-export { UlidIdGenerator, IdGeneratorInterface } from './id-generator';
+export {
+  UlidIdGenerator,
+  IdGeneratorInterface,
+  ID_GENERATOR,
+} from './id-generator';
