@@ -77,7 +77,10 @@ defineFeature(feature, (test) => {
         const businessUnit = await businessUnitRepository.byId(businessUnitId);
         const targets = businessUnit.getTargets();
 
-        expect(targets).toEqual(table);
+        for (const index in table) {
+          expect(targets[index].year).toEqual(table[index].year);
+          expect(targets[index].quantity).toEqual(table[index].quantity);
+        }
         expect(targets.length).toEqual(3);
       },
     );

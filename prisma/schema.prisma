@@ -26,8 +26,10 @@ model CarbonCredit {
 
   auditStatus CarbonCreditAuditStatus @default(value: PROJECTED) @map("audit_status")
 
-  project   Project @relation(fields: [projectId], references: [id])
-  projectId String  @map("project_id")
+  project      Project     @relation(fields: [projectId], references: [id])
+  projectId    String      @map("project_id")
+  Allocation   Allocation? @relation(fields: [allocationId], references: [id])
+  allocationId String?
 
   @@map("carbon_credits")
 }
@@ -131,6 +133,7 @@ model Company {
   projects                     Project[]
   projectionSnapshots          ProjectionSnapshot[]
   HistoricalProjectionSnapshot HistoricalProjectionSnapshot[]
+  businessUnits                BusinessUnit[]
 
   @@map("company")
 }
@@ -158,6 +161,76 @@ model CompanyConfiguration {
   companyId String  @map("company_id")
 
   @@map("company_configuration")
+}
+
+model BusinessUnit {
+  id              String @id
+  name            String
+  description     String
+  defaultEmission Int    @map("default_emission")
+  defaultTarget   Int    @map("default_target")
+  debt            Int
+  metadata        Json
+
+  forecastEmissions ForecastEmission[]
+  forecastTargets   ForecastTarget[]
+  allocations       Allocation[]
+  orders            Order[]
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String  @map("company_id")
+
+  @@map("business_unit")
+}
+
+model ForecastEmission {
+  id       String @id
+  quantity Int
+  year     Int
+
+  businessUnitId String       @map("business_unit_id")
+  businessUnit   BusinessUnit @relation(fields: [businessUnitId], references: [id])
+
+  @@unique([year, businessUnitId])
+  @@map("forecast_emission")
+}
+
+model ForecastTarget {
+  id       String @id
+  quantity Int
+  year     Int
+
+  businessUnitId String       @map("business_unit_id")
+  businessUnit   BusinessUnit @relation(fields: [businessUnitId], references: [id])
+
+  @@unique([year, businessUnitId])
+  @@map("forecast_target")
+}
+
+model Order {
+  id String @id
+
+  year     Int
+  quantity Int
+  deficit  Int?
+  status   OrderStatus @default(value: PENDING) @map("order_status")
+
+  businessUnitId String       @map("business_unit_id")
+  businessUnit   BusinessUnit @relation(fields: [businessUnitId], references: [id])
+
+  @@unique([year, businessUnitId])
+  @@map("order")
+}
+
+model Allocation {
+  id String @id
+
+  quantity      Int
+  carbonCredits CarbonCredit[]
+  status        AllocationStatus
+
+  businessUnitId String       @map("business_unit_id")
+  businessUnit   BusinessUnit @relation(fields: [businessUnitId], references: [id])
 }
 
 model Certifier {
@@ -230,4 +303,15 @@ enum CarbonCreditAuditStatus {
   PROJECTED
   CONFIRMED
   AUDITED
+}
+
+enum OrderStatus {
+  PENDING
+  ONGOING
+  FULLFILLED
+}
+
+enum AllocationStatus {
+  INITIAL
+  RE_ALLOCATED
 }

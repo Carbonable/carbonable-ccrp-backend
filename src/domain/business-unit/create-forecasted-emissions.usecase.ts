@@ -4,6 +4,7 @@ import {
   CreateForecastedEmissionsRequest,
   CreateForecastedEmissionsResponse,
 } from '.';
+import { IdGeneratorInterface, UlidIdGenerator } from '../common';
 
 export class CreateForecastedEmissionsUseCase
   implements
@@ -14,6 +15,7 @@ export class CreateForecastedEmissionsUseCase
 {
   constructor(
     private readonly businessUnitRepository: BusinessUnitRepositoryInterface,
+    private readonly idGenerator: IdGeneratorInterface = new UlidIdGenerator(),
   ) {}
 
   async execute(
@@ -23,7 +25,12 @@ export class CreateForecastedEmissionsUseCase
       request.businessUnitId,
     );
 
-    businessUnit.addForecastEmissions(request.forecastEmissions);
+    const emissions = request.forecastEmissions.map((fe) => ({
+      ...fe,
+      id: this.idGenerator.generate(),
+      businessUnitId: businessUnit.id,
+    }));
+    businessUnit.addForecastEmissions(emissions);
 
     await this.businessUnitRepository.save(businessUnit);
 
