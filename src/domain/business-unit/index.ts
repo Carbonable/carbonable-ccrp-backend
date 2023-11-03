@@ -1,5 +1,8 @@
 export { Company } from './company';
-export { CreateBusinessUnitRequest } from './create-business-unit.request';
+export {
+  CreateBusinessUnitRequest,
+  CreateBusinessRequestInput,
+} from './create-business-unit.request';
 export { CreateBusinessUnitResponse } from './create-business-unit.response';
 export { CreateBusinessUnitUseCase } from './create-business-unit.usecase';
 export { CompanyManager } from './company.manager';
@@ -8,6 +11,7 @@ export { BusinessUnit } from './business-unit';
 export { BusinessUnitRepositoryInterface } from './business-unit-repository.interface';
 export { ForecastEmission } from './forecast-emission';
 export { ForecastTarget } from './forecast-target';
+export { Demand } from './demand';
 export { CreateForecastedEmissionsRequest } from './create-forecasted-emissions.request';
 export { CreateForecastedEmissionsResponse } from './create-forecasted-emissions.response';
 export { CreateForecastedEmissionsUseCase } from './create-forecasted-emissions.usecase';

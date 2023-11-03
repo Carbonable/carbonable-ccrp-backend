@@ -1,4 +1,4 @@
-import { ForecastEmission, ForecastTarget } from '.';
+import { Demand, ForecastEmission, ForecastTarget } from '.';
 import { Metadata } from '../common/metadata-parser';
 import { CreateBusinessUnitRequest } from './create-business-unit.request';
 
@@ -31,6 +31,18 @@ export class BusinessUnit {
 
   getTargets(): Array<ForecastTarget> {
     return this.forecastTargets;
+  }
+
+  getDemands(): Array<Demand> {
+    return this.forecastEmissions.reduce((acc, curr) => {
+      const target = this.forecastTargets.find((t) => t.year === curr.year);
+      const demand = new Demand(
+        curr.year.toString(),
+        target?.target || this.defaultTarget,
+        curr.emission,
+      );
+      return [...acc, demand];
+    }, []);
   }
 
   getMetatada(): Array<Metadata<string, string>> {

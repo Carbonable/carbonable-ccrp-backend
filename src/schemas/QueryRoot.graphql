@@ -1,5 +1,6 @@
 type Query {
     countries: [Country]
+    projects: [Project]
     countryBy(field: String!, value: String!): Country
 
     certifierBy(field: String!, value: String!): Certifier
@@ -11,6 +12,18 @@ type Query {
     getProjectFundingAllocation(pagination: Pagination): ProjectedFundingAllocationWithPagination
     getProjectMetrics: ProjectMetrics!
     getImpactMetrics: ImpactMetrics!
+}
+
+type Mutation {
+    createBusinessUnit(request: CreateBusinessUnitRequest!): DomainResponse
+    createForecastedEmissions(request: CreateForecastedEmissionsRequest!): DomainResponse
+    createForecastedTargets(request: CreateForecastedTargetsRequest!): DomainResponse
+    addAllocations(request: [AddAllocationRequestItem]!): AddAllocationResponse
+}
+
+type DomainResponse {
+    id: String!
+    errors: [String]
 }
 
 type Map {

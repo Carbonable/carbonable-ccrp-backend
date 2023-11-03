@@ -11,28 +11,45 @@ export class PrismaCompanyRepository implements CompanyRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
 
   async byId(id: string): Promise<Company> {
+    const dbModel = await this.prisma.company.findUnique({
+      where: { id },
+      include: { businessUnits: true },
+    });
+    if (null === dbModel) {
+      return null;
+    }
+    return this.companyFromPrisma(dbModel);
+  }
+
+  async byName(name: string): Promise<Company> {
     return this.companyFromPrisma(
-      await this.prisma.company.findUnique({
-        where: { id },
+      await this.prisma.company.findFirst({
+        where: { name },
         include: { businessUnits: true },
       }),
     );
   }
 
   async save(company: Company): Promise<void> {
-    const c = await this.prisma.company.findUnique({
-      where: { id: company.id, slug: company.slug },
-    });
-    if (null !== c) {
-      return;
-    }
-    await this.prisma.company.create({
-      data: {
+    await this.prisma.company.upsert({
+      where: { slug: company.slug },
+      update: {
+        name: company.name,
+        slug: company.slug,
+        businessUnits: {
+          connectOrCreate: [
+            ...company.businessUnits.map(mapBusinessUnitToPrisma),
+          ],
+        },
+      },
+      create: {
         id: company.id,
         name: company.name,
         slug: company.slug,
         businessUnits: {
-          create: [...company.businessUnits.map(mapBusinessUnitToPrisma)],
+          connectOrCreate: [
+            ...company.businessUnits.map(mapBusinessUnitToPrisma),
+          ],
         },
       },
     });
@@ -62,12 +79,15 @@ export class PrismaCompanyRepository implements CompanyRepositoryInterface {
 
 function mapBusinessUnitToPrisma(bu: BusinessUnit): any {
   return {
-    id: bu.id,
-    name: bu.name,
-    description: bu.description,
-    defaultEmission: bu.defaultEmission,
-    defaultTarget: bu.defaultTarget,
-    debt: bu.debt,
-    metadata: JSON.stringify(bu.getMetatada()),
+    where: { id: bu.id },
+    create: {
+      id: bu.id,
+      name: bu.name,
+      description: bu.description,
+      defaultEmission: bu.defaultEmission,
+      defaultTarget: bu.defaultTarget,
+      debt: bu.debt,
+      metadata: JSON.stringify(bu.getMetatada()),
+    },
   };
 }

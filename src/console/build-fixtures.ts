@@ -3,15 +3,13 @@ import { Command, CommandRunner } from 'nest-commander';
 import { PrismaService } from '../infrastructure/prisma.service';
 import { monotonicFactory } from 'ulid';
 import {
-  CarbonCreditsDataFixtures,
   CertifierDataFixtures,
   CompanyDataFixtures,
-  CompanyEmissionDataFixtures,
-  CurvePointDataFixtures,
   DevelopperDataFixtures,
   ProjectDataFixtures,
   ProjectsSdgsDataFixtures,
   SdgDataFixtures,
+  VintageDataFixtures,
 } from './fixtures-data/fixtures-models';
 
 const ulid = monotonicFactory();
@@ -53,13 +51,11 @@ export class BuildFixturesCommand extends CommandRunner {
     const fixturesManagers = [
       CertifierDataFixtures,
       CompanyDataFixtures,
-      CompanyEmissionDataFixtures,
       DevelopperDataFixtures,
       SdgDataFixtures,
       ProjectDataFixtures,
       ProjectsSdgsDataFixtures,
-      CurvePointDataFixtures,
-      CarbonCreditsDataFixtures,
+      VintageDataFixtures,
     ];
 
     const references = [];

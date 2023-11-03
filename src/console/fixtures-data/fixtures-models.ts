@@ -9,15 +9,11 @@ import {
   Sdg,
 } from '@prisma/client';
 import slugify from 'slugify';
-import {
-  LasDeliciasCarbonCredits,
-  LasDeliciasCurvePoints,
-} from './las-delicias';
-import {
-  BanegasFarmCarbonCredits,
-  BanegasFarmCurvePoints,
-} from './banegas-farm';
+import { LasDeliciasCurvePoints } from './las-delicias';
+import { BanegasFarmCurvePoints } from './banegas-farm';
 import { PrismaService } from '../../infrastructure/prisma.service';
+import { Vintage } from '../../domain/portfolio';
+import { UlidIdGenerator } from '../../domain/common';
 
 type Reference<T> = {
   name: string;
@@ -69,79 +65,6 @@ export const CompanyDataFixtures = ({
       id: '01H5739RTVV0JV8M3DAN0C10ME',
       name: 'Carbonable',
       slug: 'carbonable',
-    },
-  ],
-});
-
-export const CompanyEmissionDataFixtures = ({
-  prismaClient,
-}: DataFixtureFn): DataFixture<
-  Omit<Prisma.CompanyEmissionCreateManyInput, 'id'>,
-  Prisma.CompanyEmissionDelegate
-> => ({
-  name: 'companyEmission',
-  count: 0,
-  object: prismaClient.companyEmission,
-  data: [
-    {
-      year: '2023',
-      emission: 150,
-      target: 100,
-      companyId: '01H5739RTVV0JV8M3DAN0C10ME',
-    },
-    {
-      year: '2024',
-      emission: 150,
-      target: 100,
-      companyId: '01H5739RTVV0JV8M3DAN0C10ME',
-    },
-    {
-      year: '2025',
-      emission: 150,
-      target: 100,
-      companyId: '01H5739RTVV0JV8M3DAN0C10ME',
-    },
-    {
-      year: '2026',
-      emission: 150,
-      target: 100,
-      companyId: '01H5739RTVV0JV8M3DAN0C10ME',
-    },
-    {
-      year: '2027',
-      emission: 150,
-      target: 100,
-      companyId: '01H5739RTVV0JV8M3DAN0C10ME',
-    },
-    {
-      year: '2028',
-      emission: 150,
-      target: 100,
-      companyId: '01H5739RTVV0JV8M3DAN0C10ME',
-    },
-    {
-      year: '2029',
-      emission: 150,
-      target: 100,
-      companyId: '01H5739RTVV0JV8M3DAN0C10ME',
-    },
-    {
-      year: '2030',
-      emission: 150,
-      target: 100,
-      companyId: '01H5739RTVV0JV8M3DAN0C10ME',
-    },
-    {
-      year: '2031',
-      emission: 150,
-      target: 100,
-      companyId: '01H5739RTVV0JV8M3DAN0C10ME',
-    },
-    {
-      year: '2032',
-      emission: 150,
-      target: 100,
-      companyId: '01H5739RTVV0JV8M3DAN0C10ME',
     },
   ],
 });
@@ -272,18 +195,6 @@ export const ProjectDataFixtures = ({
   ],
 });
 
-export const CurvePointDataFixtures = ({
-  prismaClient,
-}: DataFixtureFn): DataFixture<
-  Omit<Prisma.CurvePointCreateManyInput, 'id'>,
-  Prisma.CurvePointDelegate
-> => ({
-  name: 'curvePoint',
-  count: 0,
-  object: prismaClient.curvePoint,
-  data: [...LasDeliciasCurvePoints, ...BanegasFarmCurvePoints],
-});
-
 export const ProjectsSdgsDataFixtures = ({
   prismaClient,
 }: DataFixtureFn): DataFixture<
@@ -312,14 +223,40 @@ export const ProjectsSdgsDataFixtures = ({
   data: [],
 });
 
-export const CarbonCreditsDataFixtures = ({
+export const VintageDataFixtures = ({
   prismaClient,
 }: DataFixtureFn): DataFixture<
-  Omit<Prisma.CarbonCreditCreateManyInput, 'id'>,
-  Prisma.CarbonCreditDelegate
+  Omit<Prisma.VintageCreateManyInput, 'id'>,
+  Prisma.VintageDelegate
 > => ({
-  name: 'carbonCredit',
-  count: 0,
-  object: prismaClient.carbonCredit,
-  data: [...LasDeliciasCarbonCredits, ...BanegasFarmCarbonCredits],
+  name: 'vintage',
+  count: 1,
+  object: prismaClient.vintage,
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  model: async function* ({ references }) {
+    const projects: Project[] = references['project'];
+
+    for (const project of projects) {
+      let data = [];
+      if ('Las Delicias' === project.name) {
+        data = LasDeliciasCurvePoints;
+      } else {
+        data = BanegasFarmCurvePoints;
+      }
+      const vintage = await Vintage.buildFromAbsorptionCurve(
+        new UlidIdGenerator(),
+        data,
+      );
+      for (const item of vintage) {
+        yield {
+          id: item.id,
+          year: item.year,
+          capacity: item.capacity,
+          projectId: project.id,
+        };
+      }
+    }
+  },
+  data: [],
 });

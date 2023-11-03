@@ -4,8 +4,17 @@ import {
   CompanyRepositoryInterface,
   CreateBusinessUnitRequest,
   CreateBusinessUnitUseCase,
+  CreateForecastedEmissionsRequest,
+  CreateForecastedEmissionsUseCase,
+  CreateForecastedTargetsRequest,
+  CreateForecastedTargetsUseCase,
+  ForecastTarget,
+  ForecastEmission,
 } from '../../domain/business-unit';
 import { UseCaseInterface } from '../../domain/usecase.interface';
+import { Project, Vintage } from '../../domain/portfolio';
+import { InMemoryProjectRepository } from '../../infrastructure/repository/project.in-memory';
+import { IdGeneratorInterface } from '../../domain/common';
 
 export const givenIHaveAnExistingCompany = (
   given: DefineStepFunction,
@@ -13,10 +22,40 @@ export const givenIHaveAnExistingCompany = (
   company: Company,
   companyRepository: CompanyRepositoryInterface,
 ) => {
-  given(/^I have an existing company "(.*)"$/, (companyName: string) => {
+  given(/^I have an existing company "(.*)"$/, async (companyName: string) => {
     company = new Company(companyId, companyName);
-    companyRepository.save(company);
+    await companyRepository.save(company);
   });
+};
+
+export const andProjectIsConfigured = async (
+  and: DefineStepFunction,
+  projectRepository: InMemoryProjectRepository,
+  idGenerator: IdGeneratorInterface,
+) => {
+  and(
+    /^company "(.*)" has a project "(.*)" called "(.*)" described as "(.*)" with this absorption curve:$/,
+    async (
+      companyName: string,
+      projectId: string,
+      projectName: string,
+      description: string,
+      absorptionCurve: { timestamp: number; absorption: number }[],
+    ) => {
+      const vintages = await Vintage.buildFromAbsorptionCurve(
+        idGenerator,
+        absorptionCurve,
+      );
+      const project = new Project(
+        projectId,
+        projectName,
+        description,
+        [],
+        vintages,
+      );
+      await projectRepository.addProject(project);
+    },
+  );
 };
 
 export const andTheFollowingBusinessUnit = async (
@@ -34,11 +73,11 @@ export const andTheFollowingBusinessUnit = async (
         id,
         name,
         description,
-        forecastEmission: parseInt(forecastEmission),
+        forecast_emission: parseInt(forecastEmission),
         target: parseInt(target),
         debt: parseInt(debt),
         metadata,
-        companyId,
+        company_id: companyId,
       }),
     );
     bId = response.id;
@@ -60,3 +99,35 @@ export function andIExecuteTheRequest<
     setResponseCallback(await useCase.execute(request()));
   });
 }
+
+export const andEmissionsForBusinessUnit = async (
+  and: DefineStepFunction,
+  createForecastedEmissionsUseCase: CreateForecastedEmissionsUseCase,
+) => {
+  and(
+    /^the business unit with id "(.*)" have the following emissions:$/,
+    async (businessUnitId: string, table) => {
+      const request = new CreateForecastedEmissionsRequest(
+        businessUnitId,
+        table.map((i) => new ForecastEmission(i.year, i.quantity)),
+      );
+      await createForecastedEmissionsUseCase.execute(request);
+    },
+  );
+};
+
+export const andTargetsForBusinessUnit = async (
+  and: DefineStepFunction,
+  createForecastedTargetsUseCase: CreateForecastedTargetsUseCase,
+) => {
+  and(
+    /^the business unit with id "(.*)" have the following targets:$/,
+    async (businessUnitId: string, table) => {
+      const request = new CreateForecastedTargetsRequest(
+        businessUnitId,
+        table.map((i) => new ForecastTarget(i.year, i.quantity)),
+      );
+      await createForecastedTargetsUseCase.execute(request);
+    },
+  );
+};

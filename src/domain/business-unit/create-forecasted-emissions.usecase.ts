@@ -24,6 +24,11 @@ export class CreateForecastedEmissionsUseCase
     const businessUnit = await this.businessUnitRepository.byId(
       request.businessUnitId,
     );
+    if (null === businessUnit) {
+      return new CreateForecastedEmissionsResponse('', [
+        'Business unit not found.',
+      ]);
+    }
 
     const emissions = request.forecastEmissions.map((fe) => ({
       ...fe,

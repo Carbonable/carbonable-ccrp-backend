@@ -16,4 +16,3 @@ Feature: Create forecasted targets
       | 2025 |       80 |
       | 2026 |       85 |
       | 2027 |       90 |
-    And I should have 3 orders in my order book

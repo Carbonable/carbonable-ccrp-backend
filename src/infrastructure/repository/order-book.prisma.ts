@@ -3,6 +3,30 @@ import { PrismaService } from '../prisma.service';
 
 export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
+
+  async findByBusinessUnitIds(businessUnitIds: string[]): Promise<Order[]> {
+    return prismaToOrder(
+      await this.prisma.order.findMany({
+        where: {
+          businessUnitId: {
+            in: businessUnitIds,
+          },
+        },
+      }),
+    );
+  }
+
+  async findOrderForDemand(
+    businessUnitId: string,
+    year: string,
+  ): Promise<Order> {
+    return prismaToOrder(
+      await this.prisma.order.findFirst({
+        where: { businessUnitId, year: parseInt(year) },
+      }),
+    ).shift();
+  }
+
   async listOrdersFor(id: string): Promise<Order[]> {
     return prismaToOrder(
       await this.prisma.order.findMany({
@@ -17,7 +41,7 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
         where: {
           year_businessUnitId: {
             businessUnitId: order.businessUnitId,
-            year: order.year,
+            year: parseInt(order.year),
           },
         },
         create: { ...orderToPrisma(order) },
@@ -33,14 +57,24 @@ function orderToPrisma(o: Order): any {
   return {
     id: o.id,
     quantity: o.quantity,
-    year: o.year,
-    deficit: o.getDeficit(),
+    year: parseInt(o.year),
+    deficit: o.debt,
     businessUnitId: o.businessUnitId,
+    status: o.status,
   };
 }
 
 function prismaToOrder(orders: any): Order[] {
   return orders.map(
-    (o) => new Order(o.id, o.quantity, o.year, o.businessUnitId, o.deficit),
+    (o) =>
+      new Order(
+        o.id,
+        o.quantity,
+        o.year,
+        o.businessUnitId,
+        o.status,
+        o.reservations ?? [],
+        o.executions ?? [],
+      ),
   );
 }

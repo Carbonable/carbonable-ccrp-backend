@@ -15,6 +15,9 @@ export class PrismaBusinessUnitRepository
     const dbModel = await this.prisma.businessUnit.findUnique({
       where: { id },
     });
+    if (null === dbModel) {
+      return null;
+    }
 
     return new BusinessUnit(
       dbModel.id,

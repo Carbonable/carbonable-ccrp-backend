@@ -1,0 +1,14 @@
+input ForecastedData {
+    year: String
+    quantity: Int
+}
+
+input CreateForecastedEmissionsRequest {
+    business_unit_id: String!
+    data: [ForecastedData!]!
+}
+
+input CreateForecastedTargetsRequest {
+    business_unit_id: String!
+    data: [ForecastedData!]!
+}
