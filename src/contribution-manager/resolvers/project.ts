@@ -9,6 +9,10 @@ export class ProjectResolver {
 
   constructor(private prisma: PrismaService) {}
 
+  @Query('projects')
+  async getProjects() {
+    return await this.prisma.project.findMany();
+  }
   @Query('projectBy')
   async getCertifierBy(
     @Args('field') field: string,

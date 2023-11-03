@@ -14,7 +14,6 @@ import {
   CreateForecastedTargetsRequest,
   CreateForecastedTargetsResponse,
 } from '../../domain/business-unit';
-import { InMemoryOrderBookRepository } from '../../infrastructure/repository/order-book.in-memory';
 
 const feature = loadFeature('src/feature/create-forecasted-targets.feature');
 const ulid = monotonicFactory();
@@ -31,11 +30,7 @@ defineFeature(feature, (test) => {
     businessUnitRepository,
     companyRepository,
   );
-  const orderBookRepository = new InMemoryOrderBookRepository();
-  const useCase = new CreateForecastedTargetsUseCase(
-    businessUnitRepository,
-    orderBookRepository,
-  );
+  const useCase = new CreateForecastedTargetsUseCase(businessUnitRepository);
 
   function setBusinessId(id: string) {
     businessId = id;
@@ -82,15 +77,6 @@ defineFeature(feature, (test) => {
           expect(targets[index].quantity).toEqual(table[index].quantity);
         }
         expect(targets.length).toEqual(3);
-      },
-    );
-
-    and(
-      /^I should have (\d+) orders in my order book$/,
-      async (orderCount: string) => {
-        const orders = await orderBookRepository.listOrdersFor(businessId);
-
-        expect(orders.length).toBe(parseInt(orderCount));
       },
     );
   });

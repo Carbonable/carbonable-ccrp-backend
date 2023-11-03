@@ -1,0 +1,10 @@
+input AddAllocationRequestItem {
+  project_id: String
+  business_unit_id: String!
+  amount: Int!
+}
+
+type AddAllocationResponse {
+    allocationIds: [String]!
+    errors: [String]!
+}

@@ -1,7 +1,7 @@
 import { ulid } from 'ulid';
 import { PrismaService } from '../../prisma.service';
 import { PrismaOrderBookRepository } from '../order-book.prisma';
-import { Order } from '../../../domain/order-book';
+import { Order, OrderStatus } from '../../../domain/order-book';
 import { BusinessUnit, Company } from '../../../domain/business-unit';
 import { PrismaCompanyRepository } from '../company.prisma';
 
@@ -40,7 +40,15 @@ describe('OrderBook Prisma Repository Adapter', () => {
     await companyRepository.save(companyData);
 
     const orderId = ulid().toString();
-    const orderData = new Order(orderId, 10, 2024, businessUnitId);
+    const orderData = new Order(
+      orderId,
+      10,
+      '2024',
+      businessUnitId,
+      OrderStatus.OPEN,
+      [],
+      [],
+    );
 
     await orderBookRepository.save([orderData]);
   });

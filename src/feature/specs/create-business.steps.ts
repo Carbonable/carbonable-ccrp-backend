@@ -46,11 +46,11 @@ defineFeature(feature, (test) => {
         id,
         name,
         description,
-        forecastEmission: parseInt(forecastEmission),
+        forecast_emission: parseInt(forecastEmission),
         target: parseInt(target),
         debt: parseInt(debt),
         metadata,
-        companyId,
+        company_id: companyId,
       });
     });
 

@@ -24,10 +24,14 @@ export class CreateBusinessUnitUseCase
   async execute(
     request: CreateBusinessUnitRequest,
   ): Promise<CreateBusinessUnitResponse> {
+    const company = await this.companyRepository.byId(request.companyId);
+    if (null === company) {
+      return new CreateBusinessUnitResponse('', ['Company not found.']);
+    }
+
     const businessUnit = BusinessUnit.fromRequest(request);
 
     await this.repository.save(businessUnit);
-    const company = await this.companyRepository.byId(request.companyId);
     company.addBusinessUnit(businessUnit);
 
     await this.companyRepository.save(company);

@@ -9,7 +9,13 @@ export class InMemoryCompanyRepository implements CompanyRepositoryInterface {
     return this.companies.find((company) => company.id === id);
   }
 
+  async byName(name: string): Promise<Company> {
+    return this.companies.find((company) => company.name === name);
+  }
+
   async save(company: Company): Promise<void> {
-    this.companies.push(company);
+    if (!this.companies.includes(company)) {
+      this.companies.push(company);
+    }
   }
 }

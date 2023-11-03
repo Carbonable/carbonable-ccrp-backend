@@ -97,7 +97,6 @@ model Project {
   allocation       Int
 
   carbonCredits CarbonCredit[]
-  curvePoints   CurvePoint[]
   certifier     Certifier?     @relation(fields: [certifierId], references: [id])
   certifierId   String?        @map("certifier_id")
   developper    Developper?    @relation(fields: [developperId], references: [id])
@@ -106,20 +105,12 @@ model Project {
   countryId     String         @map("country_id")
   company       Company        @relation(fields: [companyId], references: [id])
   companyId     String         @map("company_id")
-  ProjectsSdgs  ProjectsSdgs[]
+  projectsSdgs  ProjectsSdgs[]
+  stock         Stock[]
+  vintages      Vintage[]
+  allocations   Allocation[]
 
   @@map("projects")
-}
-
-model CurvePoint {
-  id         String   @id
-  time       DateTime @db.Timestamptz
-  absorption Float
-
-  project   Project @relation(fields: [projectId], references: id)
-  projectId String  @map("project_id")
-
-  @@map("curve_point")
 }
 
 model Company {
@@ -129,26 +120,12 @@ model Company {
   slug String @unique
 
   configuration                CompanyConfiguration[]
-  emissions                    CompanyEmission[]
   projects                     Project[]
   projectionSnapshots          ProjectionSnapshot[]
   HistoricalProjectionSnapshot HistoricalProjectionSnapshot[]
   businessUnits                BusinessUnit[]
 
   @@map("company")
-}
-
-model CompanyEmission {
-  id String @id
-
-  year     String @db.VarChar(4)
-  emission Int
-  target   Int
-
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId String  @map("company_id")
-
-  @@map("company_emission")
 }
 
 model CompanyConfiguration {
@@ -179,6 +156,7 @@ model BusinessUnit {
 
   company   Company @relation(fields: [companyId], references: [id])
   companyId String  @map("company_id")
+  Stock     Stock[]
 
   @@map("business_unit")
 }
@@ -213,10 +191,12 @@ model Order {
   year     Int
   quantity Int
   deficit  Int?
-  status   OrderStatus @default(value: PENDING) @map("order_status")
+  status   OrderStatus @default(value: OPEN) @map("order_status")
 
-  businessUnitId String       @map("business_unit_id")
-  businessUnit   BusinessUnit @relation(fields: [businessUnitId], references: [id])
+  businessUnitId String        @map("business_unit_id")
+  businessUnit   BusinessUnit  @relation(fields: [businessUnitId], references: [id])
+  Reservation    Reservation[]
+  Execution      Execution[]
 
   @@unique([year, businessUnitId])
   @@map("order")
@@ -225,12 +205,75 @@ model Order {
 model Allocation {
   id String @id
 
-  quantity      Int
-  carbonCredits CarbonCredit[]
-  status        AllocationStatus
+  quantity Int
 
-  businessUnitId String       @map("business_unit_id")
-  businessUnit   BusinessUnit @relation(fields: [businessUnitId], references: [id])
+  businessUnitId String         @map("business_unit_id")
+  businessUnit   BusinessUnit   @relation(fields: [businessUnitId], references: [id])
+  projectId      String         @map("project_id")
+  project        Project        @relation(fields: [projectId], references: [id])
+  stock          Stock[]
+  CarbonCredit   CarbonCredit[]
+
+  @@map("allocation")
+}
+
+model Stock {
+  id        String @id
+  vintage   String @db.VarChar(4)
+  quantity  Int
+  available Int    @default(0)
+  consumed  Int    @default(0)
+
+  businessUnitId String        @map("business_unit_id")
+  businessUnit   BusinessUnit  @relation(fields: [businessUnitId], references: [id])
+  projectId      String        @map("project_id")
+  project        Project       @relation(fields: [projectId], references: [id])
+  allocationId   String        @map("allocation_id")
+  allocation     Allocation?   @relation(fields: [allocationId], references: [id])
+  Reservation    Reservation[]
+  Execution      Execution[]
+
+  @@map("stock")
+}
+
+model Vintage {
+  id       String @id
+  year     String @db.VarChar(4)
+  capacity Int
+  reserved Int    @default(0)
+  consumed Int    @default(0)
+
+  projectId String  @map("project_id")
+  project   Project @relation(fields: [projectId], references: [id])
+
+  @@map("vintage")
+}
+
+model Reservation {
+  id String @id
+
+  quantity Int @default(0)
+
+  orderId String @map("order_id")
+  order   Order  @relation(fields: [orderId], references: [id])
+  stockId String @map("stock_id")
+  stock   Stock  @relation(fields: [stockId], references: [id])
+
+  @@map("reservation")
+}
+
+model Execution {
+  id String @id
+
+  quantity      Int      @default(0)
+  executionDate DateTime @map("execution_date") @db.Timestamptz
+
+  orderId String @map("order_id")
+  order   Order  @relation(fields: [orderId], references: [id])
+  stockId String @map("stock_id")
+  stock   Stock  @relation(fields: [stockId], references: [id])
+
+  @@map("execution")
 }
 
 model Certifier {
@@ -306,9 +349,9 @@ enum CarbonCreditAuditStatus {
 }
 
 enum OrderStatus {
+  OPEN
   PENDING
-  ONGOING
-  FULLFILLED
+  CLOSED
 }
 
 enum AllocationStatus {

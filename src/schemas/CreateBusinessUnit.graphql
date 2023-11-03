@@ -1,0 +1,13 @@
+input CreateBusinessUnitRequest {
+    name: String!
+    description: String!
+    metadata: String!
+    company_id: String!
+    default_forecasted_emission: Int
+    default_target: Int
+}
+
+type CreateBusinessUnitResponse {
+    id: String!
+    errors: [String]
+}

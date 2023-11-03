@@ -9,6 +9,32 @@ export class InMemoryOrderBookRepository
     return this.orders.filter((order) => order.businessUnitId === id);
   }
   async save(orders: Order[]): Promise<void> {
-    orders.forEach((order) => this.orders.push(order));
+    orders.forEach((order) => {
+      if (this.orders.find((o) => o.id === order.id)) {
+        return;
+      }
+      this.orders.push(order);
+    });
+  }
+
+  async findByBusinessUnitIds(businessUnitIds: string[]): Promise<Order[]> {
+    return this.orders.filter((o) =>
+      businessUnitIds.includes(o.businessUnitId),
+    );
+  }
+
+  async findOrderForDemand(
+    businessUnitId: string,
+    year: string,
+  ): Promise<Order> {
+    const filteredOrders = this.orders.filter(
+      (o) => businessUnitId === o.businessUnitId && o.year === year,
+    );
+    if (filteredOrders.length === 0) {
+      throw new Error(
+        `No order found for businessUnitId ${businessUnitId} and year ${year}`,
+      );
+    }
+    return filteredOrders[0];
   }
 }
