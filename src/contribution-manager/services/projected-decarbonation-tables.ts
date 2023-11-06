@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/prisma.service';
-import { PaginationDTO } from 'src/contribution-manager/resolvers/carbon-credits';
 
 type AnualProjectedDecarbonation = {
   timePeriod: string;
@@ -46,19 +45,15 @@ type FinancialAnalysisProjectedDecarbonation = {
 export class ProjectedDecarbonationTablesService {
   constructor(private prisma: PrismaService) {}
 
-  async getAnual(
-    pagination: PaginationDTO,
-  ): Promise<AnualProjectedDecarbonation[]> {
+  async getAnual(): Promise<AnualProjectedDecarbonation[]> {
     return [];
   }
-  async getCumulative(
-    pagination: PaginationDTO,
-  ): Promise<CumulativeProjectedDecarbonation[]> {
+  async getCumulative(): Promise<CumulativeProjectedDecarbonation[]> {
     return [];
   }
-  async getFinancialAnalysis(
-    pagination: PaginationDTO,
-  ): Promise<FinancialAnalysisProjectedDecarbonation[]> {
+  async getFinancialAnalysis(): Promise<
+    FinancialAnalysisProjectedDecarbonation[]
+  > {
     return [];
   }
 }

@@ -19,46 +19,6 @@ type CarbonCreditProjection = {
   retired_cc: number;
 };
 
-type AnualProjectedDecarbonation = {
-  timePeriod: string;
-  emissions: string;
-  exPostIssued: number;
-  exPostPurchased: number;
-  exPostRetired: number;
-  neutralityTarget: number;
-  actualRate: number;
-  delta: number;
-  debt: number;
-  exPostStock: number;
-  exAnteStock: number;
-};
-
-type CumulativeProjectedDecarbonation = {
-  timePeriod: string;
-  emissions: string;
-  exPostIssued: number;
-  exPostPurchased: number;
-  exPostRetired: number;
-  delta: number;
-  emissionDebt: number;
-};
-
-type FinancialAnalysisProjectedDecarbonation = {
-  timePeriod: string;
-  averagePurchasePrice: number;
-  cumulativeAveragePurchasePrice: number;
-  totalPurchasedAmount: number;
-  cumulativePurchasedAmount: number;
-  averageIssuedPrice: number;
-  cumulativeAverageIssuedPrice: number;
-  totalIssuedAmount: number;
-  cumulativeTotalIssuedAmount: number;
-  granTotalAmount: number;
-  cumulativeGranTotalAmount: number;
-  emissionDebtEstimatedAmount: number;
-  cumulativeEmissionDebtEstimatedAmount: number;
-};
-
 type ProjectedDecarbonationWithPagination = {
   data: string[];
   pagination: {
@@ -86,7 +46,7 @@ export class ProjectedDecarbonationService {
 
   constructor(private prisma: PrismaService) {}
 
-  async get(filter: string): Promise<ProjectedDecarbonationGraph[]> {
+  async get(): Promise<ProjectedDecarbonationGraph[]> {
     // TODO: Change this to be based on min and max vintage of CC
     const historicalSnapshots =
       await this.prisma.historicalProjectionSnapshot.findMany();
@@ -216,7 +176,7 @@ SELECT
     ];
   }
 
-  async resolveOffset(year: string) {
+  async resolveOffset() {
     const cc_data = await this.prisma.$queryRaw<
       {
         ex_post_count: number;
@@ -269,6 +229,7 @@ function toProjectedDecarbonationGraph(
   return {
     year: snapshot.vintage,
     emissions: snapshot.emissions.toString(),
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     target: Number(snapshot.target),
     data: [

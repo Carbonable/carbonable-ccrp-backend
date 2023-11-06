@@ -7,4 +7,3 @@ export class CompanyManager {
     return await this.repository.byId(id);
   }
 }
-
