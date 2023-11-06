@@ -12,4 +12,15 @@ describe('MetadataParser', () => {
       { key: 'key3', value: 'value3' },
     ]);
   });
+
+  it('should ban keys and values with hyphens', () => {
+    const input = 'an-invalid-key-value';
+    try {
+      MetadataParser.parse(input);
+    } catch (err: any) {
+      expect(err.message).toBe(
+        'Metadata can only contains 1 hyphen by key/value. Consider replacing them with "_" with input : "an-invalid-key-value"',
+      );
+    }
+  });
 });

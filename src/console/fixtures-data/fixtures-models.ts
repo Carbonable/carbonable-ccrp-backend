@@ -162,6 +162,7 @@ export const ProjectDataFixtures = ({
       countryId: (references: any) => {
         return references['country'].find((c) => c.name === 'Costa Rica').id;
       },
+      metadata: {},
     },
     {
       id: '01H5739RVSRKHFVNM47AE4NHMK',
@@ -191,6 +192,7 @@ export const ProjectDataFixtures = ({
       countryId: (references: any) => {
         return references['country'].find((c) => c.name === 'Panama').id;
       },
+      metadata: {},
     },
   ],
 });
