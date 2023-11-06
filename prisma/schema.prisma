@@ -95,6 +95,7 @@ model Project {
   protectedSpecies Int                @map("protected_species")
   protectedForest  Int                @map("protected_forest")
   allocation       Int
+  metadata         Json
 
   carbonCredits CarbonCredit[]
   certifier     Certifier?     @relation(fields: [certifierId], references: [id])

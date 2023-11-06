@@ -53,8 +53,9 @@ export class CarbonCreditResolver {
   }
 
   @Query('getProjectedDecarbonation')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getProjectedDecarbonation(@Args('viewType') filter: string) {
-    return await this.projectedDecarbonation.get(filter);
+    return await this.projectedDecarbonation.get();
   }
 
   @Query('getProjectedDecarbonationTable')
