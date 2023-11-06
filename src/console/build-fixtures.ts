@@ -168,7 +168,7 @@ export class BuildFixturesCommand extends CommandRunner {
     return await res.json();
   }
 
-  async run(inputs: string[], options: Record<string, any>): Promise<void> {
+  async run(): Promise<void> {
     try {
       await this.seedCountries();
       await this.addFixtures({

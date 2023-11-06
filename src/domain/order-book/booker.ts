@@ -5,12 +5,7 @@ import {
   BusinessUnitRepositoryInterface,
 } from '../business-unit';
 import { IdGeneratorInterface, UlidIdGenerator } from '../common';
-import {
-  CarbonCredit,
-  Project,
-  ProjectRepositoryInterface,
-  Vintage,
-} from '../portfolio';
+import { ProjectRepositoryInterface } from '../portfolio';
 import { Order, OrderStatus } from './order';
 import { OrderBookRepositoryInterface } from './order-book.repository';
 

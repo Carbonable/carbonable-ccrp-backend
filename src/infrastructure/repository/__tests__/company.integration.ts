@@ -1,7 +1,7 @@
 import { ulid } from 'ulid';
 import { PrismaService } from '../../prisma.service';
 import { PrismaCompanyRepository } from '../company.prisma';
-import { BusinessUnit, Company } from '../../../domain/business-unit';
+import { BusinessUnit } from '../../../domain/business-unit';
 import { createCompany } from './common';
 
 describe('Company Prisma Repository Adapter', () => {

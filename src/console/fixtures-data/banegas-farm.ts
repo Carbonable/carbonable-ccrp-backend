@@ -52,4 +52,3 @@ export const BanegasFarmCurvePoints = [
     absorption: 1573000000,
   },
 ];
-
