@@ -15,6 +15,7 @@ import { UseCaseInterface } from '../../domain/usecase.interface';
 import { Project, Vintage } from '../../domain/portfolio';
 import { InMemoryProjectRepository } from '../../infrastructure/repository/project.in-memory';
 import { IdGeneratorInterface } from '../../domain/common';
+import { InMemoryEventDispatcher } from '../../infrastructure/event-dispatcher.in-memory';
 
 export const givenIHaveAnExistingCompany = (
   given: DefineStepFunction,
@@ -128,6 +129,19 @@ export const andTargetsForBusinessUnit = async (
         table.map((i) => new ForecastTarget(i.year, i.quantity)),
       );
       await createForecastedTargetsUseCase.execute(request);
+    },
+  );
+};
+
+export const andEventShouldHaveBeenDispatched = (
+  and: DefineStepFunction,
+  eventDispatcher: InMemoryEventDispatcher,
+) => {
+  and(
+    /^(\d+) event should have been dispatched with key "(.*)"$/,
+    (count, key) => {
+      const events = eventDispatcher.events.get(key) || [];
+      expect(events.length).toBe(parseInt(count));
     },
   );
 };

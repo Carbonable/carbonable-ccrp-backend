@@ -13,4 +13,8 @@ export class InMemoryAllocationRepository
   async save(allocation: Allocation): Promise<void> {
     this.allocations = [...this.allocations, allocation];
   }
+
+  async flushAllocationsExcept(ids: string[]): Promise<void> {
+    this.allocations = this.allocations.filter((a) => !ids.includes(a.id));
+  }
 }

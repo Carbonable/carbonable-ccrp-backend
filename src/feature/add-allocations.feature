@@ -65,3 +65,4 @@ Feature: Add allocations for business unit
     Then the business unit should have 2 allocations attached
     And I should not have any errors
     And I should have 10 orders created
+    And 1 event should have been dispatched with key "allocations.finished"

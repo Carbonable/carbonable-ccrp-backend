@@ -57,6 +57,34 @@ export class PrismaStockRepository implements StockRepositoryInterface {
     });
   }
 
+  async findCompanyStock(companyId: string): Promise<Stock[]> {
+    return this.prismaToStock(
+      await this.prisma.stock.findMany({
+        where: {
+          businessUnit: { companyId },
+        },
+      }),
+    );
+  }
+  async findBusinessUnitStock(businessUnitId: string): Promise<Stock[]> {
+    return this.prismaToStock(
+      await this.prisma.stock.findMany({
+        where: {
+          businessUnitId,
+        },
+      }),
+    );
+  }
+  async findProjectStock(projectId: string): Promise<Stock[]> {
+    return this.prismaToStock(
+      await this.prisma.stock.findMany({
+        where: {
+          projectId,
+        },
+      }),
+    );
+  }
+
   prismaToStock(stock: StockModel[]): Stock[] {
     return stock.map((s) => {
       const stock = new Stock(

@@ -4,3 +4,4 @@ export {
   IdGeneratorInterface,
   ID_GENERATOR,
 } from './id-generator';
+export { EventDispatcherInterface } from './event-dispatcher';

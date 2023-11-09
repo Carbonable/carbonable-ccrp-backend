@@ -9,7 +9,11 @@ export class InMemoryBusinessUnitRepository
   constructor(private readonly inner: Array<BusinessUnit> = []) {}
 
   async byId(id: string): Promise<BusinessUnit> {
-    return this.inner.find((businessUnit) => businessUnit.id === id);
+    return this.inner.find((bu) => bu.id === id);
+  }
+
+  async byCompanyId(companyId: string): Promise<BusinessUnit[]> {
+    return this.inner.filter((bu) => bu.companyId === companyId);
   }
 
   async save(businessUnit: BusinessUnit): Promise<void> {

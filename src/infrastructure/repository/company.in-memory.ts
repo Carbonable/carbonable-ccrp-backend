@@ -18,4 +18,10 @@ export class InMemoryCompanyRepository implements CompanyRepositoryInterface {
       this.companies.push(company);
     }
   }
+
+  async byBusinessUnitId(id: string): Promise<Company> {
+    return this.companies.find((c) =>
+      c.businessUnits.find((bu) => bu.id === id),
+    );
+  }
 }

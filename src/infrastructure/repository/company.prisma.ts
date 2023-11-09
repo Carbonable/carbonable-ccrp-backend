@@ -55,6 +55,15 @@ export class PrismaCompanyRepository implements CompanyRepositoryInterface {
     });
   }
 
+  async byBusinessUnitId(id: string): Promise<Company> {
+    return this.companyFromPrisma(
+      await this.prisma.company.findFirst({
+        where: { businessUnits: { some: { id } } },
+        include: { businessUnits: true },
+      }),
+    );
+  }
+
   mapPrismaToBusinessUnit(bu: any): BusinessUnit {
     return new BusinessUnit(
       bu.id,

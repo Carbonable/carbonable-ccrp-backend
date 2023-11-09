@@ -2,6 +2,7 @@ import {
   BusinessUnit,
   BusinessUnitRepositoryInterface,
 } from '../../domain/business-unit';
+import { BusinessUnit as BusinessUnitModel } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 
 export const BUSINESS_UNIT_REPOSITORY = 'BUSINESS_UNIT_REPOSITORY';
@@ -19,15 +20,14 @@ export class PrismaBusinessUnitRepository
       return null;
     }
 
-    return new BusinessUnit(
-      dbModel.id,
-      dbModel.name,
-      dbModel.description,
-      dbModel.defaultEmission,
-      dbModel.defaultTarget,
-      dbModel.debt,
-      dbModel.companyId,
-      JSON.parse(dbModel.metadata.toString()),
+    return prismaToBusinessUnit([dbModel]).pop();
+  }
+
+  async byCompanyId(companyId: string): Promise<BusinessUnit[]> {
+    return prismaToBusinessUnit(
+      await this.prisma.businessUnit.findMany({
+        where: { companyId },
+      }),
     );
   }
 
@@ -84,6 +84,22 @@ export class PrismaBusinessUnitRepository
       });
     }
   }
+}
+
+function prismaToBusinessUnit(bus: BusinessUnitModel[]): BusinessUnit[] {
+  return bus.map(
+    (b) =>
+      new BusinessUnit(
+        b.id,
+        b.name,
+        b.description,
+        b.defaultEmission,
+        b.defaultTarget,
+        b.debt,
+        b.companyId,
+        JSON.parse(b.metadata.toString()),
+      ),
+  );
 }
 
 export function mapBusinessUnitToPrisma(bu: BusinessUnit): any {

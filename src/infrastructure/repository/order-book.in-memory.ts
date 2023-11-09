@@ -1,4 +1,9 @@
-import { Order, OrderBookRepositoryInterface } from '../../domain/order-book';
+import {
+  EffectiveCompensation,
+  Order,
+  OrderBookRepositoryInterface,
+  OrderStatus,
+} from '../../domain/order-book';
 
 export class InMemoryOrderBookRepository
   implements OrderBookRepositoryInterface
@@ -36,5 +41,27 @@ export class InMemoryOrderBookRepository
       );
     }
     return filteredOrders[0];
+  }
+
+  async getBusinessUnitYearlyEffectiveCompensation(
+    businessUnitId: string,
+  ): Promise<EffectiveCompensation[]> {
+    const filtered = this.orders.filter(
+      (o) =>
+        o.businessUnitId === businessUnitId && o.status === OrderStatus.CLOSED,
+    );
+    return filtered.map((o) => new EffectiveCompensation(o.year, o.quantity));
+  }
+  async getCompanyYearlyEffectiveCompensation(
+    //eslint-disable-next-line @typescript-eslint/no-unused-vars
+    companyId: string,
+  ): Promise<EffectiveCompensation[]> {
+    throw new Error('Operation not supported');
+  }
+  async getProjectYearlyEffectiveCompensation(
+    //eslint-disable-next-line @typescript-eslint/no-unused-vars
+    projectId: string,
+  ): Promise<EffectiveCompensation[]> {
+    throw new Error('Operation not supported');
   }
 }

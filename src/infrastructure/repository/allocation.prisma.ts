@@ -31,6 +31,15 @@ export class PrismaAllocationRepository
       },
     });
   }
+
+  async flushAllocationsExcept(ids: string[]): Promise<void> {
+    await this.prisma.allocation.deleteMany({
+      where: {
+        NOT: { id: { in: ids } },
+      },
+    });
+  }
+
   prismaToAllocation(allocation: AllocationModel[]): Allocation[] {
     return allocation.map(
       (a) => new Allocation(a.id, a.projectId, a.businessUnitId, a.quantity),

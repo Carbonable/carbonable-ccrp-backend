@@ -1,4 +1,9 @@
-import { Order, OrderBookRepositoryInterface } from '../../domain/order-book';
+import {
+  EffectiveCompensation,
+  Order,
+  OrderBookRepositoryInterface,
+  OrderStatus,
+} from '../../domain/order-book';
 import { PrismaService } from '../prisma.service';
 
 export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
@@ -50,6 +55,41 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
         },
       });
     }
+  }
+
+  async getBusinessUnitYearlyEffectiveCompensation(
+    businessUnitId: string,
+  ): Promise<EffectiveCompensation[]> {
+    const orders = await this.prisma.order.findMany({
+      where: { businessUnitId, status: OrderStatus.CLOSED },
+    });
+    return orders.map(
+      (o) => new EffectiveCompensation(o.year.toString(), o.quantity),
+    );
+  }
+
+  async getCompanyYearlyEffectiveCompensation(
+    companyId: string,
+  ): Promise<EffectiveCompensation[]> {
+    const orders = await this.prisma.order.findMany({
+      where: { businessUnit: { companyId }, status: OrderStatus.CLOSED },
+    });
+    return orders.map(
+      (o) => new EffectiveCompensation(o.year.toString(), o.quantity),
+    );
+  }
+  async getProjectYearlyEffectiveCompensation(
+    projectId: string,
+  ): Promise<EffectiveCompensation[]> {
+    const orders = await this.prisma.order.findMany({
+      where: {
+        businessUnit: { allocations: { some: { projectId } } },
+        status: OrderStatus.CLOSED,
+      },
+    });
+    return orders.map(
+      (o) => new EffectiveCompensation(o.year.toString(), o.quantity),
+    );
   }
 }
 
