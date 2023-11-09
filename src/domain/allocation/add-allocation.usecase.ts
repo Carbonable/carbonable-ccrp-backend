@@ -2,12 +2,13 @@ import {
   AddAllocationRequest,
   AddAllocationResponse,
   Allocation,
+  AllocationFinished,
   AllocationRepositoryInterface,
 } from '.';
 import { UseCaseInterface } from '../usecase.interface';
 import { ProjectRepositoryInterface } from '../portfolio';
 import { BusinessUnitRepositoryInterface } from '../business-unit';
-import { IdGeneratorInterface } from '../common';
+import { EventDispatcherInterface, IdGeneratorInterface } from '../common';
 import { Booker, StockManager } from '../order-book';
 
 const PROJECT_IDENTIFIER_REQUIRED = 'You have to provide a project identifier.';
@@ -25,6 +26,7 @@ export class AddAllocationUseCase
     private readonly booker: Booker,
     private readonly stockManager: StockManager,
     private readonly idGenerator: IdGeneratorInterface,
+    private readonly eventDispatcher: EventDispatcherInterface,
   ) {}
 
   async execute(request: AddAllocationRequest): Promise<AddAllocationResponse> {
@@ -93,9 +95,12 @@ export class AddAllocationUseCase
       errors = [...errors, ORDER_BOOKING_ERRORS + ': ' + bookError];
     }
 
-    return new AddAllocationResponse(
-      allocations.map((a) => a.id),
-      errors,
+    const allocationIds = allocations.map((a) => a.id);
+    this.eventDispatcher.dispatch(
+      'allocations.finished',
+      new AllocationFinished(allocationIds),
     );
+
+    return new AddAllocationResponse(allocationIds, errors);
   }
 }

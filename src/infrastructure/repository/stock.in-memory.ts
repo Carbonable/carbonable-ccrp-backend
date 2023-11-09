@@ -32,4 +32,15 @@ export class InMemoryStockRepository implements StockRepositoryInterface {
     const s = this.stock.find((s) => s.id === stock.id);
     s.lock(quantity);
   }
+
+  //eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async findCompanyStock(companyId: string): Promise<Stock[]> {
+    throw new Error('Operation not supported');
+  }
+  async findBusinessUnitStock(businessUnitId: string): Promise<Stock[]> {
+    return this.stock.filter((s) => s.businessUnitId === businessUnitId);
+  }
+  async findProjectStock(projectId: string): Promise<Stock[]> {
+    return this.stock.filter((s) => s.projectId === projectId);
+  }
 }

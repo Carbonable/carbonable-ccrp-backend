@@ -1,6 +1,7 @@
 import { defineFeature, loadFeature } from 'jest-cucumber';
 import {
   andEmissionsForBusinessUnit,
+  andEventShouldHaveBeenDispatched,
   andIExecuteTheRequest,
   andProjectIsConfigured,
   andTargetsForBusinessUnit,
@@ -28,6 +29,7 @@ import { InMemoryAllocationRepository } from '../../infrastructure/repository/al
 import { InMemoryOrderBookRepository } from '../../infrastructure/repository/order-book.in-memory';
 import { Booker, StockManager } from '../../domain/order-book';
 import { InMemoryStockRepository } from '../../infrastructure/repository/stock.in-memory';
+import { InMemoryEventDispatcher } from '../../infrastructure/event-dispatcher.in-memory';
 
 const feature = loadFeature('src/feature/add-allocations.feature');
 const ulid = monotonicFactory();
@@ -52,6 +54,7 @@ defineFeature(feature, (test) => {
     businessUnitRepository,
     stockRepository,
   );
+  const eventDispatcher = new InMemoryEventDispatcher();
   const stockManager = new StockManager(stockRepository, new UlidIdGenerator());
 
   const createForecastedEmissionsUseCase = new CreateForecastedEmissionsUseCase(
@@ -73,6 +76,7 @@ defineFeature(feature, (test) => {
     booker,
     stockManager,
     new UlidIdGenerator(),
+    eventDispatcher,
   );
 
   const idGenerator = new UlidIdGenerator();
@@ -150,5 +154,7 @@ defineFeature(feature, (test) => {
 
       expect(orders.length).toBe(parseInt(orderCount));
     });
+
+    andEventShouldHaveBeenDispatched(and, eventDispatcher);
   });
 });

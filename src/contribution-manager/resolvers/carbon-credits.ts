@@ -28,6 +28,8 @@ export class PaginationDTO {
   count = 10;
 }
 
+const CARBONABLE_COMPANY_ID = '01H5739RTVV0JV8M3DAN0C10ME';
+
 @Resolver('CarbonCredit')
 export class CarbonCreditResolver {
   private readonly logger = new Logger(CarbonCreditResolver.name);
@@ -55,7 +57,7 @@ export class CarbonCreditResolver {
   @Query('getProjectedDecarbonation')
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getProjectedDecarbonation(@Args('viewType') filter: string) {
-    return await this.projectedDecarbonation.get();
+    return await this.projectedDecarbonation.get(CARBONABLE_COMPANY_ID);
   }
 
   @Query('getProjectedDecarbonationTable')

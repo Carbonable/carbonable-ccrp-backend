@@ -1,11 +1,11 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/prisma.service';
 import { PaginationDTO } from '../resolvers/carbon-credits';
 import Utils from '../../utils';
 import {
-  HistoricalProjectionSnapshot,
-  ProjectionSnapshot,
-} from '@prisma/client';
+  VISUALIZATION_REPOSITORY,
+  VisualizationRepositoryInterface,
+} from '../../domain/allocation';
 
 type DecarbonationVintage = {
   year: string;
@@ -44,17 +44,18 @@ type DataFilter = { filter?: string; page?: number; count?: number };
 export class ProjectedDecarbonationService {
   private readonly logger = new Logger(ProjectedDecarbonationService.name);
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(VISUALIZATION_REPOSITORY)
+    private readonly visualizationRepository: VisualizationRepositoryInterface,
+  ) {}
 
-  async get(): Promise<ProjectedDecarbonationGraph[]> {
-    // TODO: Change this to be based on min and max vintage of CC
-    const historicalSnapshots =
-      await this.prisma.historicalProjectionSnapshot.findMany();
-    const snapshots = await this.prisma.projectionSnapshot.findMany();
+  async get(id: string): Promise<ProjectedDecarbonationGraph[]> {
+    const visualizations = await this.visualizationRepository.get(
+      `NET-ZERO#COMPANY#${id}`,
+    );
 
-    const mergedSnapshots = [...historicalSnapshots, ...snapshots];
-
-    return mergedSnapshots.map((s) => toProjectedDecarbonationGraph(s));
+    return JSON.parse(visualizations);
   }
 
   async getTable(
@@ -221,21 +222,4 @@ SELECT
       },
     ];
   }
-}
-
-function toProjectedDecarbonationGraph(
-  snapshot: ProjectionSnapshot | HistoricalProjectionSnapshot,
-): ProjectedDecarbonationGraph {
-  return {
-    year: snapshot.vintage,
-    emissions: snapshot.emissions.toString(),
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    target: Number(snapshot.target),
-    data: [
-      { key: 'ExPost', value: Number(snapshot.exPostCount) },
-      { key: 'Confirmed', value: Number(snapshot.confirmedCount) },
-      { key: 'ExAnte', value: Number(snapshot.exAnteCount) },
-    ],
-  };
 }
