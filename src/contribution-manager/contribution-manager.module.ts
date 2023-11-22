@@ -17,6 +17,7 @@ import { InfrastructureModule } from '../infrastructure/infrastructure.module';
 import { BusinessUnitResolver } from './resolvers/business-unit';
 import { DemandResolver } from './resolvers/demand';
 import { AllocationResolver } from './resolvers/allocations';
+import { VisualizationResolver } from './resolvers/visualization';
 
 @Module({
   providers: [
@@ -28,6 +29,7 @@ import { AllocationResolver } from './resolvers/allocations';
     BusinessUnitResolver,
     DemandResolver,
     AllocationResolver,
+    VisualizationResolver,
     GlobalDataService,
     ProjectedDecarbonationService,
     ImpactMetricsService,
@@ -44,6 +46,7 @@ import { AllocationResolver } from './resolvers/allocations';
     BusinessUnitResolver,
     DemandResolver,
     AllocationResolver,
+    VisualizationResolver,
     ProjectedDecarbonationService,
     ImpactMetricsService,
     ProjectMetricsService,

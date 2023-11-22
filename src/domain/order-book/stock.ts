@@ -1,6 +1,20 @@
+export const exPostStock = (stocks: Stock[], currentYear: number): number =>
+  stocks.reduce(
+    (acc, curr) =>
+      acc + (parseInt(curr.vintage) <= currentYear ? curr.quantity : 0),
+    0,
+  );
+export const exAnteStock = (stocks: Stock[], currentYear: number): number =>
+  stocks.reduce(
+    (acc, curr) =>
+      acc + (parseInt(curr.vintage) > currentYear ? curr.quantity : 0),
+    0,
+  );
+
 export class Stock {
-  private _consumed: number;
-  private _available: number;
+  private _consumed = 0;
+  private _available = 0;
+  private _retired = 0;
 
   constructor(
     public readonly id: string,
@@ -9,8 +23,11 @@ export class Stock {
     public readonly vintage: string,
     private _quantity: number,
     private _allocationId: string = null,
+    private _purchased: number = 0,
+    private _purchasedPrice: number = 0,
+    private _issuedPrice: number = 0,
   ) {
-    this._available = _quantity;
+    this._available = _quantity + _purchased;
     this._consumed = 0;
   }
 
@@ -19,11 +36,16 @@ export class Stock {
     this._consumed += count;
   }
 
+  // TODO: Add check into this method
+  retire(count: number): void {
+    this._retired += count;
+  }
+
   get allocationId(): string {
     return this._allocationId;
   }
   get quantity(): number {
-    return this._quantity;
+    return this._quantity + this._purchased;
   }
   set quantity(quantity: number) {
     this._quantity = quantity;
@@ -33,5 +55,20 @@ export class Stock {
   }
   get consumed(): number {
     return this._consumed;
+  }
+  get retired(): number {
+    return this._retired;
+  }
+  get purchased(): number {
+    return this._purchased;
+  }
+  get issued(): number {
+    return this._quantity;
+  }
+  get purchasedPrice(): number {
+    return this._purchasedPrice;
+  }
+  get issuedPrice(): number {
+    return this._issuedPrice;
   }
 }
