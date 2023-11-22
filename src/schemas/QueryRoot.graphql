@@ -7,11 +7,16 @@ type Query {
     projectBy(field: String!, value: String!): Project
 
     getGlobalData: GlobalData,
-    getProjectedDecarbonation(viewType: ProjectedDecarbonationViewType): [ProjectedDecarbonationGraph]
-    getProjectedDecarbonationTable(pagination: Pagination): ProjectedDecarbonationWithPagination
+    getProjectedDecarbonation(viewType: ProjectedDecarbonationViewType): [ProjectedDecarbonationGraph] @deprecated(reason: "replaced by netZeroPlanning")
+    getProjectedDecarbonationTable(pagination: Pagination): ProjectedDecarbonationWithPagination @deprecated(reason: "replaced by annual")
     getProjectFundingAllocation(pagination: Pagination): ProjectedFundingAllocationWithPagination
     getProjectMetrics: ProjectMetrics!
     getImpactMetrics: ImpactMetrics!
+
+    netZeroPlanning(view: VisualizationViewType): [NetZeroPlanning]
+    annual(view: VisualizationViewType): [Annual]
+    cumulative(view: VisualizationViewType): [Cumulative]
+    financialAnalysis(view: VisualizationViewType): [FinancialAnalysis]
 }
 
 type Mutation {

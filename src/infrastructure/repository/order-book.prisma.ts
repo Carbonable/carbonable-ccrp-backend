@@ -5,6 +5,7 @@ import {
   OrderStatus,
 } from '../../domain/order-book';
 import { PrismaService } from '../prisma.service';
+import { Order as OrdersModel } from '@prisma/client';
 
 export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
@@ -17,6 +18,10 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
             in: businessUnitIds,
           },
         },
+        include: {
+          reservations: true,
+          executions: true,
+        },
       }),
     );
   }
@@ -25,17 +30,19 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
     businessUnitId: string,
     year: string,
   ): Promise<Order> {
-    return prismaToOrder(
+    return prismaToOrder([
       await this.prisma.order.findFirst({
         where: { businessUnitId, year: parseInt(year) },
+        include: { reservations: true, executions: true },
       }),
-    ).shift();
+    ]).shift();
   }
 
   async listOrdersFor(id: string): Promise<Order[]> {
     return prismaToOrder(
       await this.prisma.order.findMany({
         where: { businessUnitId: id },
+        include: { reservations: true, executions: true },
       }),
     );
   }
@@ -62,6 +69,7 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
   ): Promise<EffectiveCompensation[]> {
     const orders = await this.prisma.order.findMany({
       where: { businessUnitId, status: OrderStatus.CLOSED },
+      include: { reservations: true, executions: true },
     });
     return orders.map(
       (o) => new EffectiveCompensation(o.year.toString(), o.quantity),
@@ -73,6 +81,7 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
   ): Promise<EffectiveCompensation[]> {
     const orders = await this.prisma.order.findMany({
       where: { businessUnit: { companyId }, status: OrderStatus.CLOSED },
+      include: { reservations: true, executions: true },
     });
     return orders.map(
       (o) => new EffectiveCompensation(o.year.toString(), o.quantity),
@@ -91,6 +100,25 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
       (o) => new EffectiveCompensation(o.year.toString(), o.quantity),
     );
   }
+
+  async getCompanyOrders(companyId: string): Promise<Order[]> {
+    const orders = await this.prisma.order.findMany({
+      where: { businessUnit: { companyId }, status: OrderStatus.CLOSED },
+      include: { reservations: true, executions: true },
+    });
+
+    return prismaToOrder(orders);
+  }
+
+  async getProjectOrders(projectId: string): Promise<Order[]> {
+    const orders = await this.prisma.order.findMany({
+      where: {
+        businessUnit: { allocations: { some: { projectId } } },
+      },
+      include: { reservations: true, executions: true },
+    });
+    return prismaToOrder(orders);
+  }
 }
 
 function orderToPrisma(o: Order): any {
@@ -101,20 +129,24 @@ function orderToPrisma(o: Order): any {
     deficit: o.debt,
     businessUnitId: o.businessUnitId,
     status: o.status,
+    reservations: o.reservations ?? [],
+    executions: o.executions ?? [],
   };
 }
 
-function prismaToOrder(orders: any): Order[] {
+function prismaToOrder(orders: OrdersModel[]): Order[] {
   return orders.map(
     (o) =>
       new Order(
         o.id,
         o.quantity,
-        o.year,
+        o.year.toString(),
         o.businessUnitId,
-        o.status,
-        o.reservations ?? [],
-        o.executions ?? [],
+        OrderStatus[o.status],
+        [],
+        [],
+        // o.reservations ?? [],
+        // o.executions ?? [],
       ),
   );
 }

@@ -1,0 +1,24 @@
+input VisualizationViewType {
+    company_id: String
+    business_unit_id: String
+    project_id: String
+}
+
+type NetZeroPlanning {
+    year: String
+}
+
+type Annual {
+    year: String
+
+}
+
+type Cumulative {
+    year: String
+
+}
+
+type FinancialAnalysis {
+    year: String
+
+ }

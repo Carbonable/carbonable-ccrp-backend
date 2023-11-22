@@ -4,6 +4,11 @@ import { NetZeroStockExtractor } from './net-zero-stock-extractor';
 
 describe('NetZeroStockExtractor', () => {
   let extractor: NetZeroStockExtractor;
+  beforeAll(() => {
+    // Mock date to avoid issues with those tests over time
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date(2023, 11, 10));
+  });
   beforeEach(() => {
     extractor = new NetZeroStockExtractor();
   });
@@ -106,4 +111,6 @@ describe('NetZeroStockExtractor', () => {
     expect(res[0].actual).toBe(50);
     expect(res[1].actual).toBe(60);
   });
+
+  afterAll(() => jest.useRealTimers());
 });

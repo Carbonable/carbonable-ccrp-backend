@@ -64,4 +64,14 @@ export class InMemoryOrderBookRepository
   ): Promise<EffectiveCompensation[]> {
     throw new Error('Operation not supported');
   }
+
+  //eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getCompanyOrders(companyId: string): Promise<Order[]> {
+    throw new Error('Operation not supported');
+  }
+
+  //eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getProjectOrders(projectId: string): Promise<Order[]> {
+    throw new Error('Operation not supported');
+  }
 }

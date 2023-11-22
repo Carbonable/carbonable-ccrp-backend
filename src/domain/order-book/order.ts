@@ -69,4 +69,26 @@ export class Order {
   get status(): OrderStatus {
     return this._status;
   }
+
+  get actualRate(): number {
+    if (0 === this._quantity) return 0;
+
+    const reserved = this._executions.reduce(
+      (acc, curr) => acc + curr.count,
+      0,
+    );
+    return (reserved / this.quantity) * 100;
+  }
+
+  get reservations(): Array<Reservation> {
+    return this._reservations;
+  }
+
+  get executions(): Array<Execution> {
+    return this._executions;
+  }
+
+  static default(): Order {
+    return new Order('0', 0, '0', '0', OrderStatus.OPEN, [], []);
+  }
 }

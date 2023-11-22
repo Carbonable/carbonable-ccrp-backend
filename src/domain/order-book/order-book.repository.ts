@@ -16,4 +16,7 @@ export interface OrderBookRepositoryInterface {
   getProjectYearlyEffectiveCompensation(
     projectId: string,
   ): Promise<EffectiveCompensation[]>;
+
+  getCompanyOrders(companyId: string): Promise<Order[]>;
+  getProjectOrders(projectId: string): Promise<Order[]>;
 }

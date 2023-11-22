@@ -30,7 +30,12 @@ import {
 } from './event-dispatcher.nestjs';
 import { RedisClientType, createClient } from 'redis';
 import { RedisVisualizationRepository } from './repository/visualization.redis';
-import { NetZeroVisualizationStrategy } from '../domain/allocation/visualization/net-zero.strategy';
+import {
+  NetZeroVisualizationStrategy,
+  AnnualPlanningVisualizationStrategy,
+  CumulativePlanningVisualizationStrategy,
+} from '../domain/allocation/visualization';
+import { FinancialAnalysisVisualizationStrategy } from '../domain/allocation/visualization/financial-analysis.strategy';
 
 export const REDIS_CLIENT = 'REDIS_CLIENT';
 
@@ -158,17 +163,37 @@ export const REDIS_CLIENT = 'REDIS_CLIENT';
         prisma: PrismaService,
         visualizationRepository: VisualizationRepositoryInterface,
       ) => {
+        const stockRepository = new PrismaStockRepository(prisma);
+        const orderRepository = new PrismaOrderBookRepository(prisma);
+        const businessUnitRepository = new PrismaBusinessUnitRepository(prisma);
+
         return new VisualizationManager(
           visualizationRepository,
           new PrismaAllocationRepository(prisma),
-          new PrismaBusinessUnitRepository(prisma),
+          businessUnitRepository,
           new PrismaCompanyRepository(prisma),
           [
             new NetZeroVisualizationStrategy(
               visualizationRepository,
-              new PrismaStockRepository(prisma),
-              new PrismaOrderBookRepository(prisma),
-              new PrismaBusinessUnitRepository(prisma),
+              stockRepository,
+              orderRepository,
+              businessUnitRepository,
+            ),
+            new AnnualPlanningVisualizationStrategy(
+              visualizationRepository,
+              stockRepository,
+              orderRepository,
+              businessUnitRepository,
+            ),
+            new CumulativePlanningVisualizationStrategy(
+              visualizationRepository,
+              stockRepository,
+              orderRepository,
+              businessUnitRepository,
+            ),
+            new FinancialAnalysisVisualizationStrategy(
+              visualizationRepository,
+              stockRepository,
             ),
           ],
         );

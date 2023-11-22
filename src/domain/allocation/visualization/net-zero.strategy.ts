@@ -10,6 +10,7 @@ import {
 import { Allocation } from '../allocation';
 import { VisualizationRepositoryInterface } from '../visualization-repositoy.interface';
 import { NetZeroStockExtractor } from './net-zero-stock-extractor';
+import { netZeroKey } from './utils';
 import { VisualizationStrategyInterface } from './visualization-strategy.interface';
 
 export class NetZeroVisualizationStrategy
@@ -28,9 +29,13 @@ export class NetZeroVisualizationStrategy
     businessUnit: BusinessUnit,
     allocation: Allocation,
   ): Promise<void> {
-    await this.repository.delete(`NET-ZERO#COMPANY#${company.id}`);
-    await this.repository.delete(`NET-ZERO#BUSINESSUNIT#${businessUnit.id}`);
-    await this.repository.delete(`NET-ZERO#PROJECT#${allocation.projectId}`);
+    await this.repository.delete(netZeroKey({ companyId: company.id }));
+    await this.repository.delete(
+      netZeroKey({ businessUnitId: businessUnit.id }),
+    );
+    await this.repository.delete(
+      netZeroKey({ projectId: allocation.projectId }),
+    );
   }
 
   async hydrate(
@@ -56,7 +61,7 @@ export class NetZeroVisualizationStrategy
     visualization = this.extractor.aggregate(visualization, [], actuals);
 
     await this.repository.put(
-      `NET-ZERO#PROJECT#${projectId}`,
+      netZeroKey({ projectId }),
       JSON.stringify(visualization),
     );
   }
@@ -75,7 +80,7 @@ export class NetZeroVisualizationStrategy
     visualization = this.extractor.aggregate(visualization, demands, actuals);
 
     await this.repository.put(
-      `NET-ZERO#BUSINESSUNIT#${businessUnit.id}`,
+      netZeroKey({ businessUnitId: businessUnit.id }),
       JSON.stringify(visualization),
     );
   }
@@ -97,9 +102,8 @@ export class NetZeroVisualizationStrategy
     visualization = this.extractor.aggregate(visualization, demands, actuals);
 
     await this.repository.put(
-      `NET-ZERO#COMPANY#${companyId}`,
+      netZeroKey({ companyId }),
       JSON.stringify(visualization),
     );
-    throw new Error('Method not implemented.');
   }
 }

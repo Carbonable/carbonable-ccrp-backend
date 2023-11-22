@@ -196,8 +196,8 @@ model Order {
 
   businessUnitId String        @map("business_unit_id")
   businessUnit   BusinessUnit  @relation(fields: [businessUnitId], references: [id])
-  Reservation    Reservation[]
-  Execution      Execution[]
+  reservations   Reservation[]
+  executions     Execution[]
 
   @@unique([year, businessUnitId])
   @@map("order")
