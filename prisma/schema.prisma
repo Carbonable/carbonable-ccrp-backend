@@ -83,6 +83,7 @@ model Project {
   id String @id
 
   name             String
+  slug             String             @unique
   description      String
   localization     String
   startDate        String             @map("start_date") @db.VarChar(4)
@@ -206,7 +207,8 @@ model Order {
 model Allocation {
   id String @id
 
-  quantity Int
+  quantity    Int
+  allocatedAt DateTime @default(now()) @map("allocated_at")
 
   businessUnitId String         @map("business_unit_id")
   businessUnit   BusinessUnit   @relation(fields: [businessUnitId], references: [id])
@@ -219,17 +221,20 @@ model Allocation {
 }
 
 model Stock {
-  id        String @id
-  vintage   String @db.VarChar(4)
-  quantity  Int
-  available Int    @default(0)
-  consumed  Int    @default(0)
+  id              String @id
+  vintage         String @db.VarChar(4)
+  quantity        Int
+  available       Int    @default(0)
+  consumed        Int    @default(0)
+  purchased       Int    @default(0)
+  purchased_price Int    @default(0)
+  issued_price    Int    @default(0)
 
-  businessUnitId String        @map("business_unit_id")
-  businessUnit   BusinessUnit  @relation(fields: [businessUnitId], references: [id])
+  businessUnitId String?       @map("business_unit_id")
+  businessUnit   BusinessUnit? @relation(fields: [businessUnitId], references: [id])
   projectId      String        @map("project_id")
   project        Project       @relation(fields: [projectId], references: [id])
-  allocationId   String        @map("allocation_id")
+  allocationId   String?       @map("allocation_id")
   allocation     Allocation?   @relation(fields: [allocationId], references: [id])
   Reservation    Reservation[]
   Execution      Execution[]
@@ -238,11 +243,14 @@ model Stock {
 }
 
 model Vintage {
-  id       String @id
-  year     String @db.VarChar(4)
-  capacity Int
-  reserved Int    @default(0)
-  consumed Int    @default(0)
+  id              String @id
+  year            String @db.VarChar(4)
+  capacity        Int
+  reserved        Int    @default(0)
+  consumed        Int    @default(0)
+  purchased       Int    @default(0)
+  purchased_price Int    @default(0)
+  issued_price    Int    @default(0)
 
   projectId String  @map("project_id")
   project   Project @relation(fields: [projectId], references: [id])

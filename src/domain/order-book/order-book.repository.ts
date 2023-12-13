@@ -1,4 +1,4 @@
-import { EffectiveCompensation, Order } from '.';
+import { EffectiveCompensation, EffectiveContribution, Order } from '.';
 
 export interface OrderBookRepositoryInterface {
   listOrdersFor(id: string): Promise<Array<Order>>;
@@ -10,6 +10,9 @@ export interface OrderBookRepositoryInterface {
   getBusinessUnitYearlyEffectiveCompensation(
     businessUnitId: string,
   ): Promise<EffectiveCompensation[]>;
+  getBusinessUnitYearlyEffectiveContribution(
+    businessUnitId: string,
+  ): Promise<EffectiveContribution[]>;
   getCompanyYearlyEffectiveCompensation(
     companyId: string,
   ): Promise<EffectiveCompensation[]>;
@@ -19,4 +22,8 @@ export interface OrderBookRepositoryInterface {
 
   getCompanyOrders(companyId: string): Promise<Order[]>;
   getProjectOrders(projectId: string): Promise<Order[]>;
+
+  getProjectTotalInvestedAmount(projectId: string): Promise<number>;
+  getBusinessUnitTotalInvestedAmount(businessUnitId: string): Promise<number>;
+  getCompanyTotalInvestedAmount(companyId: string): Promise<number>;
 }

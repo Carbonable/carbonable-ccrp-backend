@@ -1,3 +1,6 @@
+import { IdGeneratorInterface } from '../common';
+import { Vintage } from '../portfolio';
+
 export const exPostStock = (stocks: Stock[], currentYear: number): number =>
   stocks.reduce(
     (acc, curr) =>
@@ -11,6 +14,11 @@ export const exAnteStock = (stocks: Stock[], currentYear: number): number =>
     0,
   );
 
+export type StockAvailability = {
+  percentage: number;
+  units: number;
+};
+
 export class Stock {
   private _consumed = 0;
   private _available = 0;
@@ -18,7 +26,7 @@ export class Stock {
 
   constructor(
     public readonly id: string,
-    public readonly businessUnitId: string,
+    public readonly businessUnitId: string = null,
     public readonly projectId: string,
     public readonly vintage: string,
     private _quantity: number,
@@ -70,5 +78,15 @@ export class Stock {
   }
   get issuedPrice(): number {
     return this._issuedPrice;
+  }
+  static fromVintages(
+    idGenerator: IdGeneratorInterface,
+    projectId: string,
+    vintages: Vintage[],
+  ): Stock[] {
+    return vintages.map(
+      (v) =>
+        new Stock(idGenerator.generate(), null, projectId, v.year, v.capacity),
+    );
   }
 }

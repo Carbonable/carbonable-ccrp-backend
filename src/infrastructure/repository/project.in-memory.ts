@@ -43,7 +43,16 @@ export class InMemoryProjectRepository implements ProjectRepositoryInterface {
     }
   }
 
+  async findByIds(ids: string[]): Promise<Project[]> {
+    return this.projects.filter((project) => ids.includes(project.id));
+  }
+
   async addProject(project: Project): Promise<void> {
     this.projects.push(project);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async byAllocationIds(ids: string[]): Promise<Project[]> {
+    throw new Error('Method not implemented.');
   }
 }

@@ -99,8 +99,18 @@ defineFeature(feature, (test) => {
     when,
   }) => {
     givenIHaveAnExistingCompany(given, companyId, company, companyRepository);
-    andProjectIsConfigured(and, projectRepository, idGenerator);
-    andProjectIsConfigured(and, projectRepository, idGenerator);
+    andProjectIsConfigured(
+      and,
+      projectRepository,
+      stockRepository,
+      idGenerator,
+    );
+    andProjectIsConfigured(
+      and,
+      projectRepository,
+      stockRepository,
+      idGenerator,
+    );
 
     andTheFollowingBusinessUnit(
       and,

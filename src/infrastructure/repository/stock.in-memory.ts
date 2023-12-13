@@ -1,4 +1,6 @@
+import { Demand } from '../../domain/business-unit';
 import { Stock, StockRepositoryInterface } from '../../domain/order-book';
+import { StockAvailability } from '../../domain/order-book/stock';
 
 export class InMemoryStockRepository implements StockRepositoryInterface {
   constructor(public stock: Stock[] = []) {}
@@ -11,9 +13,14 @@ export class InMemoryStockRepository implements StockRepositoryInterface {
     );
   }
 
-  async findAllocatedStockByVintage(businessUnitId: string): Promise<Stock[]> {
+  async findAllocatedStockByVintage(
+    businessUnitId: string,
+    allocationIds: string[],
+  ): Promise<Stock[]> {
     const stock = this.stock.filter(
-      (s) => businessUnitId === s.businessUnitId && null !== s.allocationId,
+      (s) =>
+        businessUnitId === s.businessUnitId &&
+        allocationIds.includes(s.allocationId),
     );
     return stock.sort((a, b) =>
       parseInt(a.vintage) < parseInt(b.vintage) ? -1 : 1,
@@ -42,5 +49,19 @@ export class InMemoryStockRepository implements StockRepositoryInterface {
   }
   async findProjectStock(projectId: string): Promise<Stock[]> {
     return this.stock.filter((s) => s.projectId === projectId);
+  }
+
+  async availableToAllocate(
+    projectId: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    demands: Demand[],
+  ): Promise<StockAvailability> {
+    const stock = this.stock.filter((s) => s.projectId === projectId);
+    // TODO: get available stock based on demands
+
+    return {
+      percentage: 100,
+      units: stock.reduce((acc, curr) => acc + curr.available, 0),
+    };
   }
 }

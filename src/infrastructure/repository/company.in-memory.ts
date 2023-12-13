@@ -24,4 +24,9 @@ export class InMemoryCompanyRepository implements CompanyRepositoryInterface {
       c.businessUnits.find((bu) => bu.id === id),
     );
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async byAllocationIds(ids: string[]): Promise<Company[]> {
+    throw new Error('Method not supported.');
+  }
 }

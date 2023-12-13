@@ -1,9 +1,11 @@
+import slugify from 'slugify';
 import { CarbonCredit, Vintage } from '.';
 import { MetadataParser } from '../common';
 import { Metadata } from '../common/metadata-parser';
 
 export class Project {
   private _metadata: Metadata<string, string>[];
+  public readonly slug: string;
   constructor(
     public readonly id: string,
     public readonly name: string,
@@ -11,8 +13,12 @@ export class Project {
     private _carbonCredits: Array<CarbonCredit> = [],
     private _vintages: Array<Vintage> = [],
     metadata = '',
+    slug = '',
   ) {
     this._metadata = MetadataParser.parse(metadata);
+    if ('' === slug) {
+      this.slug = slugify(name.toLowerCase());
+    }
   }
 
   async getAvailableCarbonCredits(): Promise<Array<CarbonCredit>> {

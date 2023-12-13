@@ -2,6 +2,9 @@ import { IdGeneratorInterface } from '../common';
 import { TON_IN_GRAM } from '../order-book';
 import { AbsorptionCurve } from './carbon-credit';
 
+export const DEFAULT_PURCHASED_PRICE = 22;
+export const DEFAULT_ISSUED_PRICE = 22;
+
 export class Vintage {
   private _capacity: number;
   private _reserved: number;
@@ -11,6 +14,9 @@ export class Vintage {
     public readonly id: string,
     public readonly year: string,
     capacity: number,
+    private _purchased: number = 0,
+    private _purchased_price: number = DEFAULT_PURCHASED_PRICE,
+    private _issued_price: number = DEFAULT_ISSUED_PRICE,
   ) {
     this._reserved = 0;
     this._available = capacity;
@@ -33,6 +39,35 @@ export class Vintage {
     this._reserved += count;
     this._available -= count;
     this.checkCapacity();
+  }
+
+  get purchased(): number {
+    return this._purchased;
+  }
+  get purchasePrice(): number {
+    return this._purchased_price;
+  }
+  get issuedPrice(): number {
+    return this._issued_price;
+  }
+
+  static exPostStockAt(
+    vintages: Vintage[],
+    year: number = new Date().getFullYear(),
+  ): number {
+    return vintages.reduce(
+      (acc, curr) => acc + (parseInt(curr.year) <= year ? curr.capacity : 0),
+      0,
+    );
+  }
+  static exAnteStockAt(
+    vintages: Vintage[],
+    year: number = new Date().getFullYear(),
+  ): number {
+    return vintages.reduce(
+      (acc, curr) => acc + (parseInt(curr.year) > year ? curr.capacity : 0),
+      0,
+    );
   }
 
   // Ensure our business domain obect cannot enter an invalid state.

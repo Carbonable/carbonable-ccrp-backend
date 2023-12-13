@@ -1,6 +1,7 @@
 type Project {
     id: ID!,
   name:         String
+  slug:         String
   description:  String
   localization: String
   startDate:    String
@@ -8,11 +9,60 @@ type Project {
   area:         Int
   type:         CarbonCreditType
   origin:       CarbonCreditOrigin
-  carbon_credits: [CarbonCredit!]
+  vintages: [Vintage!]
   certifier: Certifier!
   developper: Developper
   country: Country
   metadata: JSON
+  global_data: ProjectGlobalData
+}
+
+type AllocationAvailability {
+  available_percent: Int
+  available_units: Int
+}
+
+type ProjectGlobalData {
+  amount: Int
+  source: String
+  rating:  String
+  allocated_units: Int
+  available_ex_post: Int
+  available_ex_ante: Int
+}
+
+type Vintage {
+  id: ID!
+  year: String
+  capacity: Int
+  reserved: Int
+  consumed: Int
+  purchased: Int
+  purchased_price: Int
+  issued_price: Int
+}
+
+type BusinessUnit {
+    id: String
+    name: String
+    description: String
+
+    default_emission: Int
+    default_target: Int
+    metadata: [Metadata]
+    allocations: [Allocation]
+    yearly_emissions: String
+    yearly_contributions: String
+}
+
+type Allocation {
+    project: String
+    amount: Int
+}
+
+type Metadata {
+    key: String
+    value: String
 }
 
 type ProjectColorRepartition {

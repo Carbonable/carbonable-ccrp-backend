@@ -64,6 +64,18 @@ export class PrismaCompanyRepository implements CompanyRepositoryInterface {
     );
   }
 
+  async byAllocationIds(ids: string[]): Promise<Company[]> {
+    const companies = await this.prisma.company.findMany({
+      where: {
+        businessUnits: {
+          some: { allocations: { some: { id: { in: ids } } } },
+        },
+      },
+      include: { businessUnits: true },
+    });
+    return companies.map(this.companyFromPrisma.bind(this));
+  }
+
   mapPrismaToBusinessUnit(bu: any): BusinessUnit {
     return new BusinessUnit(
       bu.id,
@@ -81,7 +93,7 @@ export class PrismaCompanyRepository implements CompanyRepositoryInterface {
     return new Company(
       c.id,
       c.name,
-      c.businessUnits.map(this.mapPrismaToBusinessUnit),
+      c.businessUnits.map(this.mapPrismaToBusinessUnit.bind(this)),
     );
   }
 }
@@ -96,7 +108,7 @@ function mapBusinessUnitToPrisma(bu: BusinessUnit): any {
       defaultEmission: bu.defaultEmission,
       defaultTarget: bu.defaultTarget,
       debt: bu.debt,
-      metadata: JSON.stringify(bu.getMetatada()),
+      metadata: JSON.stringify(bu.getMetadata()),
     },
   };
 }

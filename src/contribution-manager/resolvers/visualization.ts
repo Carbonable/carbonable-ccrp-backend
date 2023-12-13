@@ -21,29 +21,35 @@ export class VisualizationResolver {
     private readonly repository: VisualizationRepositoryInterface,
   ) {}
 
-  @Query('netZeroPlanning')
-  async netZeroPlanning(@Args('view') view: VisualizationViewType) {
-    return await getVisualizationView(netZeroKey)(this.repository, view);
-  }
-
-  @Query('annual')
-  async annual(@Args('view') view: VisualizationViewType) {
-    return await getVisualizationView(annualPlanningKey)(this.repository, view);
-  }
-
-  @Query('cumulative')
-  async cumulative(@Args('view') view: VisualizationViewType) {
-    return await getVisualizationView(cumulativePlanningKey)(
+  @Query()
+  async netZeroPlanning(@Args('view') view: any) {
+    return await getVisualizationView(netZeroKey)(
       this.repository,
-      view,
+      view as VisualizationViewType,
     );
   }
 
-  @Query('financialAnalysis')
-  async financialAnalysis(@Args('view') view: VisualizationViewType) {
+  @Query()
+  async annual(@Args('view') view: any) {
+    return await getVisualizationView(annualPlanningKey)(
+      this.repository,
+      view as VisualizationViewType,
+    );
+  }
+
+  @Query()
+  async cumulative(@Args('view') view: any) {
+    return await getVisualizationView(cumulativePlanningKey)(
+      this.repository,
+      view as VisualizationViewType,
+    );
+  }
+
+  @Query()
+  async financialAnalysis(@Args('view') view: any) {
     return await getVisualizationView(financialAnalysisKey)(
       this.repository,
-      view,
+      view as VisualizationViewType,
     );
   }
 }
@@ -56,14 +62,22 @@ function getVisualizationView(
     view: VisualizationViewType,
   ) {
     // converting snakecase to camelCase
-    view = _.mapKeys(view, (_v: string, k: string) => _.camelCase(k));
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const camelized = _.mapKeys(view, (_v: string, k: string) =>
+      _.camelCase(k),
+    );
     const res = await repository.get(
-      viewKey(view as VisualizationStrategyKeyInput),
+      viewKey(camelized as VisualizationStrategyKeyInput),
     );
     if (!res) {
       return [];
     }
 
-    return JSON.parse(res);
+    return _.values(
+      _.mapValues(JSON.parse(res), (item) => {
+        return _.mapKeys(item, (_v: any, k: string) => _.snakeCase(k));
+      }),
+    );
   };
 }

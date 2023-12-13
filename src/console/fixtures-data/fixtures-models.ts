@@ -136,6 +136,7 @@ export const ProjectDataFixtures = ({
     {
       id: '01H5739RVDH5MFVTHD90TBR92J',
       name: 'Banegas Farm',
+      slug: 'forest-regeneration-banegas-farm-costa-rica',
       description:
         'the Banegas site is a patch of dirt and shrubs that was degraded over time due to overgrazing.',
       localization: '8.701643683464424, -83.5534715922547',
@@ -162,11 +163,15 @@ export const ProjectDataFixtures = ({
       countryId: (references: any) => {
         return references['country'].find((c) => c.name === 'Costa Rica').id;
       },
-      metadata: {},
+      metadata: {
+        image_url:
+          'https://www.dappland.com/_next/image?url=%2Fdapps%2Fcarbonable%2Fcarbonable-Banegas-Farm.jpeg&w=384&q=75',
+      },
     },
     {
       id: '01H5739RVSRKHFVNM47AE4NHMK',
       name: 'Las Delicias',
+      slug: 'mangroves-regeneration-las-delicias-panama',
       description:
         'Las Delicias is a mangrove restoration project located right outside of the municipality of Colón Island in the Bocas del Toro archipiélago, Panama.',
       localization: '9.402630368441974, -82.30576308181759',
@@ -192,7 +197,10 @@ export const ProjectDataFixtures = ({
       countryId: (references: any) => {
         return references['country'].find((c) => c.name === 'Panama').id;
       },
-      metadata: {},
+      metadata: {
+        image_url:
+          'https://www.dappland.com/_next/image?url=%2Fdapps%2Fcarbonable%2Fcarbonable-Las-Delicias.jpeg&w=384&q=75',
+      },
     },
   ],
 });
@@ -256,8 +264,49 @@ export const VintageDataFixtures = ({
           year: item.year,
           capacity: item.capacity,
           projectId: project.id,
+          purchased: item.purchased,
+          purchased_price: item.purchasePrice,
+          issued_price: item.issuedPrice,
         };
       }
+    }
+  },
+  data: [],
+});
+
+export const StockDataFixtures = ({
+  prismaClient,
+}: DataFixtureFn): DataFixture<
+  Omit<Prisma.StockCreateManyInput, 'id'>,
+  Prisma.StockDelegate
+> => ({
+  name: 'stock',
+  count: 1,
+  object: prismaClient.stock,
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  model: async function* ({ references }) {
+    const projects: Project[] = references['project'];
+    const idGenerator = new UlidIdGenerator();
+
+    for (const project of projects) {
+      const vintages = await prismaClient.vintage.findMany({
+        where: { projectId: project.id },
+      });
+
+      await prismaClient.stock.createMany({
+        data: vintages.map((v) => ({
+          id: idGenerator.generate(),
+          vintage: v.year,
+          quantity: v.capacity,
+          available: v.capacity,
+          consumed: 0,
+          purchased: 0,
+          purchased_price: v.purchased_price,
+          issued_price: v.issued_price,
+          projectId: project.id,
+        })),
+      });
     }
   },
   data: [],

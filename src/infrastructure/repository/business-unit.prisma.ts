@@ -1,9 +1,17 @@
 import {
   BusinessUnit,
   BusinessUnitRepositoryInterface,
+  ForecastEmission,
+  ForecastTarget,
 } from '../../domain/business-unit';
-import { BusinessUnit as BusinessUnitModel } from '@prisma/client';
+import {
+  BusinessUnit as BusinessUnitModel,
+  ForecastTarget as ForecastTargetModel,
+  ForecastEmission as ForecastEmissionModel,
+  Allocation as AllocationModel,
+} from '@prisma/client';
 import { PrismaService } from '../prisma.service';
+import { Allocation } from '../../domain/allocation';
 
 export const BUSINESS_UNIT_REPOSITORY = 'BUSINESS_UNIT_REPOSITORY';
 
@@ -15,6 +23,10 @@ export class PrismaBusinessUnitRepository
   async byId(id: string): Promise<BusinessUnit> {
     const dbModel = await this.prisma.businessUnit.findUnique({
       where: { id },
+      include: {
+        forecastTargets: true,
+        forecastEmissions: true,
+      },
     });
     if (null === dbModel) {
       return null;
@@ -27,6 +39,10 @@ export class PrismaBusinessUnitRepository
     return prismaToBusinessUnit(
       await this.prisma.businessUnit.findMany({
         where: { companyId },
+        include: {
+          forecastTargets: true,
+          forecastEmissions: true,
+        },
       }),
     );
   }
@@ -84,22 +100,83 @@ export class PrismaBusinessUnitRepository
       });
     }
   }
+
+  async byAllocationIds(ids: string[]): Promise<BusinessUnit[]> {
+    return prismaToBusinessUnit(
+      await this.prisma.businessUnit.findMany({
+        where: { allocations: { some: { id: { in: ids } } } },
+        include: {
+          forecastEmissions: true,
+          forecastTargets: true,
+        },
+      }),
+    );
+  }
+
+  async byAllocatedProjects(projectId: string): Promise<BusinessUnit[]> {
+    return prismaToBusinessUnit(
+      await this.prisma.businessUnit.findMany({
+        where: {
+          allocations: { some: { projectId } },
+        },
+        include: {
+          forecastEmissions: true,
+          forecastTargets: true,
+        },
+      }),
+    );
+  }
 }
 
-function prismaToBusinessUnit(bus: BusinessUnitModel[]): BusinessUnit[] {
-  return bus.map(
-    (b) =>
-      new BusinessUnit(
-        b.id,
-        b.name,
-        b.description,
-        b.defaultEmission,
-        b.defaultTarget,
-        b.debt,
-        b.companyId,
-        JSON.parse(b.metadata.toString()),
+export function prismaToBusinessUnit(bus: BusinessUnitModel[]): BusinessUnit[] {
+  return bus.map((b) => {
+    const bu = new BusinessUnit(
+      b.id,
+      b.name,
+      b.description,
+      b.defaultEmission,
+      b.defaultTarget,
+      b.debt,
+      b.companyId,
+      JSON.parse(b.metadata.toString()),
+    );
+    bu.addTargets(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      b.forecastTargets.map(
+        (t: ForecastTargetModel) =>
+          new ForecastTarget(t.year, t.quantity, t.id),
       ),
-  );
+    );
+    bu.addForecastEmissions(
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      b.forecastEmissions.map(
+        (e: ForecastEmissionModel) =>
+          new ForecastEmission(e.year, e.quantity, e.id),
+      ),
+    );
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    if (b.allocations && b.allocations.length > 0) {
+      bu.addAllocations(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        b.allocations.map(
+          (a: AllocationModel) =>
+            new Allocation(
+              a.id,
+              a.projectId,
+              a.businessUnitId,
+              a.quantity,
+              a.allocatedAt,
+            ),
+        ),
+      );
+    }
+
+    return bu;
+  });
 }
 
 export function mapBusinessUnitToPrisma(bu: BusinessUnit): any {
@@ -111,6 +188,6 @@ export function mapBusinessUnitToPrisma(bu: BusinessUnit): any {
     defaultTarget: bu.defaultTarget,
     debt: bu.debt,
     companyId: bu.companyId,
-    metadata: JSON.stringify(bu.getMetatada()),
+    metadata: JSON.stringify(bu.getMetadata()),
   };
 }

@@ -45,12 +45,14 @@ export class Booker {
     }, {});
 
     for (const businessUnitId in grouped) {
+      const allocations = grouped[businessUnitId];
       const businessUnit = await this.businessUnitRepository.byId(
         businessUnitId,
       );
       // all stock for every allocations ordered by vintage.
       const stocks = await this.stockRepository.findAllocatedStockByVintage(
         businessUnit.id,
+        allocations.map((a) => a.id),
       );
 
       await this.placeOrdersForAllocation(businessUnit, allocations, stocks);
@@ -72,8 +74,7 @@ export class Booker {
 
     for (const demand of demands) {
       // in cc unit
-      let quantityForDemand =
-        (demand.emission * demand.target) / 100 / TON_IN_GRAM;
+      let quantityForDemand = (demand.emission * demand.target) / 100;
 
       // The idea here is to consume cc's until demand is fullfilled.
       // from bottom up, take every ccs of lower vintage until all are consumed
@@ -82,14 +83,14 @@ export class Booker {
           continue;
         }
 
-        // get quantity expressed in g to order
+        // get quantity expressed in carbon units to order
         // based on demand emission and target
         const availableQuantity = item.available;
 
         const quantity =
           availableQuantity < quantityForDemand
             ? availableQuantity
-            : availableQuantity - quantityForDemand;
+            : quantityForDemand;
 
         let order = null;
         try {

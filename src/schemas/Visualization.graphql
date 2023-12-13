@@ -5,20 +5,53 @@ input VisualizationViewType {
 }
 
 type NetZeroPlanning {
-    year: String
+    vintage: String
+    ex_ante_count: Int
+    ex_post_count: Int
+    emission: Int
+    target: Int
+    actual: Int
 }
 
 type Annual {
-    year: String
-
+  time_period: String
+  emissions: Int
+  ex_post_issued: Int
+  ex_post_purchased: Int
+  ex_post_retired: Int
+  target: Int
+  actual_rate: Int
+  delta: Int
+  debt: Int
+  ex_post_stock: Int
+  ex_ante_stock: Int
 }
 
 type Cumulative {
-    year: String
-
+  time_period: String
+  emissions: Int
+  ex_post_issued: Int
+  ex_post_purchased: Int
+  ex_post_retired: Int
+  target: Int
+  actual_rate: Int
+  delta: Int
+  debt: Int
+  ex_post_stock: Int
+  ex_ante_stock: Int
 }
 
 type FinancialAnalysis {
-    year: String
-
+  year: String
+  purchased_price: Int
+  cumulative_purchased_price: Int
+  total_purchased_amount: Int
+  cumulative_total_purchased_amount: Int
+  issued_price: Int
+  total_issued_amount: Int
+  cumulative_total_issued_amount: Int
+  gran_total_amount: Int
+  cumulative_gran_total_amount: Int
+  estimated_debt_amount: Int
+  cumulative_estimated_debt_amount: Int
  }

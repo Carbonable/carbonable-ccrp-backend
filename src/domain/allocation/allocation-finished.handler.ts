@@ -15,6 +15,7 @@ export class AllocationFinishedHandler
   ) {}
 
   async handle(event: AllocationFinished): Promise<void> {
+    this.logger.log(`Handling event ${JSON.stringify(event)}`);
     // remove allocations not in event.allocationIds
     try {
       await this.repository.flushAllocationsExcept(event.ids);
@@ -31,6 +32,13 @@ export class AllocationFinishedHandler
     // - annual
     // - cumulative
     // - financial analysis
+    // - project funding allocation
     await this.visualizationManager.hydrateVisualization(event.ids);
+    this.logger.log(
+      `Successfully finished handling AllocationFinished event : ${JSON.stringify(
+        event,
+      )}`,
+    );
+    // remove allocations not in event.allocationIds
   }
 }

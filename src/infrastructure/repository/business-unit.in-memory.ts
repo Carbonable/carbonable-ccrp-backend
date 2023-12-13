@@ -19,4 +19,14 @@ export class InMemoryBusinessUnitRepository
   async save(businessUnit: BusinessUnit): Promise<void> {
     this.inner.push(businessUnit);
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async byAllocationIds(ids: string[]): Promise<BusinessUnit[]> {
+    throw new Error('Method not supported');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async byAllocatedProjects(projectId: string): Promise<BusinessUnit[]> {
+    throw new Error('Method not supported');
+  }
 }
