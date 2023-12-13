@@ -5,8 +5,6 @@ import { Vintage } from '../../domain/portfolio';
 import { BusinessUnitRepositoryInterface } from '../../domain/business-unit';
 import { BUSINESS_UNIT_REPOSITORY } from '../../infrastructure/repository/business-unit.prisma';
 import { Metadata } from '../../domain/common/metadata-parser';
-import { ORDER_BOOK_REPOSITORY } from '../../infrastructure/repository/order-book.prisma';
-import { OrderBookRepositoryInterface } from '../../domain/order-book';
 import Utils from '../../utils';
 import {
   PROJECT_REPOSITORY,
@@ -18,21 +16,6 @@ type AllocationTarget = {
   name: string;
   metadata: Metadata<string, string>[];
 };
-type CompanyCarbonAssetAllocationItem = {
-  project_name: string;
-  business_unit_names: AllocationTarget[];
-  type: string;
-  total_potential: number;
-  ex_post_to_date: number;
-  ex_ante_to_date: number;
-  project_completion: string;
-  total_allocated_to_date: number;
-  total_available_to_date: number;
-  allocation_rate: string;
-  price: number;
-  total_amount: number;
-};
-
 type ProjectCarbonAssetAllocationItem = {
   business_unit: AllocationTarget;
   allocated: number;
@@ -56,19 +39,15 @@ export class CarbonAssetAllocationService {
     private readonly prisma: PrismaService,
     @Inject(BUSINESS_UNIT_REPOSITORY)
     private readonly businessUnitRepository: BusinessUnitRepositoryInterface,
-    @Inject(ORDER_BOOK_REPOSITORY)
-    private readonly orderRepository: OrderBookRepositoryInterface,
     @Inject(PROJECT_REPOSITORY)
     private readonly projectRepository: ProjectRepositoryInterface,
   ) {}
 
-  async getProject(id: string): Promise<ProjectCarbonAssetAllocationItem[]> {
-    return await this.fetchProjectWide(id);
+  async getProject(id: string, pagination: any) {
+    return Utils.paginate(await this.fetchProjectWide(id), pagination);
   }
-  async getBusinessUnit(
-    id: string,
-  ): Promise<BusinessUnitCarbonAssetAllocationItem[]> {
-    return await this.fetchBusinessUnitWide(id);
+  async getBusinessUnit(id: string, pagination: any) {
+    return Utils.paginate(await this.fetchBusinessUnitWide(id), pagination);
   }
 
   async fetchBusinessUnitWide(
@@ -137,9 +116,7 @@ export class CarbonAssetAllocationService {
     return res;
   }
 
-  async getCompanyWide(
-    companyId: string,
-  ): Promise<CompanyCarbonAssetAllocationItem[]> {
+  async getCompanyWide(companyId: string, pagination: any) {
     const businessUnits = await this.businessUnitRepository.byCompanyId(
       companyId,
     );
@@ -200,7 +177,8 @@ export class CarbonAssetAllocationService {
         total_amount: total_potential * price,
       });
     }
-    return res;
+
+    return Utils.paginate(res, pagination);
   }
 }
 
