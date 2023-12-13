@@ -7,16 +7,17 @@ import {
   OrderBookRepositoryInterface,
   StockRepositoryInterface,
 } from '../../order-book';
-import { Allocation } from '../allocation';
 import { VisualizationRepositoryInterface } from '../visualization-repositoy.interface';
 import { NetZeroStockExtractor } from './net-zero-stock-extractor';
 import { netZeroKey } from './utils';
+import { VisualizationDataExtractor } from './visualization-data-extractor';
 import { VisualizationStrategyInterface } from './visualization-strategy.interface';
 
 export class NetZeroVisualizationStrategy
   implements VisualizationStrategyInterface
 {
   constructor(
+    private readonly visualizationDataExtractor: VisualizationDataExtractor,
     private readonly repository: VisualizationRepositoryInterface,
     private readonly stockRepository: StockRepositoryInterface,
     private readonly orderRepository: OrderBookRepositoryInterface,
@@ -24,31 +25,40 @@ export class NetZeroVisualizationStrategy
     private readonly extractor: NetZeroStockExtractor = new NetZeroStockExtractor(),
   ) {}
 
-  async clean(
-    company: Company,
-    businessUnit: BusinessUnit,
-    allocation: Allocation,
-  ): Promise<void> {
-    await this.repository.delete(netZeroKey({ companyId: company.id }));
-    await this.repository.delete(
-      netZeroKey({ businessUnitId: businessUnit.id }),
+  async clean(allocationIds: string[]): Promise<void> {
+    this.visualizationDataExtractor.iterateOverData(
+      await this.visualizationDataExtractor.fetchCompanies(allocationIds),
+      async (c) =>
+        await this.repository.delete(netZeroKey({ companyId: c.id })),
     );
-    await this.repository.delete(
-      netZeroKey({ projectId: allocation.projectId }),
+    this.visualizationDataExtractor.iterateOverData(
+      await this.visualizationDataExtractor.fetchBusinessUnits(allocationIds),
+      async (bu) =>
+        await this.repository.delete(netZeroKey({ businessUnitId: bu.id })),
+    );
+    this.visualizationDataExtractor.iterateOverData(
+      await this.visualizationDataExtractor.fetchProjects(allocationIds),
+      async (p) =>
+        await this.repository.delete(netZeroKey({ projectId: p.id })),
     );
   }
 
-  async hydrate(
-    company: Company,
-    businessUnit: BusinessUnit,
-    allocation: Allocation,
-  ): Promise<void> {
+  async hydrate(allocationIds: string[]): Promise<void> {
     // company wide find stock associated with company busines unit ids
-    await this.hydrateCompanyWideData(company.id);
+    this.visualizationDataExtractor.iterateOverData(
+      await this.visualizationDataExtractor.fetchCompanies(allocationIds),
+      async (c) => await this.hydrateCompanyWideData(c.id),
+    );
     // business unit wide find stock associated with businessunit id
-    await this.hydrateBusinessUnitWideData(businessUnit);
+    this.visualizationDataExtractor.iterateOverData(
+      await this.visualizationDataExtractor.fetchBusinessUnits(allocationIds),
+      async (bu) => await this.hydrateBusinessUnitWideData(bu),
+    );
     // project wide find stock associated with project id
-    await this.hydrateProjectWideData(allocation.projectId);
+    this.visualizationDataExtractor.iterateOverData(
+      await this.visualizationDataExtractor.fetchProjects(allocationIds),
+      async (p) => await this.hydrateProjectWideData(p.id),
+    );
   }
 
   async hydrateProjectWideData(projectId: string) {

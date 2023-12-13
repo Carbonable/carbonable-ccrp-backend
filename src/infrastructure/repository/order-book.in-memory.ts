@@ -1,5 +1,6 @@
 import {
   EffectiveCompensation,
+  EffectiveContribution,
   Order,
   OrderBookRepositoryInterface,
   OrderStatus,
@@ -58,6 +59,13 @@ export class InMemoryOrderBookRepository
   ): Promise<EffectiveCompensation[]> {
     throw new Error('Operation not supported');
   }
+
+  async getBusinessUnitYearlyEffectiveContribution(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    businessUnitId: string,
+  ): Promise<EffectiveContribution[]> {
+    throw new Error('Operation not supported');
+  }
   async getProjectYearlyEffectiveCompensation(
     //eslint-disable-next-line @typescript-eslint/no-unused-vars
     projectId: string,
@@ -72,6 +80,21 @@ export class InMemoryOrderBookRepository
 
   //eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getProjectOrders(projectId: string): Promise<Order[]> {
+    throw new Error('Operation not supported');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getProjectTotalInvestedAmount(projectId: string): Promise<number> {
+    throw new Error('Operation not supported');
+  }
+  async getBusinessUnitTotalInvestedAmount(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    businessUnitId: string,
+  ): Promise<number> {
+    throw new Error('Operation not supported');
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getCompanyTotalInvestedAmount(companyId: string): Promise<number> {
     throw new Error('Operation not supported');
   }
 }

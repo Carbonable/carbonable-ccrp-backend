@@ -1,22 +1,28 @@
 type Query {
     countries: [Country]
     projects: [Project]
+    businessUnits: [BusinessUnit]
+    businessUnitDetails(id: String!): BusinessUnit
     countryBy(field: String!, value: String!): Country
+    businessUnitsBy(field: String!, value: String!): [BusinessUnit]
 
     certifierBy(field: String!, value: String!): Certifier
     projectBy(field: String!, value: String!): Project
+    availableToAllocate(project_id: String!, business_unit_id: String!): AllocationAvailability
 
-    getGlobalData: GlobalData,
-    getProjectedDecarbonation(viewType: ProjectedDecarbonationViewType): [ProjectedDecarbonationGraph] @deprecated(reason: "replaced by netZeroPlanning")
-    getProjectedDecarbonationTable(pagination: Pagination): ProjectedDecarbonationWithPagination @deprecated(reason: "replaced by annual")
-    getProjectFundingAllocation(pagination: Pagination): ProjectedFundingAllocationWithPagination
-    getProjectMetrics: ProjectMetrics!
-    getImpactMetrics: ImpactMetrics!
+    getGlobalData(view: VisualizationViewType): GlobalData,
+    getProjectFundingAllocation(view: VisualizationViewType): ProjectedFundingAllocationWithPagination
+    getProjectMetrics(view: VisualizationViewType): ProjectMetrics!
+    getImpactMetrics(view: VisualizationViewType): ImpactMetrics!
+    companyCarbonAssetAllocation(id: String!): [CompanyCarbonAssetAllocation]
+    projectCarbonAssetAllocation(id: String!): [ProjectCarbonAssetAllocation]
+    businessUnitCarbonAssetAllocation(id: String!): [BusinessUnitCarbonAssetAllocation]
 
-    netZeroPlanning(view: VisualizationViewType): [NetZeroPlanning]
-    annual(view: VisualizationViewType): [Annual]
-    cumulative(view: VisualizationViewType): [Cumulative]
-    financialAnalysis(view: VisualizationViewType): [FinancialAnalysis]
+
+    netZeroPlanning(view: VisualizationViewType): [NetZeroPlanning]!
+    annual(view: VisualizationViewType!): [Annual]!
+    cumulative(view: VisualizationViewType!): [Cumulative]!
+    financialAnalysis(view: VisualizationViewType!): [FinancialAnalysis]!
 }
 
 type Mutation {
@@ -53,10 +59,48 @@ enum ProjectedDecarbonationViewType {
 }
 
 type GlobalData {
-    total_invested: String!
-    generated_cc: String!
-    forecasted_cc: String!
-    retired_cc: String!
+    target: String!
+    actual: String!
+    debt: String!
+    invested_amount: String!
+    number_of_projects: String!
+}
+
+type CompanyCarbonAssetAllocation {
+    project_name: String
+    business_units: [AssetAllocationItem]
+    type: String
+    total_potential: Int
+    ex_post_to_date: Int
+    ex_ante_to_date: Int
+    project_completion: String
+    total_allocated_to_date: Int
+    total_available_to_date: Int
+    allocation_rate: String
+    price: Int
+    total_amount: Int
+}
+
+type AssetAllocationItem {
+    id: String!
+    name: String!
+    metadata: [Map]!
+}
+type ProjectCarbonAssetAllocation {
+  business_unit: AssetAllocationItem!
+  allocated: Int
+  allocation_amount: Int
+  target: Int
+  actual: Int
+  start_date: String
+}
+type BusinessUnitCarbonAssetAllocation {
+  project: AssetAllocationItem!
+  total_cu: Int
+  allocated: Int
+  generated: Int
+  forward: Int
+  retired: Int
 }
 
 type ProjectedDecarbonation {

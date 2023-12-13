@@ -21,28 +21,38 @@ export class PrismaAllocationRepository
       }),
     );
   }
-  async save(allocation: Allocation): Promise<void> {
+  async save(a: Allocation): Promise<void> {
     await this.prisma.allocation.create({
       data: {
-        id: allocation.id,
-        quantity: allocation.amount,
-        businessUnitId: allocation.businessUnitId,
-        projectId: allocation.projectId,
+        id: a.id,
+        quantity: a.amount,
+        businessUnitId: a.businessUnitId,
+        projectId: a.projectId,
+        allocatedAt: a.allocatedAt,
       },
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async flushAllocationsExcept(ids: string[]): Promise<void> {
-    await this.prisma.allocation.deleteMany({
-      where: {
-        NOT: { id: { in: ids } },
-      },
-    });
+    // TODO: Proper allocation deletion -> stock + orders
+    // await this.prisma.allocation.deleteMany({
+    //   where: {
+    //     NOT: { id: { in: ids } },
+    //   },
+    // });
   }
 
   prismaToAllocation(allocation: AllocationModel[]): Allocation[] {
     return allocation.map(
-      (a) => new Allocation(a.id, a.projectId, a.businessUnitId, a.quantity),
+      (a) =>
+        new Allocation(
+          a.id,
+          a.projectId,
+          a.businessUnitId,
+          a.quantity,
+          a.allocatedAt,
+        ),
     );
   }
 }

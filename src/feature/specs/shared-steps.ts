@@ -16,6 +16,7 @@ import { Project, Vintage } from '../../domain/portfolio';
 import { InMemoryProjectRepository } from '../../infrastructure/repository/project.in-memory';
 import { IdGeneratorInterface } from '../../domain/common';
 import { InMemoryEventDispatcher } from '../../infrastructure/event-dispatcher.in-memory';
+import { Stock, StockRepositoryInterface } from '../../domain/order-book';
 
 export const givenIHaveAnExistingCompany = (
   given: DefineStepFunction,
@@ -32,6 +33,7 @@ export const givenIHaveAnExistingCompany = (
 export const andProjectIsConfigured = async (
   and: DefineStepFunction,
   projectRepository: InMemoryProjectRepository,
+  stockRepository: StockRepositoryInterface,
   idGenerator: IdGeneratorInterface,
 ) => {
   and(
@@ -47,6 +49,7 @@ export const andProjectIsConfigured = async (
         idGenerator,
         absorptionCurve,
       );
+      const stocks = Stock.fromVintages(idGenerator, projectId, vintages);
       const project = new Project(
         projectId,
         projectName,
@@ -55,6 +58,7 @@ export const andProjectIsConfigured = async (
         vintages,
       );
       await projectRepository.addProject(project);
+      await stockRepository.save(stocks);
     },
   );
 };

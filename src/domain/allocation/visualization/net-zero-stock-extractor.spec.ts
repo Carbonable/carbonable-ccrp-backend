@@ -112,5 +112,65 @@ describe('NetZeroStockExtractor', () => {
     expect(res[1].actual).toBe(60);
   });
 
+  it('should not duplicate vintage', async () => {
+    const stocks = [
+      new Stock('1', 'businessUnit1', 'project1', '2023', 10),
+      new Stock('1', 'businessUnit1', 'project2', '2023', 10),
+      new Stock('1', 'businessUnit1', 'project3', '2023', 10),
+      new Stock('2', 'businessUnit1', 'project1', '2024', 10),
+      new Stock('3', 'businessUnit1', 'project1', '2025', 10),
+    ];
+    const demands = [
+      new Demand('2023', 50, 1000000),
+      new Demand('2024', 60, 1000000),
+    ];
+    const actuals = [
+      new EffectiveCompensation('2023', 50),
+      new EffectiveCompensation('2024', 60),
+    ];
+    const visualizationData = extractor.extract(stocks);
+    const visualization = extractor.aggregate(
+      visualizationData,
+      demands,
+      actuals,
+    );
+
+    expect(visualization.length).toBe(3);
+    expect(visualization[0].actual).toBe(50);
+    expect(visualization[1].actual).toBe(60);
+    expect(visualization[0].target).toBe(50);
+    expect(visualization[1].target).toBe(60);
+  });
+
+  it('should keep track of expost count even if we skip a year', async () => {
+    const stocks = [
+      new Stock('1', 'businessUnit1', 'project1', '2022', 10),
+      new Stock('1', 'businessUnit1', 'project2', '2022', 10),
+      new Stock('1', 'businessUnit1', 'project3', '2022', 10),
+      new Stock('2', 'businessUnit1', 'project1', '2024', 10),
+      new Stock('3', 'businessUnit1', 'project1', '2025', 10),
+    ];
+    const demands = [
+      new Demand('2023', 50, 1000000),
+      new Demand('2024', 60, 1000000),
+    ];
+    const actuals = [
+      new EffectiveCompensation('2023', 50),
+      new EffectiveCompensation('2024', 60),
+    ];
+    const visualizationData = extractor.extract(stocks);
+    const visualization = extractor.aggregate(
+      visualizationData,
+      demands,
+      actuals,
+    );
+
+    expect(visualization.length).toBe(3);
+    expect(visualization[0].actual).toBe(0);
+    expect(visualization[1].actual).toBe(60);
+    expect(visualization[0].target).toBe(0);
+    expect(visualization[1].target).toBe(60);
+  });
+
   afterAll(() => jest.useRealTimers());
 });

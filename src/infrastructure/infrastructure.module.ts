@@ -11,18 +11,28 @@ import {
   IdGeneratorInterface,
   EventDispatcherInterface,
 } from '../domain/common';
-import { PrismaBusinessUnitRepository } from './repository/business-unit.prisma';
+import {
+  BUSINESS_UNIT_REPOSITORY,
+  PrismaBusinessUnitRepository,
+} from './repository/business-unit.prisma';
 import { PrismaCompanyRepository } from './repository/company.prisma';
-import { PrismaOrderBookRepository } from './repository/order-book.prisma';
+import {
+  ORDER_BOOK_REPOSITORY,
+  PrismaOrderBookRepository,
+} from './repository/order-book.prisma';
 import {
   AddAllocationUseCase,
+  AllocationFinishedHandler,
   VISUALIZATION_REPOSITORY,
   VisualizationManager,
   VisualizationRepositoryInterface,
 } from '../domain/allocation';
 import { PrismaProjectRepository } from './repository/project.prisma';
 import { Booker, StockManager } from '../domain/order-book';
-import { PrismaStockRepository } from './repository/stock.prisma';
+import {
+  PrismaStockRepository,
+  STOCK_REPOSITORY,
+} from './repository/stock.prisma';
 import { PrismaAllocationRepository } from './repository/allocation.prisma';
 import {
   NEST_EVENT_DISPATCHER,
@@ -36,6 +46,11 @@ import {
   CumulativePlanningVisualizationStrategy,
 } from '../domain/allocation/visualization';
 import { FinancialAnalysisVisualizationStrategy } from '../domain/allocation/visualization/financial-analysis.strategy';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { NestJsOnAllocationFinished } from './event-handler/allocations.event-handler';
+import { VisualizationDataExtractor } from '../domain/allocation/visualization/visualization-data-extractor';
+import { PROJECT_REPOSITORY } from '../domain/portfolio/project-repository.interface';
+import { COMPANY_REPOSITORY } from '../domain/business-unit/company-repository.interface';
 
 export const REDIS_CLIENT = 'REDIS_CLIENT';
 
@@ -137,8 +152,66 @@ export const REDIS_CLIENT = 'REDIS_CLIENT';
       useClass: UlidIdGenerator,
     },
     {
+      provide: ORDER_BOOK_REPOSITORY,
+      useFactory: (prisma: PrismaService) => {
+        return new PrismaOrderBookRepository(prisma);
+      },
+      inject: [PrismaService],
+    },
+    {
+      provide: BUSINESS_UNIT_REPOSITORY,
+      useFactory: (prisma: PrismaService) => {
+        return new PrismaBusinessUnitRepository(prisma);
+      },
+      inject: [PrismaService],
+    },
+    {
+      provide: PROJECT_REPOSITORY,
+      useFactory: (prisma: PrismaService) => {
+        return new PrismaProjectRepository(prisma);
+      },
+      inject: [PrismaService],
+    },
+    {
+      provide: COMPANY_REPOSITORY,
+      useFactory: (prisma: PrismaService) => {
+        return new PrismaCompanyRepository(prisma);
+      },
+      inject: [PrismaService],
+    },
+    {
+      provide: STOCK_REPOSITORY,
+      useFactory: (prisma: PrismaService) => {
+        return new PrismaStockRepository(prisma);
+      },
+      inject: [PrismaService],
+    },
+    {
       provide: NEST_EVENT_DISPATCHER,
-      useClass: NestjsEventDispatcher,
+      useFactory: (eventEmitter: EventEmitter2) => {
+        return new NestjsEventDispatcher(eventEmitter);
+      },
+      inject: [EventEmitter2],
+    },
+    {
+      provide: AllocationFinishedHandler,
+      useFactory: (
+        prisma: PrismaService,
+        visualizationManager: VisualizationManager,
+      ) => {
+        return new AllocationFinishedHandler(
+          new PrismaAllocationRepository(prisma),
+          visualizationManager,
+        );
+      },
+      inject: [PrismaService, VisualizationManager],
+    },
+    {
+      provide: NestJsOnAllocationFinished,
+      useFactory: (handler: AllocationFinishedHandler) => {
+        return new NestJsOnAllocationFinished(handler);
+      },
+      inject: [AllocationFinishedHandler],
     },
     {
       provide: REDIS_CLIENT,
@@ -166,37 +239,43 @@ export const REDIS_CLIENT = 'REDIS_CLIENT';
         const stockRepository = new PrismaStockRepository(prisma);
         const orderRepository = new PrismaOrderBookRepository(prisma);
         const businessUnitRepository = new PrismaBusinessUnitRepository(prisma);
+        const projectRepository = new PrismaProjectRepository(prisma);
+        const companyRepository = new PrismaCompanyRepository(prisma);
 
-        return new VisualizationManager(
-          visualizationRepository,
-          new PrismaAllocationRepository(prisma),
+        const visualizationDataExtractor = new VisualizationDataExtractor(
+          companyRepository,
           businessUnitRepository,
-          new PrismaCompanyRepository(prisma),
-          [
-            new NetZeroVisualizationStrategy(
-              visualizationRepository,
-              stockRepository,
-              orderRepository,
-              businessUnitRepository,
-            ),
-            new AnnualPlanningVisualizationStrategy(
-              visualizationRepository,
-              stockRepository,
-              orderRepository,
-              businessUnitRepository,
-            ),
-            new CumulativePlanningVisualizationStrategy(
-              visualizationRepository,
-              stockRepository,
-              orderRepository,
-              businessUnitRepository,
-            ),
-            new FinancialAnalysisVisualizationStrategy(
-              visualizationRepository,
-              stockRepository,
-            ),
-          ],
+          projectRepository,
         );
+
+        return new VisualizationManager([
+          new NetZeroVisualizationStrategy(
+            visualizationDataExtractor,
+            visualizationRepository,
+            stockRepository,
+            orderRepository,
+            businessUnitRepository,
+          ),
+          new AnnualPlanningVisualizationStrategy(
+            visualizationDataExtractor,
+            visualizationRepository,
+            stockRepository,
+            orderRepository,
+            businessUnitRepository,
+          ),
+          new CumulativePlanningVisualizationStrategy(
+            visualizationDataExtractor,
+            visualizationRepository,
+            stockRepository,
+            orderRepository,
+            businessUnitRepository,
+          ),
+          new FinancialAnalysisVisualizationStrategy(
+            visualizationDataExtractor,
+            visualizationRepository,
+            stockRepository,
+          ),
+        ]);
       },
       inject: [PrismaService, VISUALIZATION_REPOSITORY],
     },
@@ -212,6 +291,11 @@ export const REDIS_CLIENT = 'REDIS_CLIENT';
     REDIS_CLIENT,
     VisualizationManager,
     VISUALIZATION_REPOSITORY,
+    ORDER_BOOK_REPOSITORY,
+    BUSINESS_UNIT_REPOSITORY,
+    PROJECT_REPOSITORY,
+    COMPANY_REPOSITORY,
+    STOCK_REPOSITORY,
   ],
 })
 export class InfrastructureModule {}

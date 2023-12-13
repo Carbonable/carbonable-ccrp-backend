@@ -3,7 +3,6 @@ import {
   BusinessUnit,
   BusinessUnitRepositoryInterface,
 } from '../../business-unit';
-import { Allocation } from '../allocation';
 import { cumulativePlanningKey } from './utils';
 import { VisualizationRepositoryInterface } from '../visualization-repositoy.interface';
 import { VisualizationStrategyInterface } from './visualization-strategy.interface';
@@ -15,6 +14,7 @@ import {
   AnnualPlanningStockExtractor,
   AnnualPlanningVisualization,
 } from './annual-planning-stock-extractor';
+import { VisualizationDataExtractor } from './visualization-data-extractor';
 
 type CumulativeVisualization = {
   timePeriod: string;
@@ -30,6 +30,7 @@ export class CumulativePlanningVisualizationStrategy
   implements VisualizationStrategyInterface
 {
   constructor(
+    private readonly visualizationDataExtractor: VisualizationDataExtractor,
     private readonly repository: VisualizationRepositoryInterface,
     private readonly stockRepository: StockRepositoryInterface,
     private readonly orderRepository: OrderBookRepositoryInterface,
@@ -37,30 +38,46 @@ export class CumulativePlanningVisualizationStrategy
     private readonly extractor: AnnualPlanningStockExtractor = new AnnualPlanningStockExtractor(),
   ) {}
 
-  async clean(
-    company: Company,
-    businessUnit: BusinessUnit,
-    allocation: Allocation,
-  ): Promise<void> {
-    await this.repository.delete(
-      cumulativePlanningKey({ companyId: company.id }),
+  async clean(allocationIds: string[]): Promise<void> {
+    this.visualizationDataExtractor.iterateOverData(
+      await this.visualizationDataExtractor.fetchCompanies(allocationIds),
+      async (c) =>
+        await this.repository.delete(
+          cumulativePlanningKey({ companyId: c.id }),
+        ),
     );
-    await this.repository.delete(
-      cumulativePlanningKey({ businessUnitId: businessUnit.id }),
+    this.visualizationDataExtractor.iterateOverData(
+      await this.visualizationDataExtractor.fetchBusinessUnits(allocationIds),
+      async (bu) =>
+        await this.repository.delete(
+          cumulativePlanningKey({ businessUnitId: bu.id }),
+        ),
     );
-    await this.repository.delete(
-      cumulativePlanningKey({ projectId: allocation.projectId }),
+    this.visualizationDataExtractor.iterateOverData(
+      await this.visualizationDataExtractor.fetchProjects(allocationIds),
+      async (p) =>
+        await this.repository.delete(
+          cumulativePlanningKey({ projectId: p.id }),
+        ),
     );
   }
 
-  async hydrate(
-    company: Company,
-    businessUnit: BusinessUnit,
-    allocation: Allocation,
-  ): Promise<void> {
-    await this.hydrateCompanyWideData(company);
-    await this.hydrateBusinessUnitWideData(businessUnit);
-    await this.hydrateProjectWideData(allocation.projectId);
+  async hydrate(allocationIds: string[]): Promise<void> {
+    // company wide find stock associated with company busines unit ids
+    this.visualizationDataExtractor.iterateOverData(
+      await this.visualizationDataExtractor.fetchCompanies(allocationIds),
+      async (c) => await this.hydrateCompanyWideData(c),
+    );
+    // business unit wide find stock associated with businessunit id
+    this.visualizationDataExtractor.iterateOverData(
+      await this.visualizationDataExtractor.fetchBusinessUnits(allocationIds),
+      async (bu) => await this.hydrateBusinessUnitWideData(bu),
+    );
+    // project wide find stock associated with project id
+    this.visualizationDataExtractor.iterateOverData(
+      await this.visualizationDataExtractor.fetchProjects(allocationIds),
+      async (p) => await this.hydrateProjectWideData(p.id),
+    );
   }
 
   async hydrateCompanyWideData(company: Company) {

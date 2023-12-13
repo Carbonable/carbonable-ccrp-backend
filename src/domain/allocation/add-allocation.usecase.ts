@@ -10,6 +10,7 @@ import { ProjectRepositoryInterface } from '../portfolio';
 import { BusinessUnitRepositoryInterface } from '../business-unit';
 import { EventDispatcherInterface, IdGeneratorInterface } from '../common';
 import { Booker, StockManager } from '../order-book';
+import { ALLOCATION_FINISHED } from './allocation.events';
 
 const PROJECT_IDENTIFIER_REQUIRED = 'You have to provide a project identifier.';
 const PROJECT_NOT_FOUND = 'Project not found.';
@@ -97,7 +98,7 @@ export class AddAllocationUseCase
 
     const allocationIds = allocations.map((a) => a.id);
     this.eventDispatcher.dispatch(
-      'allocations.finished',
+      ALLOCATION_FINISHED,
       new AllocationFinished(allocationIds),
     );
 

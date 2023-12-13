@@ -3,36 +3,42 @@ import { PrismaService } from '../../infrastructure/prisma.service';
 import { PaginationDTO } from '../resolvers/carbon-credits';
 import Utils from '../../utils';
 
-type Allocation = {
-  id: string;
-  name: string;
-  allocation: string;
-  generated_cc: string;
-  forwarded_cc: string;
-  retired_cc: string;
-  comitted_cc: string;
-};
-
 @Injectable()
 export class ProjectFundingAllocationService {
-  constructor(private prismaClient: PrismaService) {}
+  constructor(private readonly prismaClient: PrismaService) {}
 
   async get(pagination: PaginationDTO) {
     const { page = 1, count = 10 } = pagination;
-    const allocations = await this.prismaClient.$queryRaw<Allocation[]>`
-SELECT
-    p.id,
-    p.allocation,
-    p.color,
-    p.name,
-    (SELECT SUM(cp.absorption) from curve_point cp where cp.project_id = p.id and cp.time < now() and p.origin = 'FORWARD_FINANCE') as generated_cc,
-    (SELECT SUM(cp.absorption) from curve_point cp where cp.project_id = p.id and cp.time > now()) as forwarded_cc,
-    (SELECT COUNT(cc.id) FROM carbon_credits cc WHERE cc.is_retired and cc.project_id = p.id) as retired_cc,
-    (SELECT COUNT(cc.id) FROM carbon_credits cc WHERE cc.is_locked and cc.project_id = p.id) as comitted_cc
-FROM projects p
-LIMIT ${count} OFFSET ${(page - 1) * count}
-;
-        `;
+    const projects = await this.prismaClient.project.findMany();
+    let data = [];
+    const currentYear = new Date().getFullYear();
+    for (const project of projects) {
+      const allocations = await this.prismaClient.allocation.findMany({
+        where: { projectId: project.id },
+      });
+      const vintages = await this.prismaClient.vintage.findMany({
+        where: { projectId: project.id },
+      });
+      data = [
+        ...data,
+        {
+          id: project.id,
+          name: project.name,
+          color: project.color,
+          allocation: allocations.reduce((acc, curr) => acc + curr.quantity, 0),
+          generated_cc: vintages
+            .filter((v) => parseInt(v.year) < currentYear)
+            .reduce((acc, curr) => acc + curr.capacity, 0),
+          forwarded_cc: vintages
+            .filter((v) => parseInt(v.year) > currentYear)
+            .reduce((acc, curr) => {
+              return acc + curr.capacity;
+            }, 0),
+          retired_cc: vintages.reduce((acc, curr) => acc + curr.consumed, 0),
+          comitted_cc: vintages.reduce((acc, curr) => acc + curr.reserved, 0),
+        },
+      ];
+    }
 
     const project_count = await this.prismaClient.project.count();
     const paginationObject = {
@@ -41,7 +47,7 @@ LIMIT ${count} OFFSET ${(page - 1) * count}
       count,
     };
 
-    const data = allocations.map((a) => ({
+    const formattedData = data.map((a) => ({
       ...a,
       allocation: Utils.formatString({ value: a.allocation, suffix: '%' }),
       generated_cc: Utils.formatString({ value: a.generated_cc, suffix: 'cc' }),
@@ -50,6 +56,6 @@ LIMIT ${count} OFFSET ${(page - 1) * count}
       comitted_cc: Utils.formatString({ value: a.comitted_cc, suffix: 'cc' }),
     }));
 
-    return { data, pagination: paginationObject };
+    return { data: formattedData, pagination: paginationObject };
   }
 }

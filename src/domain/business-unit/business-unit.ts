@@ -1,10 +1,12 @@
 import { Demand, ForecastEmission, ForecastTarget } from '.';
+import { Allocation } from '../allocation';
 import { Metadata } from '../common/metadata-parser';
 import { CreateBusinessUnitRequest } from './create-business-unit.request';
 
 export class BusinessUnit {
   private forecastEmissions: Array<ForecastEmission> = [];
   private forecastTargets: Array<ForecastTarget> = [];
+  private _allocations: Array<Allocation> = [];
 
   constructor(
     public readonly id: string,
@@ -29,6 +31,10 @@ export class BusinessUnit {
     this.forecastTargets = targets;
   }
 
+  addAllocations(allocations: Allocation[]): void {
+    this._allocations = allocations;
+  }
+
   getTargets(): Array<ForecastTarget> {
     return this.forecastTargets;
   }
@@ -45,8 +51,18 @@ export class BusinessUnit {
     }, []);
   }
 
-  getMetatada(): Array<Metadata<string, string>> {
+  getYearlyEmission(now: number): number {
+    return this.forecastEmissions
+      .filter((e) => e.year === now)
+      .reduce((acc, curr) => acc + curr.emission, 0);
+  }
+
+  getMetadata(): Array<Metadata<string, string>> {
     return this.metadata;
+  }
+
+  get allocations(): Array<Allocation> {
+    return this._allocations;
   }
 
   static fromRequest(request: CreateBusinessUnitRequest): BusinessUnit {

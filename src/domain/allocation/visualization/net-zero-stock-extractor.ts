@@ -22,6 +22,14 @@ export class NetZeroStockExtractor {
       const last = acc[acc.length - 1];
       const lastExPostCount = last ? last.exPostCount : 0;
       const exPostCount = lastExPostCount + curr.quantity;
+
+      if (last && last.vintage === curr.vintage) {
+        return [
+          ...acc.slice(0, acc.length - 1),
+          { ...last, exAnteCount: total - exPostCount, exPostCount },
+        ];
+      }
+
       acc.push({
         vintage: curr.vintage,
         exAnteCount: total - exPostCount,

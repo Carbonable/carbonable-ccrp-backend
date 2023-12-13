@@ -4,5 +4,6 @@ export class Allocation {
     public readonly projectId: string,
     public readonly businessUnitId: string,
     public readonly amount: number,
+    public readonly allocatedAt: Date = new Date(),
   ) {}
 }

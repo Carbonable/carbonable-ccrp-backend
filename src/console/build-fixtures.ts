@@ -9,6 +9,7 @@ import {
   ProjectDataFixtures,
   ProjectsSdgsDataFixtures,
   SdgDataFixtures,
+  StockDataFixtures,
   VintageDataFixtures,
 } from './fixtures-data/fixtures-models';
 
@@ -56,6 +57,7 @@ export class BuildFixturesCommand extends CommandRunner {
       ProjectDataFixtures,
       ProjectsSdgsDataFixtures,
       VintageDataFixtures,
+      StockDataFixtures,
     ];
 
     const references = [];

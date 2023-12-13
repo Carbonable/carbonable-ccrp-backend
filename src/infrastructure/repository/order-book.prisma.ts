@@ -1,11 +1,15 @@
 import {
   EffectiveCompensation,
+  EffectiveContribution,
   Order,
   OrderBookRepositoryInterface,
   OrderStatus,
+  Reservation,
 } from '../../domain/order-book';
 import { PrismaService } from '../prisma.service';
 import { Order as OrdersModel } from '@prisma/client';
+
+export const ORDER_BOOK_REPOSITORY = 'ORDER_BOOK_REPOSITORY';
 
 export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
@@ -56,11 +60,31 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
             year: parseInt(order.year),
           },
         },
-        create: { ...orderToPrisma(order) },
+        create: { ...upsertOrderToPrisma(order) },
         update: {
-          ...orderToPrisma(order),
+          ...upsertOrderToPrisma(order),
+        },
+        include: {
+          reservations: true,
         },
       });
+
+      for (const reservation of order.reservations) {
+        await this.prisma.reservation.upsert({
+          where: { id: reservation.id },
+          create: {
+            id: reservation.id,
+            orderId: reservation.orderId,
+            quantity: reservation.count,
+            stockId: reservation.stockId,
+          },
+          update: {
+            orderId: reservation.orderId,
+            quantity: reservation.count,
+            stockId: reservation.stockId,
+          },
+        });
+      }
     }
   }
 
@@ -73,6 +97,21 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
     });
     return orders.map(
       (o) => new EffectiveCompensation(o.year.toString(), o.quantity),
+    );
+  }
+
+  async getBusinessUnitYearlyEffectiveContribution(
+    businessUnitId: string,
+  ): Promise<EffectiveContribution[]> {
+    const orders = await this.prisma.stock.findMany({
+      where: { businessUnitId },
+    });
+    return orders.map(
+      (o) =>
+        new EffectiveContribution(
+          o.vintage.toString(),
+          o.quantity * o.issued_price,
+        ),
     );
   }
 
@@ -119,9 +158,39 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
     });
     return prismaToOrder(orders);
   }
+
+  async getProjectTotalInvestedAmount(projectId: string): Promise<number> {
+    const vintages = await this.prisma.vintage.findMany({
+      where: { projectId },
+    });
+    return vintages.reduce((acc, v) => acc + v.capacity * v.issued_price, 0);
+  }
+  async getBusinessUnitTotalInvestedAmount(
+    businessUnitId: string,
+  ): Promise<number> {
+    const allocatedStock = await this.prisma.stock.findMany({
+      where: { businessUnitId },
+    });
+
+    return allocatedStock.reduce(
+      (acc, v) => acc + v.quantity * v.issued_price,
+      0,
+    );
+  }
+  async getCompanyTotalInvestedAmount(companyId: string): Promise<number> {
+    const vintages = await this.prisma.vintage.findMany({
+      where: {
+        project: {
+          companyId,
+        },
+      },
+    });
+
+    return vintages.reduce((acc, v) => acc + v.capacity * v.issued_price, 0);
+  }
 }
 
-function orderToPrisma(o: Order): any {
+function upsertOrderToPrisma(o: Order): any {
   return {
     id: o.id,
     quantity: o.quantity,
@@ -129,8 +198,6 @@ function orderToPrisma(o: Order): any {
     deficit: o.debt,
     businessUnitId: o.businessUnitId,
     status: o.status,
-    reservations: o.reservations ?? [],
-    executions: o.executions ?? [],
   };
 }
 
@@ -143,10 +210,16 @@ function prismaToOrder(orders: OrdersModel[]): Order[] {
         o.year.toString(),
         o.businessUnitId,
         OrderStatus[o.status],
-        [],
-        [],
-        // o.reservations ?? [],
-        // o.executions ?? [],
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        o.reservations.map(
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          (r) => new Reservation(r.id, o.id, o.year, r.quantity, r.stockId),
+        ) ?? [],
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        o.executions ?? [],
       ),
   );
 }

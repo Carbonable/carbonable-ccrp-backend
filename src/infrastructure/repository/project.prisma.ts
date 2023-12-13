@@ -4,7 +4,10 @@ import {
   Vintage,
 } from '../../domain/portfolio';
 import { PrismaService } from '../prisma.service';
-import { Project as ProjectModel } from '@prisma/client';
+import {
+  Project as ProjectModel,
+  Vintage as VintageModel,
+} from '@prisma/client';
 
 export class PrismaProjectRepository implements ProjectRepositoryInterface {
   constructor(private readonly prisma: PrismaService) {}
@@ -39,8 +42,41 @@ export class PrismaProjectRepository implements ProjectRepositoryInterface {
       },
     });
   }
+  async findByIds(ids: string[]): Promise<Project[]> {
+    const projects = await this.prisma.project.findMany({
+      where: { id: { in: ids } },
+      include: { vintages: true },
+    });
+    return projects.map(this.prismaToProject.bind(this));
+  }
+
+  async byAllocationIds(ids: string[]): Promise<Project[]> {
+    const projects = await this.prisma.project.findMany({
+      where: { allocations: { some: { id: { in: ids } } } },
+      include: { vintages: true },
+    });
+    return projects.map(this.prismaToProject.bind(this));
+  }
 
   prismaToProject(project: ProjectModel): Project {
-    return new Project(project.id, project.name, project.description, [], []);
+    return new Project(
+      project.id,
+      project.name,
+      project.description,
+      [],
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      project.vintages.map(
+        (v: VintageModel) =>
+          new Vintage(
+            v.id,
+            v.year,
+            v.capacity,
+            v.purchased,
+            v.purchased_price,
+            v.issued_price,
+          ),
+      ) ?? [],
+    );
   }
 }
