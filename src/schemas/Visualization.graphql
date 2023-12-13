@@ -13,7 +13,26 @@ type NetZeroPlanning {
     actual: Int
 }
 
+type AnnualData {
+  time_period: String
+  emissions: Int
+  ex_post_issued: Int
+  ex_post_purchased: Int
+  ex_post_retired: Int
+  target: Int
+  actual_rate: Int
+  delta: Int
+  debt: Int
+  ex_post_stock: Int
+  ex_ante_stock: Int
+}
+
 type Annual {
+  data: [AnnualData]
+  page_info: PageInfo
+}
+
+type CumulativeData {
   time_period: String
   emissions: Int
   ex_post_issued: Int
@@ -28,20 +47,11 @@ type Annual {
 }
 
 type Cumulative {
-  time_period: String
-  emissions: Int
-  ex_post_issued: Int
-  ex_post_purchased: Int
-  ex_post_retired: Int
-  target: Int
-  actual_rate: Int
-  delta: Int
-  debt: Int
-  ex_post_stock: Int
-  ex_ante_stock: Int
+  data: [CumulativeData]
+  page_info: PageInfo
 }
 
-type FinancialAnalysis {
+type FinancialAnalysisData {
   year: String
   purchased_price: Int
   cumulative_purchased_price: Int
@@ -54,4 +64,9 @@ type FinancialAnalysis {
   cumulative_gran_total_amount: Int
   estimated_debt_amount: Int
   cumulative_estimated_debt_amount: Int
- }
+}
+
+type FinancialAnalysis {
+  data: [FinancialAnalysisData]
+  page_info: PageInfo
+}

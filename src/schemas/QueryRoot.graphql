@@ -14,15 +14,15 @@ type Query {
     getProjectFundingAllocation(view: VisualizationViewType): ProjectedFundingAllocationWithPagination
     getProjectMetrics(view: VisualizationViewType): ProjectMetrics!
     getImpactMetrics(view: VisualizationViewType): ImpactMetrics!
-    companyCarbonAssetAllocation(id: String!): [CompanyCarbonAssetAllocation]
-    projectCarbonAssetAllocation(id: String!): [ProjectCarbonAssetAllocation]
-    businessUnitCarbonAssetAllocation(id: String!): [BusinessUnitCarbonAssetAllocation]
+    companyCarbonAssetAllocation(id: String!, pagination: Pagination): CompanyCarbonAssetAllocation
+    projectCarbonAssetAllocation(id: String!, pagination: Pagination): ProjectCarbonAssetAllocation
+    businessUnitCarbonAssetAllocation(id: String!, pagination: Pagination): BusinessUnitCarbonAssetAllocation
 
 
     netZeroPlanning(view: VisualizationViewType): [NetZeroPlanning]!
-    annual(view: VisualizationViewType!): [Annual]!
-    cumulative(view: VisualizationViewType!): [Cumulative]!
-    financialAnalysis(view: VisualizationViewType!): [FinancialAnalysis]!
+    annual(view: VisualizationViewType!, pagination: Pagination): Annual!
+    cumulative(view: VisualizationViewType!, pagination: Pagination): Cumulative!
+    financialAnalysis(view: VisualizationViewType!, pagination: Pagination): FinancialAnalysis!
 }
 
 type Mutation {
@@ -66,7 +66,7 @@ type GlobalData {
     number_of_projects: String!
 }
 
-type CompanyCarbonAssetAllocation {
+type CompanyCarbonAssetAllocationData {
     project_name: String
     business_units: [AssetAllocationItem]
     type: String
@@ -80,13 +80,18 @@ type CompanyCarbonAssetAllocation {
     price: Int
     total_amount: Int
 }
+type CompanyCarbonAssetAllocation {
+    data: [CompanyCarbonAssetAllocationData]!
+    page_info: PageInfo
+}
 
 type AssetAllocationItem {
     id: String!
     name: String!
     metadata: [Map]!
 }
-type ProjectCarbonAssetAllocation {
+
+type ProjectCarbonAssetAllocationData {
   business_unit: AssetAllocationItem!
   allocated: Int
   allocation_amount: Int
@@ -94,13 +99,24 @@ type ProjectCarbonAssetAllocation {
   actual: Int
   start_date: String
 }
-type BusinessUnitCarbonAssetAllocation {
+
+type ProjectCarbonAssetAllocation {
+  data: [ProjectCarbonAssetAllocationData]!
+  page_info: PageInfo
+}
+
+type BusinessUnitCarbonAssetAllocationData {
   project: AssetAllocationItem!
   total_cu: Int
   allocated: Int
   generated: Int
   forward: Int
   retired: Int
+}
+
+type BusinessUnitCarbonAssetAllocation {
+  data: [BusinessUnitCarbonAssetAllocationData]!
+  page_info: PageInfo
 }
 
 type ProjectedDecarbonation {
@@ -168,12 +184,19 @@ type ImpactMetrics {
 }
 
 type PaginationObject {
-    max_page: Int!
-    page_number: Int!
-    count: Int!
+    next_cursor: String
+    has_next_page: Boolean
+    has_previous_page: Boolean
+    total_page: Int
 }
 
 input Pagination {
-    page: Int
-    count: Int
+    page: Int!
+    count: Int!
+}
+
+type PageInfo {
+    has_next_page: Boolean!
+    has_previous_page: Boolean!
+    total_page: Int!
 }
