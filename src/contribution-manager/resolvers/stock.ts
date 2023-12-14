@@ -25,46 +25,44 @@ export class StockResolver {
   }
 
   async resolveStock(view: VisualizationViewType): Promise<StockItem[]> {
+    let where = null;
     if (view?.project_id) {
-      const stock = await this.prisma.stock.findMany({
-        where: {
-          projectId: view.project_id,
-          businessUnitId: null,
-          allocationId: null,
-        },
-        include: { project: true },
-      });
-      return stock.map((s) => ({
-        project: {
-          id: s.projectId,
-          name: s.project.name,
-          metadata: getMetadata(s.project.metadata),
-        },
-        vintage: s.vintage,
-        quantity: s.quantity,
-        available: s.available,
-        locked: s.consumed,
-      }));
+      where = {
+        projectId: view.project_id,
+        businessUnitId: null,
+        allocationId: null,
+      };
     }
     if (view?.business_unit_id) {
-      const stock = await this.prisma.stock.findMany({
-        where: {
-          businessUnitId: view.business_unit_id,
-        },
-        include: { project: true },
-      });
-      return stock.map((s) => ({
-        project: {
-          id: s.projectId,
-          name: s.project.name,
-          metadata: getMetadata(s.project.metadata),
-        },
-        vintage: s.vintage,
-        quantity: s.quantity,
-        available: s.available,
-        locked: s.consumed,
-      }));
+      where = {
+        businessUnitId: view.business_unit_id,
+      };
     }
-    throw new Error('Operation not supported yet.');
+    if (view?.company_id) {
+      where = {
+        project: {
+          company: {
+            id: view.company_id,
+          },
+        },
+      };
+    }
+
+    const stock = await this.prisma.stock.findMany({
+      where,
+      include: { project: true },
+      orderBy: [{ vintage: 'asc' }],
+    });
+    return stock.map((s) => ({
+      project: {
+        id: s.projectId,
+        name: s.project.name,
+        metadata: getMetadata(s.project.metadata),
+      },
+      vintage: s.vintage,
+      quantity: s.quantity,
+      available: s.available,
+      locked: s.consumed,
+    }));
   }
 }
