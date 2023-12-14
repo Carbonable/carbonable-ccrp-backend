@@ -10,6 +10,7 @@ import {
   AllocationResolver,
   VintageResolver,
   VisualizationResolver,
+  StockResolver,
 } from './resolvers';
 import {
   GlobalDataService,
@@ -33,6 +34,7 @@ import { InfrastructureModule } from '../infrastructure/infrastructure.module';
     AllocationResolver,
     VintageResolver,
     VisualizationResolver,
+    StockResolver,
     GlobalDataService,
     ProjectedDecarbonationService,
     ImpactMetricsService,
@@ -52,6 +54,7 @@ import { InfrastructureModule } from '../infrastructure/infrastructure.module';
     AllocationResolver,
     VintageResolver,
     VisualizationResolver,
+    StockResolver,
     ProjectedDecarbonationService,
     ImpactMetricsService,
     ProjectMetricsService,

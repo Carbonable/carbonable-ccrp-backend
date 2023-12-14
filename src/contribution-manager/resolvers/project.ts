@@ -36,6 +36,12 @@ export class ProjectResolver {
     @Args('business_unit_id') businessUnitId: string,
   ) {
     const businessUnit = await this.businessUnitRepository.byId(businessUnitId);
+    if (null === businessUnit) {
+      return {
+        available_percent: 0,
+        available_units: 0,
+      };
+    }
     const availableStock = await this.stockRepository.availableToAllocate(
       projectId,
       businessUnit.getDemands(),

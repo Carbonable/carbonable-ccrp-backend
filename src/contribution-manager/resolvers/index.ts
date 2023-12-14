@@ -8,3 +8,4 @@ export { DemandResolver } from './demand';
 export { AllocationResolver } from './allocations';
 export { VintageResolver } from './vintage';
 export { VisualizationResolver } from './visualization';
+export { StockResolver } from './stock';

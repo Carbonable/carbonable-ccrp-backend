@@ -19,4 +19,10 @@ export class MetadataParser {
       };
     });
   }
+  static fromObject(metadata: any): Array<Metadata<string, string>> {
+    return Object.keys(metadata).map((key) => ({
+      key,
+      value: metadata[key],
+    }));
+  }
 }

@@ -9,6 +9,7 @@ type Query {
     certifierBy(field: String!, value: String!): Certifier
     projectBy(field: String!, value: String!): Project
     availableToAllocate(project_id: String!, business_unit_id: String!): AllocationAvailability
+    getStock(view: VisualizationViewType, pagination: Pagination): Stock
 
     getGlobalData(view: VisualizationViewType): GlobalData,
     getProjectFundingAllocation(view: VisualizationViewType): ProjectedFundingAllocationWithPagination
@@ -199,4 +200,17 @@ type PageInfo {
     has_next_page: Boolean!
     has_previous_page: Boolean!
     total_page: Int!
+}
+
+type StockData {
+    project: AssetAllocationItem!
+    vintage: String!
+    quantity: Int!
+    available: Int!
+    locked: Int!
+}
+
+type Stock {
+    data: [StockData]!
+    page_info: PageInfo
 }
