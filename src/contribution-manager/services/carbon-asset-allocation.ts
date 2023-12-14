@@ -4,14 +4,14 @@ import { Prisma, Stock as StockModel } from '@prisma/client';
 import { Vintage } from '../../domain/portfolio';
 import { BusinessUnitRepositoryInterface } from '../../domain/business-unit';
 import { BUSINESS_UNIT_REPOSITORY } from '../../infrastructure/repository/business-unit.prisma';
-import { Metadata } from '../../domain/common/metadata-parser';
+import { Metadata, MetadataParser } from '../../domain/common/metadata-parser';
 import Utils from '../../utils';
 import {
   PROJECT_REPOSITORY,
   ProjectRepositoryInterface,
 } from '../../domain/portfolio/project-repository.interface';
 
-type AllocationTarget = {
+export type AllocationTarget = {
   id: string;
   name: string;
   metadata: Metadata<string, string>[];
@@ -182,7 +182,12 @@ export class CarbonAssetAllocationService {
   }
 }
 
-function getMetadata(metadata: Prisma.JsonValue): Metadata<string, string>[] {
+export function getMetadata(
+  metadata: Prisma.JsonValue,
+): Metadata<string, string>[] {
+  if ('object' === typeof metadata) {
+    return MetadataParser.fromObject(metadata);
+  }
   return Object.keys(metadata).length === 0
     ? []
     : JSON.parse(metadata as string);
