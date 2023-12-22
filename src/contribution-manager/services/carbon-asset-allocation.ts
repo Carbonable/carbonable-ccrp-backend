@@ -193,15 +193,16 @@ export function getMetadata(
     : JSON.parse(metadata as string);
 }
 export function prismaToVintage(vintages: StockModel[]): Vintage[] {
-  return vintages.map(
-    (v) =>
-      new Vintage(
-        v.id,
-        v.vintage,
-        v.quantity,
-        v.purchased,
-        v.purchased_price,
-        v.issued_price,
-      ),
-  );
+  return vintages.map((v) => {
+    const vintage = new Vintage(
+      v.id,
+      v.vintage,
+      v.quantity,
+      v.purchased,
+      v.purchased_price,
+      v.issued_price,
+    );
+    vintage.lock(v.consumed);
+    return vintage;
+  });
 }

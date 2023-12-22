@@ -10,6 +10,9 @@ type FormatStringArgs = {
 };
 export default class Utils {
   static formatString({ value, suffix, prefix }: FormatStringArgs): string {
+    if (null === value) {
+      value = '0';
+    }
     return `${prefix ? prefix + ' ' : ''}${parseInt(value).toLocaleString(
       'fr',
     )}${suffix ? ' ' + suffix : ''}`;

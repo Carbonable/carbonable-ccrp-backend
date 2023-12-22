@@ -7,6 +7,7 @@ export type FinancialAnalysisItem = {
   totalPurchasedAmount: number;
   cumulativeTotalPurchasedAmount: number;
   issuedPrice: number;
+  averageIssuedPrice: number;
   totalIssuedAmount: number;
   cumulativeTotalIssuedAmount: number;
   granTotalAmount: number;
@@ -23,6 +24,7 @@ function defaultFinancialAnalysisItem(): FinancialAnalysisItem {
     totalPurchasedAmount: 0,
     cumulativeTotalPurchasedAmount: 0,
     issuedPrice: 0,
+    averageIssuedPrice: 0,
     totalIssuedAmount: 0,
     cumulativeTotalIssuedAmount: 0,
     granTotalAmount: 0,
@@ -44,6 +46,8 @@ export class FinancialAnalysisExtractor {
         totalPurchasedAmount,
         cumulativeTotalPurchasedAmount: 0,
         issuedPrice: s.issuedPrice,
+        // TODO: check how this is calculated
+        averageIssuedPrice: 0,
         totalIssuedAmount,
         cumulativeTotalIssuedAmount: 0,
         granTotalAmount: totalPurchasedAmount + totalIssuedAmount,
@@ -56,9 +60,10 @@ export class FinancialAnalysisExtractor {
       let previous = acc[acc.length - 1];
       if (!previous) {
         previous = defaultFinancialAnalysisItem();
+        return [curr];
       }
       curr = this.cumulate(previous, curr);
-      return [...acc, curr];
+      return [...acc.slice(0, acc.length - 1), curr];
     }, []);
   }
 

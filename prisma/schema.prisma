@@ -91,11 +91,11 @@ model Project {
   area             Int                @map("area")
   type             CarbonCreditType
   origin           CarbonCreditOrigin
-  fundingAmount    BigInt             @map("funding_amount")
+  fundingAmount    Float              @map("funding_amount")
   color            ProjectColor
   protectedSpecies Int                @map("protected_species")
   protectedForest  Int                @map("protected_forest")
-  allocation       Int
+  riskAnalysis     String             @map("risk_analysis") @db.VarChar(4)
   metadata         Json
 
   carbonCredits CarbonCredit[]
@@ -343,6 +343,7 @@ enum CarbonCreditOrigin {
 enum CarbonCreditType {
   RESTORATION
   CONCERVATION
+  REFORESTATION
 }
 
 enum ProjectColor {

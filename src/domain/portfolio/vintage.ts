@@ -21,6 +21,9 @@ export class Vintage {
     this._reserved = 0;
     this._available = capacity;
     this._capacity = capacity;
+
+    this._purchased_price = _purchased_price * 100;
+    this._issued_price = _issued_price * 100;
   }
 
   get capacity(): number {
@@ -32,6 +35,10 @@ export class Vintage {
     this._capacity += value;
     this._available += value;
     this.checkCapacity();
+  }
+
+  get reserved(): number {
+    return this._reserved;
   }
 
   lock(count = 0): void {
@@ -56,7 +63,7 @@ export class Vintage {
     year: number = new Date().getFullYear(),
   ): number {
     return vintages.reduce(
-      (acc, curr) => acc + (parseInt(curr.year) <= year ? curr.capacity : 0),
+      (acc, curr) => acc + (parseInt(curr.year) <= year ? curr._available : 0),
       0,
     );
   }
@@ -65,7 +72,7 @@ export class Vintage {
     year: number = new Date().getFullYear(),
   ): number {
     return vintages.reduce(
-      (acc, curr) => acc + (parseInt(curr.year) > year ? curr.capacity : 0),
+      (acc, curr) => acc + (parseInt(curr.year) > year ? curr._available : 0),
       0,
     );
   }
@@ -87,7 +94,17 @@ export class Vintage {
       const date = new Date(point.timestamp * 1000);
       const vintage = date.getFullYear().toString();
       const toGenerate = Math.ceil((point.absorption - absDiff) / TON_IN_GRAM);
-      ccs = [...ccs, new Vintage(idGenerator.generate(), vintage, toGenerate)];
+      ccs = [
+        ...ccs,
+        new Vintage(
+          idGenerator.generate(),
+          vintage,
+          toGenerate,
+          0,
+          point.purchasedPrice ?? 0,
+          point.issuedPrice ?? 0,
+        ),
+      ];
 
       absDiff = point.absorption;
     }

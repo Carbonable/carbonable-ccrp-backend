@@ -163,7 +163,7 @@ LIMIT 1
 SELECT c.name as key, (count(*) / tablestat.total::float) * 100 AS value_percent
 FROM projects p
          INNER JOIN certifier c on c.id = p.certifier_id
-         CROSS JOIN (SELECT count(*) AS total FROM projects p) AS tablestat
+         CROSS JOIN (SELECT count(*) AS total FROM projects p INNER JOIN allocation a2 on p.id = a2.project_id INNER JOIN business_unit b on a2.business_unit_id = b.id) AS tablestat
          INNER JOIN allocation a on a.project_id = p.id
          INNER JOIN business_unit bu on bu.id = a.business_unit_id
          WHERE bu.id = ${businessUnitId}
@@ -179,7 +179,7 @@ FROM projects p
 INNER JOIN allocation a on a.project_id = p.id
 INNER JOIN business_unit bu on bu.id = a.business_unit_id
 INNER JOIN country c on c.id = p.country_id
-CROSS JOIN (SELECT count(*) AS total FROM projects p) AS tablestat
+CROSS JOIN (SELECT count(*) AS total FROM projects p INNER JOIN allocation a2 on p.id = a2.project_id INNER JOIN business_unit b on a2.business_unit_id = b.id INNER JOIN country c2 on c2.id = p.country_id) AS tablestat
 WHERE bu.id = ${businessUnitId}
 GROUP BY tablestat.total, c.name, c.data
 ;

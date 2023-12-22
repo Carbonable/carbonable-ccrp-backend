@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 import {
+  BusinessUnitRepositoryInterface,
   CreateBusinessUnitUseCase,
   CreateForecastedEmissionsUseCase,
   CreateForecastedTargetsUseCase,
@@ -28,7 +29,12 @@ import {
   VisualizationRepositoryInterface,
 } from '../domain/allocation';
 import { PrismaProjectRepository } from './repository/project.prisma';
-import { Booker, StockManager } from '../domain/order-book';
+import {
+  Booker,
+  OrderBookRepositoryInterface,
+  StockManager,
+  StockRepositoryInterface,
+} from '../domain/order-book';
 import {
   PrismaStockRepository,
   STOCK_REPOSITORY,
@@ -49,8 +55,14 @@ import { FinancialAnalysisVisualizationStrategy } from '../domain/allocation/vis
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { NestJsOnAllocationFinished } from './event-handler/allocations.event-handler';
 import { VisualizationDataExtractor } from '../domain/allocation/visualization/visualization-data-extractor';
-import { PROJECT_REPOSITORY } from '../domain/portfolio/project-repository.interface';
-import { COMPANY_REPOSITORY } from '../domain/business-unit/company-repository.interface';
+import {
+  PROJECT_REPOSITORY,
+  ProjectRepositoryInterface,
+} from '../domain/portfolio/project-repository.interface';
+import {
+  COMPANY_REPOSITORY,
+  CompanyRepositoryInterface,
+} from '../domain/business-unit/company-repository.interface';
 
 export const REDIS_CLIENT = 'REDIS_CLIENT';
 
@@ -231,53 +243,151 @@ export const REDIS_CLIENT = 'REDIS_CLIENT';
       inject: [REDIS_CLIENT],
     },
     {
-      provide: VisualizationManager,
+      provide: VisualizationDataExtractor,
       useFactory: (
-        prisma: PrismaService,
-        visualizationRepository: VisualizationRepositoryInterface,
+        companyRepository: CompanyRepositoryInterface,
+        businessUnitRepository: BusinessUnitRepositoryInterface,
+        projectRepository: ProjectRepositoryInterface,
       ) => {
-        const stockRepository = new PrismaStockRepository(prisma);
-        const orderRepository = new PrismaOrderBookRepository(prisma);
-        const businessUnitRepository = new PrismaBusinessUnitRepository(prisma);
-        const projectRepository = new PrismaProjectRepository(prisma);
-        const companyRepository = new PrismaCompanyRepository(prisma);
-
-        const visualizationDataExtractor = new VisualizationDataExtractor(
+        return new VisualizationDataExtractor(
           companyRepository,
           businessUnitRepository,
           projectRepository,
         );
-
+      },
+      inject: [
+        COMPANY_REPOSITORY,
+        BUSINESS_UNIT_REPOSITORY,
+        PROJECT_REPOSITORY,
+      ],
+    },
+    {
+      provide: NetZeroVisualizationStrategy,
+      useFactory: (
+        visualizationDataExtractor: VisualizationDataExtractor,
+        visualizationRepository: VisualizationRepositoryInterface,
+        stockRepository: StockRepositoryInterface,
+        orderRepository: OrderBookRepositoryInterface,
+        businessUnitRepository: BusinessUnitRepositoryInterface,
+      ) => {
+        return new NetZeroVisualizationStrategy(
+          visualizationDataExtractor,
+          visualizationRepository,
+          stockRepository,
+          orderRepository,
+          businessUnitRepository,
+        );
+      },
+      inject: [
+        VisualizationDataExtractor,
+        VISUALIZATION_REPOSITORY,
+        STOCK_REPOSITORY,
+        ORDER_BOOK_REPOSITORY,
+        BUSINESS_UNIT_REPOSITORY,
+      ],
+    },
+    {
+      provide: AnnualPlanningVisualizationStrategy,
+      useFactory: (
+        visualizationDataExtractor: VisualizationDataExtractor,
+        visualizationRepository: VisualizationRepositoryInterface,
+        stockRepository: StockRepositoryInterface,
+        orderRepository: OrderBookRepositoryInterface,
+        businessUnitRepository: BusinessUnitRepositoryInterface,
+        companyRepository: CompanyRepositoryInterface,
+      ) => {
+        return new AnnualPlanningVisualizationStrategy(
+          visualizationDataExtractor,
+          visualizationRepository,
+          stockRepository,
+          orderRepository,
+          businessUnitRepository,
+          companyRepository,
+        );
+      },
+      inject: [
+        VisualizationDataExtractor,
+        VISUALIZATION_REPOSITORY,
+        STOCK_REPOSITORY,
+        ORDER_BOOK_REPOSITORY,
+        BUSINESS_UNIT_REPOSITORY,
+        COMPANY_REPOSITORY,
+      ],
+    },
+    {
+      provide: CumulativePlanningVisualizationStrategy,
+      useFactory: (
+        visualizationDataExtractor: VisualizationDataExtractor,
+        visualizationRepository: VisualizationRepositoryInterface,
+        stockRepository: StockRepositoryInterface,
+        orderRepository: OrderBookRepositoryInterface,
+        businessUnitRepository: BusinessUnitRepositoryInterface,
+        companyRepository: CompanyRepositoryInterface,
+      ) => {
+        return new CumulativePlanningVisualizationStrategy(
+          visualizationDataExtractor,
+          visualizationRepository,
+          stockRepository,
+          orderRepository,
+          businessUnitRepository,
+          companyRepository,
+        );
+      },
+      inject: [
+        VisualizationDataExtractor,
+        VISUALIZATION_REPOSITORY,
+        STOCK_REPOSITORY,
+        ORDER_BOOK_REPOSITORY,
+        BUSINESS_UNIT_REPOSITORY,
+        COMPANY_REPOSITORY,
+      ],
+    },
+    {
+      provide: FinancialAnalysisVisualizationStrategy,
+      useFactory: (
+        visualizationDataExtractor: VisualizationDataExtractor,
+        visualizationRepository: VisualizationRepositoryInterface,
+        stockRepository: StockRepositoryInterface,
+        businessUnitRepository: BusinessUnitRepositoryInterface,
+        companyRepository: CompanyRepositoryInterface,
+      ) => {
+        return new FinancialAnalysisVisualizationStrategy(
+          visualizationDataExtractor,
+          visualizationRepository,
+          stockRepository,
+          businessUnitRepository,
+          companyRepository,
+        );
+      },
+      inject: [
+        VisualizationDataExtractor,
+        VISUALIZATION_REPOSITORY,
+        STOCK_REPOSITORY,
+        BUSINESS_UNIT_REPOSITORY,
+        COMPANY_REPOSITORY,
+      ],
+    },
+    {
+      provide: VisualizationManager,
+      useFactory: (
+        netZeroVisualizationStrategy: NetZeroVisualizationStrategy,
+        annualPlanningVisualizationStrategy: AnnualPlanningVisualizationStrategy,
+        cumulativePlanningVisualizationStrategy: CumulativePlanningVisualizationStrategy,
+        financialAnalysisVisualizationStrategy: FinancialAnalysisVisualizationStrategy,
+      ) => {
         return new VisualizationManager([
-          new NetZeroVisualizationStrategy(
-            visualizationDataExtractor,
-            visualizationRepository,
-            stockRepository,
-            orderRepository,
-            businessUnitRepository,
-          ),
-          new AnnualPlanningVisualizationStrategy(
-            visualizationDataExtractor,
-            visualizationRepository,
-            stockRepository,
-            orderRepository,
-            businessUnitRepository,
-          ),
-          new CumulativePlanningVisualizationStrategy(
-            visualizationDataExtractor,
-            visualizationRepository,
-            stockRepository,
-            orderRepository,
-            businessUnitRepository,
-          ),
-          new FinancialAnalysisVisualizationStrategy(
-            visualizationDataExtractor,
-            visualizationRepository,
-            stockRepository,
-          ),
+          netZeroVisualizationStrategy,
+          annualPlanningVisualizationStrategy,
+          cumulativePlanningVisualizationStrategy,
+          financialAnalysisVisualizationStrategy,
         ]);
       },
-      inject: [PrismaService, VISUALIZATION_REPOSITORY],
+      inject: [
+        NetZeroVisualizationStrategy,
+        AnnualPlanningVisualizationStrategy,
+        CumulativePlanningVisualizationStrategy,
+        FinancialAnalysisVisualizationStrategy,
+      ],
     },
   ],
   exports: [
@@ -296,6 +406,10 @@ export const REDIS_CLIENT = 'REDIS_CLIENT';
     PROJECT_REPOSITORY,
     COMPANY_REPOSITORY,
     STOCK_REPOSITORY,
+    NetZeroVisualizationStrategy,
+    AnnualPlanningVisualizationStrategy,
+    CumulativePlanningVisualizationStrategy,
+    FinancialAnalysisVisualizationStrategy,
   ],
 })
 export class InfrastructureModule {}

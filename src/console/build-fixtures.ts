@@ -80,9 +80,15 @@ export class BuildFixturesCommand extends CommandRunner {
           references[fixture.name].push(d);
           txData = [...txData, d];
         }
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        await fixture.object.createMany({ data: txData });
+        try {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          await fixture.object.createMany({ data: txData });
+        } catch (e) {
+          console.error(`Failed at ${fixture.name}`);
+          console.error(e);
+          throw e;
+        }
       }
 
       let fixturesData = [];
