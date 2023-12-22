@@ -84,9 +84,16 @@ export class Stock {
     projectId: string,
     vintages: Vintage[],
   ): Stock[] {
-    return vintages.map(
-      (v) =>
-        new Stock(idGenerator.generate(), null, projectId, v.year, v.capacity),
-    );
+    return vintages.map((v) => {
+      const stock = new Stock(
+        idGenerator.generate(),
+        null,
+        projectId,
+        v.year,
+        v.capacity,
+      );
+      stock.lock(v.reserved);
+      return stock;
+    });
   }
 }

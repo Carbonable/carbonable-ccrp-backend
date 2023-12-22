@@ -14,6 +14,8 @@ export type AbsorptionCurve = Array<CurvePoint>;
 export type CurvePoint = {
   timestamp: number;
   absorption: number;
+  issuedPrice?: number;
+  purchasedPrice?: number;
 };
 
 export class CarbonCredit {

@@ -17,6 +17,7 @@ enum CarbonCreditOrigin {
 enum CarbonCreditType {
   RESTORATION
   CONCERVATION
+  REFORESTATION
 }
 
 enum ProjectType {

@@ -22,6 +22,7 @@ export class PrismaProjectRepository implements ProjectRepositoryInterface {
   async findProjectsCcs(ids: string[]): Promise<Map<string, Vintage[]>> {
     const vintage = await this.prisma.vintage.findMany({
       where: { projectId: { in: ids } },
+      orderBy: { year: 'asc' },
     });
     const vintageMap = new Map();
     for (const item of vintage) {
@@ -66,17 +67,18 @@ export class PrismaProjectRepository implements ProjectRepositoryInterface {
       [],
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      project.vintages.map(
-        (v: VintageModel) =>
-          new Vintage(
-            v.id,
-            v.year,
-            v.capacity,
-            v.purchased,
-            v.purchased_price,
-            v.issued_price,
-          ),
-      ) ?? [],
+      project.vintages.map((v: VintageModel) => {
+        const vintage = new Vintage(
+          v.id,
+          v.year,
+          v.capacity,
+          v.purchased,
+          v.purchased_price,
+          v.issued_price,
+        );
+        vintage.lock(v.reserved);
+        return vintage;
+      }) ?? [],
     );
   }
 }

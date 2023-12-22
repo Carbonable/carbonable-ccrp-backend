@@ -92,7 +92,7 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
     businessUnitId: string,
   ): Promise<EffectiveCompensation[]> {
     const orders = await this.prisma.order.findMany({
-      where: { businessUnitId, status: OrderStatus.CLOSED },
+      where: { businessUnitId },
       include: { reservations: true, executions: true },
     });
     return orders.map(
@@ -119,7 +119,7 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
     companyId: string,
   ): Promise<EffectiveCompensation[]> {
     const orders = await this.prisma.order.findMany({
-      where: { businessUnit: { companyId }, status: OrderStatus.CLOSED },
+      where: { businessUnit: { companyId } },
       include: { reservations: true, executions: true },
     });
     return orders.map(
@@ -132,7 +132,6 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
     const orders = await this.prisma.order.findMany({
       where: {
         businessUnit: { allocations: { some: { projectId } } },
-        status: OrderStatus.CLOSED,
       },
     });
     return orders.map(

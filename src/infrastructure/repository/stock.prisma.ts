@@ -87,8 +87,9 @@ export class PrismaStockRepository implements StockRepositoryInterface {
     return this.prismaToStock(
       await this.prisma.stock.findMany({
         where: {
-          businessUnit: { companyId },
+          project: { companyId },
         },
+        orderBy: [{ vintage: 'asc' }],
       }),
     );
   }
@@ -98,6 +99,7 @@ export class PrismaStockRepository implements StockRepositoryInterface {
         where: {
           businessUnitId,
         },
+        orderBy: [{ vintage: 'asc' }],
       }),
     );
   }
@@ -107,6 +109,7 @@ export class PrismaStockRepository implements StockRepositoryInterface {
         where: {
           projectId,
         },
+        orderBy: [{ vintage: 'asc' }],
       }),
     );
   }
@@ -121,6 +124,7 @@ export class PrismaStockRepository implements StockRepositoryInterface {
           projectId,
           allocationId: null,
         },
+        orderBy: [{ vintage: 'asc' }],
       }),
     );
     const available = stock.reduce((acc, curr) => acc + curr.available, 0);

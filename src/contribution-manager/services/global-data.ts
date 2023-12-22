@@ -34,6 +34,7 @@ type GlobalDataVisualization = {
   target: number;
   debt: number;
   investedAmount: number;
+  numberOfProjects: number;
 };
 
 @Injectable()
@@ -49,9 +50,8 @@ export class GlobalDataService {
   ) {}
 
   async get(view: VisualizationViewType): Promise<GlobalData> {
-    const { target, actual, debt, investedAmount } = await this.getTarget(view);
-
-    const numberOfProjects = await this.prisma.project.count();
+    const { target, actual, debt, investedAmount, numberOfProjects } =
+      await this.getTarget(view);
 
     return {
       actual: Utils.formatString({
@@ -118,6 +118,7 @@ export class GlobalDataService {
       investedAmount: await this.orderRepository.getCompanyTotalInvestedAmount(
         companyId,
       ),
+      numberOfProjects: await this.prisma.project.count(),
     };
   }
 
@@ -148,6 +149,13 @@ export class GlobalDataService {
         await this.orderRepository.getBusinessUnitTotalInvestedAmount(
           businessUnitId,
         ),
+      numberOfProjects: await this.prisma.project.count({
+        where: {
+          allocations: {
+            some: { businessUnitId },
+          },
+        },
+      }),
     };
   }
 
@@ -176,6 +184,11 @@ export class GlobalDataService {
       investedAmount: await this.orderRepository.getProjectTotalInvestedAmount(
         projectId,
       ),
+      numberOfProjects: await this.prisma.project.count({
+        where: {
+          id: projectId,
+        },
+      }),
     };
   }
 }

@@ -60,8 +60,7 @@ export class ProjectResolver {
   }
   @ResolveField()
   async global_data(@Parent() project: Project) {
-    const { id } = project;
-    const rating = 'AAA';
+    const { id, riskAnalysis } = project;
     const allocations = await this.prisma.stock.findMany({
       where: {
         projectId: id,
@@ -76,13 +75,13 @@ export class ProjectResolver {
       },
     });
     const allocated_units = allocations.reduce(
-      (acc, curr) => acc + curr.quantity,
+      (acc, curr) => acc + curr.available + curr.consumed,
       0,
     );
     return {
       amount: parseInt(project.fundingAmount.toString()),
       source: project.type,
-      rating,
+      rating: riskAnalysis,
       allocated_units,
       available_ex_post: Vintage.exPostStockAt(prismaToVintage(stock)),
       available_ex_ante: Vintage.exAnteStockAt(prismaToVintage(stock)),

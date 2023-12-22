@@ -92,14 +92,14 @@ ORDER BY s.number
 SELECT
     SUM(p.protected_forest) as protected_forests,
     SUM(p.protected_species) as protected_species,
-    SUM(v.capacity + v.purchased) as absorbed_tons
+    SUM(s.quantity) as absorbed_tons
 FROM projects p
-INNER JOIN vintage v on p.id = v.project_id and v.year::INTEGER < date_part('year', now())
-INNER JOIN allocation a on a.project_id = p.id
-INNER JOIN business_unit bu on bu.id = a.business_unit_id
-WHERE bu.id = ${businessUnitId}
-;
+INNER JOIN stock s2 on s2.project_id = p.id
+LEFT JOIN stock s on s.project_id = p.id and  s.vintage::INTEGER <= date_part('year', now())
+LEFT JOIN business_unit bu on bu.id = s2.business_unit_id
+WHERE bu.id = ${businessUnitId};
         `;
+
     return { linkedSdgs, metricsArr };
   }
 
