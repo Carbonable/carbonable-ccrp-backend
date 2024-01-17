@@ -6,6 +6,7 @@ import {
   OrderStatus,
   Reservation,
 } from '../../domain/order-book';
+import Utils from '../../utils';
 import { PrismaService } from '../prisma.service';
 import { Order as OrdersModel } from '@prisma/client';
 
@@ -87,16 +88,18 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
       }
     }
   }
-
   async getBusinessUnitYearlyEffectiveCompensation(
     businessUnitId: string,
   ): Promise<EffectiveCompensation[]> {
     const orders = await this.prisma.order.findMany({
-      where: { businessUnitId },
+      where: { businessUnitId: businessUnitId },
       include: { reservations: true, executions: true },
+      orderBy: { year: 'asc' },
     });
-    return orders.map(
-      (o) => new EffectiveCompensation(o.year.toString(), o.quantity),
+    return Utils.orderByYear(
+      orders.map(
+        (o) => new EffectiveCompensation(o.year.toString(), o.quantity),
+      ),
     );
   }
 
@@ -105,13 +108,18 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
   ): Promise<EffectiveContribution[]> {
     const orders = await this.prisma.stock.findMany({
       where: { businessUnitId },
+      orderBy: { vintage: 'asc' },
     });
-    return orders.map(
-      (o) =>
-        new EffectiveContribution(
-          o.vintage.toString(),
-          o.quantity * o.issued_price,
-        ),
+    return Utils.orderByVintage(
+      orders.map(
+        (o) =>
+          new EffectiveContribution(
+            o.vintage.toString(),
+            Utils.priceDecimal(
+              o.quantity * o.issued_price + o.purchased * o.purchased_price,
+            ),
+          ),
+      ),
     );
   }
 
@@ -122,8 +130,10 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
       where: { businessUnit: { companyId } },
       include: { reservations: true, executions: true },
     });
-    return orders.map(
-      (o) => new EffectiveCompensation(o.year.toString(), o.quantity),
+    return Utils.orderByVintage(
+      orders.map(
+        (o) => new EffectiveCompensation(o.year.toString(), o.quantity),
+      ),
     );
   }
   async getProjectYearlyEffectiveCompensation(
@@ -134,8 +144,10 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
         businessUnit: { allocations: { some: { projectId } } },
       },
     });
-    return orders.map(
-      (o) => new EffectiveCompensation(o.year.toString(), o.quantity),
+    return Utils.orderByVintage(
+      orders.map(
+        (o) => new EffectiveCompensation(o.year.toString(), o.quantity),
+      ),
     );
   }
 
@@ -162,7 +174,13 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
     const vintages = await this.prisma.vintage.findMany({
       where: { projectId },
     });
-    return vintages.reduce((acc, v) => acc + v.capacity * v.issued_price, 0);
+    return vintages.reduce(
+      (acc, v) =>
+        acc +
+        v.capacity * Utils.priceDecimal(v.issued_price) +
+        v.purchased * Utils.priceDecimal(v.purchased_price),
+      0,
+    );
   }
   async getBusinessUnitTotalInvestedAmount(
     businessUnitId: string,
@@ -172,7 +190,10 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
     });
 
     return allocatedStock.reduce(
-      (acc, v) => acc + v.quantity * v.issued_price,
+      (acc, v) =>
+        acc +
+        v.quantity * Utils.priceDecimal(v.issued_price) +
+        v.purchased * Utils.priceDecimal(v.purchased_price),
       0,
     );
   }
@@ -185,7 +206,13 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
       },
     });
 
-    return vintages.reduce((acc, v) => acc + v.capacity * v.issued_price, 0);
+    return vintages.reduce(
+      (acc, v) =>
+        acc +
+        (v.capacity * Utils.priceDecimal(v.issued_price) +
+          v.purchased * Utils.priceDecimal(v.purchased_price)),
+      0,
+    );
   }
 }
 

@@ -8,6 +8,7 @@ type NetZeroStockVisualization = {
   emission: number;
   target: number;
   actual: number;
+  retired: number;
 };
 export class NetZeroStockExtractor {
   extract(stocks: Stock[]): NetZeroStockVisualization[] {
@@ -26,7 +27,12 @@ export class NetZeroStockExtractor {
       if (last && last.vintage === curr.vintage) {
         return [
           ...acc.slice(0, acc.length - 1),
-          { ...last, exAnteCount: total - exPostCount, exPostCount },
+          {
+            ...last,
+            exAnteCount: total - exPostCount,
+            exPostCount,
+            retired: last.retired + curr.consumed,
+          },
         ];
       }
 
@@ -37,6 +43,7 @@ export class NetZeroStockExtractor {
         emission: 0,
         target: 0,
         actual: 0,
+        retired: (last?.retired ?? 0) + curr.consumed,
       });
       return acc;
     }, []);
@@ -49,13 +56,24 @@ export class NetZeroStockExtractor {
   ): NetZeroStockVisualization[] {
     return visualizations.map((v) => {
       const demand = demands.find((d) => d.year === v.vintage);
-      const compensation = actuals.find((d) => d.vintage === v.vintage);
+      const compensation = actuals
+        .filter((d) => d.vintage === v.vintage)
+        .reduce(
+          (acc, curr) => ({
+            ...acc,
+            compensation: acc.compensation + curr.compensation,
+          }),
+          { vintage: v.vintage, compensation: 0 },
+        );
+
       if (demand) {
         v.emission = demand.emission;
         v.target = demand.target;
       }
-      if (compensation) {
-        v.actual = compensation.compensation;
+      if (compensation && demand) {
+        const compensationPercentage =
+          (compensation.compensation / demand.emission) * 100;
+        v.actual = compensationPercentage;
       }
       return v;
     });

@@ -201,8 +201,7 @@ export const ProjectDataFixtures = ({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       certifierId: (references: any) => {
-        return references['certifier'].find((c: any) => c.name === 'Wildsense')
-          .id;
+        return references['certifier'].find((c: any) => c.name === 'ERS').id;
       },
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -240,7 +239,7 @@ export const ProjectDataFixtures = ({
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       certifierId: (references: any) => {
-        return references['certifier'].find((c) => c.name === 'Wildsense').id;
+        return references['certifier'].find((c) => c.name === 'ERS').id;
       },
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -342,7 +341,7 @@ export const ProjectDataFixtures = ({
       startDate: '2025',
       endDate: '2055',
       area: 402,
-      type: CarbonCreditType.REFORESTATION,
+      type: CarbonCreditType.RESTORATION,
       origin: CarbonCreditOrigin.FORWARD_FINANCE,
       fundingAmount: 1669306.64,
       color: ProjectColor.GREEN,
@@ -380,7 +379,7 @@ export const ProjectDataFixtures = ({
       startDate: '2007',
       endDate: '2035',
       area: 736,
-      type: CarbonCreditType.REFORESTATION,
+      type: CarbonCreditType.RESTORATION,
       origin: CarbonCreditOrigin.DIRECT_PURCHASE,
       fundingAmount: 2442000,
       color: ProjectColor.GREEN,
@@ -467,6 +466,7 @@ export const VintageDataFixtures = ({
           id: item.id,
           year: item.year,
           capacity: item.capacity,
+          available: item.available,
           projectId: project.id,
           purchased: item.purchased,
           purchased_price: item.purchasePrice,
@@ -503,9 +503,9 @@ export const StockDataFixtures = ({
           id: idGenerator.generate(),
           vintage: v.year,
           quantity: v.capacity,
-          available: v.capacity,
+          available: v.available,
           consumed: 0,
-          purchased: 0,
+          purchased: v.purchased,
           purchased_price: v.purchased_price,
           issued_price: v.issued_price,
           projectId: project.id,

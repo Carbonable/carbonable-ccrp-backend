@@ -43,13 +43,19 @@ export const andProjectIsConfigured = async (
       projectId: string,
       projectName: string,
       description: string,
-      absorptionCurve: { timestamp: number; absorption: number }[],
+      absorptionCurve: {
+        timestamp: number;
+        absorption: number;
+        issuedPrice: number;
+      }[],
     ) => {
       const vintages = await Vintage.buildFromAbsorptionCurve(
         idGenerator,
         absorptionCurve,
       );
+
       const stocks = Stock.fromVintages(idGenerator, projectId, vintages);
+
       const project = new Project(
         projectId,
         projectName,

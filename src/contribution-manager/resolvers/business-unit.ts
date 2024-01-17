@@ -59,10 +59,21 @@ export class BusinessUnitResolver {
 
     const businessUnits = prismaToBusinessUnit(bu);
     return businessUnits.map(async (bu) => {
-      const contributions =
+      const compensation =
+        await this.orderBookRepository.getBusinessUnitYearlyEffectiveCompensation(
+          bu.id,
+        );
+      const contribution =
         await this.orderBookRepository.getBusinessUnitYearlyEffectiveContribution(
           bu.id,
         );
+
+      const compensationPercentage =
+        (compensation
+          .filter((c) => c.vintage === now.toString())
+          .reduce((acc, curr) => acc + curr.compensation, 0) /
+          bu.getYearlyEmission(now)) *
+        100;
       return {
         ...bu,
         default_emission: bu.defaultEmission,
@@ -71,13 +82,16 @@ export class BusinessUnitResolver {
           project: a.projectId,
           amount: a.amount,
         })),
-
+        actual_rate: Utils.formatString({
+          value: Utils.round(compensationPercentage).toString(),
+          suffix: '%',
+        }),
         yearly_emissions: Utils.formatString({
           value: bu.getYearlyEmission(now).toString(),
           suffix: 't',
         }),
         yearly_contributions: Utils.formatString({
-          value: contributions
+          value: contribution
             .filter((c) => c.vintage === now.toString())
             .reduce((acc, curr) => acc + curr.contribution, 0)
             .toString(),
@@ -114,10 +128,22 @@ export class BusinessUnitResolver {
         project: true,
       },
     });
-    const contributions =
+    // tons of cc for current year
+    const compensation =
+      await this.orderBookRepository.getBusinessUnitYearlyEffectiveCompensation(
+        id,
+      );
+    const contribution =
       await this.orderBookRepository.getBusinessUnitYearlyEffectiveContribution(
         id,
       );
+
+    const compensationPercentage =
+      (compensation
+        .filter((c) => c.vintage === now.toString())
+        .reduce((acc, curr) => acc + curr.compensation, 0) /
+        businessUnit.getYearlyEmission(now)) *
+      100;
 
     return {
       ...businessUnit,
@@ -127,12 +153,16 @@ export class BusinessUnitResolver {
         project: a.project.name,
         amount: a.quantity,
       })),
+      actual_rate: Utils.formatString({
+        value: Utils.round(compensationPercentage).toString(),
+        suffix: '%',
+      }),
       yearly_emissions: Utils.formatString({
         value: businessUnit.getYearlyEmission(now).toString(),
         suffix: 't',
       }),
       yearly_contributions: Utils.formatString({
-        value: contributions
+        value: contribution
           .filter((c) => c.vintage === now.toString())
           .reduce((acc, curr) => acc + curr.contribution, 0)
           .toString(),

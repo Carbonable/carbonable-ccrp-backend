@@ -10,7 +10,8 @@ type NetZeroPlanning {
     ex_post_count: Int
     emission: Int
     target: Int
-    actual: Int
+    actual: Float
+    retired: Int
 }
 
 type AnnualData {
@@ -20,8 +21,8 @@ type AnnualData {
   ex_post_purchased: Int
   ex_post_retired: Int
   target: Int
-  actual_rate: Int
-  delta: Int
+  actual_rate: Float
+  delta: Float
   debt: Int
   ex_post_stock: Int
   ex_ante_stock: Int
@@ -39,7 +40,7 @@ type CumulativeData {
   ex_post_purchased: Int
   ex_post_retired: Int
   target: Int
-  actual_rate: Int
+  actual_rate: Float
   delta: Int
   debt: Int
   ex_post_stock: Int
@@ -53,17 +54,17 @@ type Cumulative {
 
 type FinancialAnalysisData {
   year: String
-  purchased_price: Int
-  cumulative_purchased_price: Int
-  total_purchased_amount: Int
-  cumulative_total_purchased_amount: Int
-  issued_price: Int
-  total_issued_amount: Int
-  cumulative_total_issued_amount: Int
-  gran_total_amount: Int
-  cumulative_gran_total_amount: Int
-  estimated_debt_amount: Int
-  cumulative_estimated_debt_amount: Int
+  purchased_price: Float
+  cumulative_purchased_price: Float
+  total_purchased_amount: Float
+  cumulative_total_purchased_amount: Float
+  issued_price: Float
+  total_issued_amount: Float
+  cumulative_total_issued_amount: Float
+  gran_total_amount: Float
+  cumulative_gran_total_amount: Float
+  estimated_debt_amount: Float
+  cumulative_estimated_debt_amount: Float
 }
 
 type FinancialAnalysis {

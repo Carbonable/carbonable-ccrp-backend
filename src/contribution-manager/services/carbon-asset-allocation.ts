@@ -58,6 +58,8 @@ export class CarbonAssetAllocationService {
       include: { project: true, businessUnit: true, stock: true },
     });
 
+    const now = new Date().getFullYear();
+
     const res = [];
     for (const a of allocations) {
       const metadata = getMetadata(a.businessUnit.metadata);
@@ -70,9 +72,17 @@ export class CarbonAssetAllocationService {
         },
         total_cu: a.stock.reduce((acc, curr) => acc + curr.quantity, 0),
         allocated: a.quantity,
-        generated: a.stock.reduce((acc, curr) => acc + curr.quantity, 0),
-        forward: a.stock.reduce((acc, curr) => acc + curr.quantity, 0),
-        retired: a.stock.reduce((acc, curr) => acc + curr.consumed, 0),
+        generated: a.stock.reduce(
+          (acc, curr) =>
+            parseInt(curr.vintage) <= now ? acc + curr.quantity : acc,
+          0,
+        ),
+        forward: a.stock.reduce(
+          (acc, curr) =>
+            parseInt(curr.vintage) >= now ? acc + curr.quantity : acc,
+          0,
+        ),
+        retired: a.stock.reduce((acc, curr) => acc + curr.retired, 0),
       });
     }
 
@@ -97,7 +107,7 @@ export class CarbonAssetAllocationService {
         a.businessUnit.id,
       );
       const target =
-        businessUnit.getTargets().find((t) => t.year === now) ??
+        businessUnit.getTargets().find((t) => t.year === now).target ??
         businessUnit.defaultTarget;
       const metadata = getMetadata(a.project.metadata);
       res.push({
@@ -141,8 +151,10 @@ export class CarbonAssetAllocationService {
       );
 
       const price =
-        a.stock.reduce((acc, curr) => acc + curr.issued_price, 0) /
-        a.stock.length;
+        a.stock.reduce(
+          (acc, curr) => acc + Utils.priceDecimal(curr.issued_price),
+          0,
+        ) / a.stock.length;
 
       const allocated = a.stock.reduce((acc, curr) => acc + curr.quantity, 0);
 

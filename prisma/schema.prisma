@@ -229,6 +229,7 @@ model Stock {
   purchased       Int    @default(0)
   purchased_price Int    @default(0)
   issued_price    Int    @default(0)
+  retired         Int    @default(0)
 
   businessUnitId String?       @map("business_unit_id")
   businessUnit   BusinessUnit? @relation(fields: [businessUnitId], references: [id])
@@ -246,6 +247,7 @@ model Vintage {
   id              String @id
   year            String @db.VarChar(4)
   capacity        Int
+  available       Int
   reserved        Int    @default(0)
   consumed        Int    @default(0)
   purchased       Int    @default(0)

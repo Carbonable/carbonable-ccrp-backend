@@ -4,13 +4,13 @@ import { Vintage } from '../portfolio';
 export const exPostStock = (stocks: Stock[], currentYear: number): number =>
   stocks.reduce(
     (acc, curr) =>
-      acc + (parseInt(curr.vintage) <= currentYear ? curr.quantity : 0),
+      acc + (parseInt(curr.vintage) < currentYear ? curr.available : 0),
     0,
   );
 export const exAnteStock = (stocks: Stock[], currentYear: number): number =>
   stocks.reduce(
     (acc, curr) =>
-      acc + (parseInt(curr.vintage) > currentYear ? curr.quantity : 0),
+      acc + (parseInt(curr.vintage) >= currentYear ? curr.available : 0),
     0,
   );
 
@@ -53,7 +53,7 @@ export class Stock {
     return this._allocationId;
   }
   get quantity(): number {
-    return this._quantity + this._purchased;
+    return this._quantity;
   }
   set quantity(quantity: number) {
     this._quantity = quantity;
@@ -90,7 +90,11 @@ export class Stock {
         null,
         projectId,
         v.year,
-        v.capacity,
+        v.issued,
+        null,
+        v.purchased,
+        v.purchasePrice,
+        v.issuedPrice,
       );
       stock.lock(v.reserved);
       return stock;

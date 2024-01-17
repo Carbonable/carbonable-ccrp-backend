@@ -11,7 +11,6 @@ type StockItem = {
   project: AllocationTarget;
   quantity: number;
   available: number;
-  locked: number;
 };
 
 @Resolver('stock')
@@ -45,6 +44,7 @@ export class StockResolver {
             id: view.company_id,
           },
         },
+        allocationId: null,
       };
     }
 
@@ -62,7 +62,6 @@ export class StockResolver {
       vintage: s.vintage,
       quantity: s.quantity,
       available: s.available,
-      locked: s.consumed,
     }));
   }
 }

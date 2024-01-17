@@ -53,6 +53,7 @@ export class PrismaStockRepository implements StockRepositoryInterface {
             quantity: s.quantity,
             available: s.available,
             consumed: s.consumed,
+            purchased: s.purchased,
           },
           create: {
             id: s.id,
@@ -88,6 +89,7 @@ export class PrismaStockRepository implements StockRepositoryInterface {
       await this.prisma.stock.findMany({
         where: {
           project: { companyId },
+          allocationId: null,
         },
         orderBy: [{ vintage: 'asc' }],
       }),
@@ -161,6 +163,7 @@ export class PrismaStockRepository implements StockRepositoryInterface {
         s.issued_price,
       );
       stock.lock(s.consumed);
+      stock.retire(s.retired);
       return stock;
     });
   }

@@ -41,6 +41,7 @@ describe('NetZeroStockExtractor', () => {
         emission: 0,
         target: 0,
         actual: 0,
+        retired: 0,
       },
     ];
     const res = extractor.aggregate(visualizations, [], []);
@@ -58,6 +59,7 @@ describe('NetZeroStockExtractor', () => {
         emission: 0,
         target: 0,
         actual: 0,
+        retired: 0,
       },
       {
         vintage: '2021',
@@ -66,6 +68,7 @@ describe('NetZeroStockExtractor', () => {
         emission: 0,
         target: 0,
         actual: 0,
+        retired: 0,
       },
     ];
     const demands = [
@@ -91,6 +94,7 @@ describe('NetZeroStockExtractor', () => {
         emission: 0,
         target: 0,
         actual: 0,
+        retired: 0,
       },
       {
         vintage: '2021',
@@ -99,6 +103,7 @@ describe('NetZeroStockExtractor', () => {
         emission: 0,
         target: 0,
         actual: 0,
+        retired: 0,
       },
     ];
     const actuals = [
@@ -108,8 +113,8 @@ describe('NetZeroStockExtractor', () => {
     const res = extractor.aggregate(visualizations, [], actuals);
     expect(res.length).toBe(2);
 
-    expect(res[0].actual).toBe(50);
-    expect(res[1].actual).toBe(60);
+    expect(res[0].actual).toBe(0);
+    expect(res[1].actual).toBe(0);
   });
 
   it('should not duplicate vintage', async () => {
@@ -120,10 +125,7 @@ describe('NetZeroStockExtractor', () => {
       new Stock('2', 'businessUnit1', 'project1', '2024', 10),
       new Stock('3', 'businessUnit1', 'project1', '2025', 10),
     ];
-    const demands = [
-      new Demand('2023', 50, 1000000),
-      new Demand('2024', 60, 1000000),
-    ];
+    const demands = [new Demand('2023', 50, 100), new Demand('2024', 60, 100)];
     const actuals = [
       new EffectiveCompensation('2023', 50),
       new EffectiveCompensation('2024', 60),
@@ -150,10 +152,7 @@ describe('NetZeroStockExtractor', () => {
       new Stock('2', 'businessUnit1', 'project1', '2024', 10),
       new Stock('3', 'businessUnit1', 'project1', '2025', 10),
     ];
-    const demands = [
-      new Demand('2023', 50, 1000000),
-      new Demand('2024', 60, 1000000),
-    ];
+    const demands = [new Demand('2023', 50, 100), new Demand('2024', 60, 100)];
     const actuals = [
       new EffectiveCompensation('2023', 50),
       new EffectiveCompensation('2024', 60),
@@ -170,6 +169,24 @@ describe('NetZeroStockExtractor', () => {
     expect(visualization[1].actual).toBe(60);
     expect(visualization[0].target).toBe(0);
     expect(visualization[1].target).toBe(60);
+  });
+
+  it('should take retired in account', () => {
+    let stocks = [
+      new Stock('1', 'businessUnit1', 'project1', '2022', 10),
+      new Stock('2', 'businessUnit1', 'project1', '2023', 10),
+      new Stock('3', 'businessUnit1', 'project1', '2025', 10),
+    ];
+    stocks = stocks.map((s) => {
+      s.lock(10);
+      return s;
+    });
+    const visualizationData = extractor.extract(stocks);
+
+    expect(visualizationData.length).toBe(3);
+    expect(visualizationData[0].retired).toBe(10);
+    expect(visualizationData[1].retired).toBe(20);
+    expect(visualizationData[2].retired).toBe(30);
   });
 
   afterAll(() => jest.useRealTimers());
