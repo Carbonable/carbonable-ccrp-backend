@@ -39,7 +39,7 @@ export class VisualizationResolver {
       view as VisualizationViewType,
     );
 
-    if (data.length === 0) {
+    if (data.length === 0 || process.env.SHOULD_CACHE) {
       await this.netZeroStrategy.hydrateFromViewType(view);
     }
 
@@ -56,7 +56,7 @@ export class VisualizationResolver {
       view as VisualizationViewType,
     );
 
-    if (data.length === 0) {
+    if (data.length === 0 || process.env.SHOULD_CACHE) {
       await this.annualPlannigStrategy.hydrateFromViewType(view);
     }
 
@@ -79,7 +79,7 @@ export class VisualizationResolver {
       view as VisualizationViewType,
     );
 
-    if (data.length === 0) {
+    if (data.length === 0 || process.env.SHOULD_CACHE) {
       await this.cumulativePlannigStrategy.hydrateFromViewType(view);
     }
     return Utils.paginate(
@@ -101,7 +101,7 @@ export class VisualizationResolver {
       view as VisualizationViewType,
     );
 
-    if (data.length === 0) {
+    if (data.length === 0 || process.env.SHOULD_CACHE) {
       await this.financialAnalysisStrategy.hydrateFromViewType(view);
     }
 

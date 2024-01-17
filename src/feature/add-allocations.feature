@@ -3,33 +3,33 @@ Feature: Add allocations for business unit
   Scenario: Add allocation to compensate on business unit consumption
     Given I have an existing company "Carbonable"
     And company "Carbonable" has a project "01H5739RVDH5MFVTHD90TBR92J" called "Banegas Farm" described as "Banegas Farm project" with this absorption curve:
-      | timestamp  | absorption |
-      | 1667314458 |          0 |
-      | 1730472858 |   12584000 |
-      | 1793544858 |   40898000 |
-      | 1856703258 |  100672000 |
-      | 1919775258 |  202917000 |
-      | 1982933658 |  333476000 |
-      | 2109164058 |  629200000 |
-      | 2235394458 |  915486000 |
-      | 2330002458 | 1108965000 |
-      | 2393160858 | 1223794000 |
-      | 2456232858 | 1335477000 |
-      | 2582463258 | 1528956000 |
-      | 2614085658 | 1573000000 |
+      | timestamp  | absorption | issuedPrice |
+      | 1667314458 |          0 | 11 |
+      | 1730472858 |   12584000 | 11 |
+      | 1793544858 |   40898000 | 11 |
+      | 1856703258 |  100672000 | 11 |
+      | 1919775258 |  202917000 | 11 |
+      | 1982933658 |  333476000 | 11 |
+      | 2109164058 |  629200000 | 11 |
+      | 2235394458 |  915486000 | 11 |
+      | 2330002458 | 1108965000 | 11 |
+      | 2393160858 | 1223794000 | 11 |
+      | 2456232858 | 1335477000 | 11 |
+      | 2582463258 | 1528956000 | 11 |
+      | 2614085658 | 1573000000 | 11 |
     And company "Carbonable" has a project "01H5739RVSRKHFVNM47AE4NHMK" called "Las Delicias" described as "Las Delicias project" with this absorption curve:
-      | timestamp  | absorption |
-      | 1667314458 |          0 |
-      | 1730472858 |  126105000 |
-      | 1793544858 |  317064000 |
-      | 1856703258 |  587289000 |
-      | 1919775258 |  907956000 |
-      | 1982933658 | 1275462000 |
-      | 2046005658 | 1686204000 |
-      | 2109164058 | 2140182000 |
-      | 2172236058 | 2630190000 |
-      | 2235394458 | 3152625000 |
-      | 2298466458 | 3603000000 |
+      | timestamp  | absorption | issuedPrice |
+      | 1667314458 |          0 | 11 |
+      | 1730472858 |  126105000 | 11 |
+      | 1793544858 |  317064000 | 11 |
+      | 1856703258 |  587289000 | 11 |
+      | 1919775258 |  907956000 | 11 |
+      | 1982933658 | 1275462000 | 11 |
+      | 2046005658 | 1686204000 | 11 |
+      | 2109164058 | 2140182000 | 11 |
+      | 2172236058 | 2630190000 | 11 |
+      | 2235394458 | 3152625000 | 11 |
+      | 2298466458 | 3603000000 | 11 |
     And the following business unit:
       | id                         | name      | description           | forecastEmission | target | debt | metadata                                |
       | 01HA6TYCTWJPAP95DJ8AGEZ1TN | Factory 1 | Factory 1 description |            10000 |    100 |      | type-factory,location-france,color-blue |

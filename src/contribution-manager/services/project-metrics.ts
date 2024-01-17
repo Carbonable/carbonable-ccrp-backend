@@ -41,11 +41,17 @@ export class ProjectMetricsService {
     const percentages = percentagesArr.shift();
     const standards = certifiersArr.map((c) => ({
       ...c,
-      value: Utils.formatString({ value: c.value_percent, suffix: '%' }),
+      value: Utils.formatString({
+        value: c.value_percent,
+        suffix: '%',
+      }),
     }));
     const localization = countriesArr.map((c) => ({
       country: { name: c.name, iso: c.iso, flag: c.flag },
-      value: Utils.formatString({ value: c.value_percent, suffix: '%' }),
+      value: Utils.formatString({
+        value: c.value_percent,
+        suffix: '%',
+      }),
     }));
     return {
       colors: {

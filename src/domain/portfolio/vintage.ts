@@ -19,22 +19,32 @@ export class Vintage {
     private _issued_price: number = DEFAULT_ISSUED_PRICE,
   ) {
     this._reserved = 0;
-    this._available = capacity;
+    this._available = capacity + _purchased;
     this._capacity = capacity;
 
     this._purchased_price = _purchased_price * 100;
     this._issued_price = _issued_price * 100;
   }
 
+  get issued(): number {
+    this.checkCapacity();
+    return this._capacity;
+  }
   get capacity(): number {
     this.checkCapacity();
-    return this._available;
+    return this._capacity;
   }
+
   set capacity(value: number) {
     this.checkCapacity();
     this._capacity += value;
     this._available += value;
     this.checkCapacity();
+  }
+
+  get available(): number {
+    this.checkCapacity();
+    return this._available;
   }
 
   get reserved(): number {
@@ -79,7 +89,7 @@ export class Vintage {
 
   // Ensure our business domain obect cannot enter an invalid state.
   private checkCapacity(): void {
-    if (this._available + this._reserved !== this._capacity) {
+    if (this._available + this._reserved !== this._capacity + this._purchased) {
       throw new Error('Failed to verify capacity');
     }
   }
@@ -99,8 +109,8 @@ export class Vintage {
         new Vintage(
           idGenerator.generate(),
           vintage,
-          toGenerate,
-          0,
+          undefined !== point.issuedPrice ? toGenerate : 0,
+          undefined !== point.purchasedPrice ? toGenerate : 0,
           point.purchasedPrice ?? 0,
           point.issuedPrice ?? 0,
         ),

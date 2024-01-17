@@ -207,7 +207,6 @@ type StockData {
     vintage: String!
     quantity: Int!
     available: Int!
-    locked: Int!
 }
 
 type Stock {

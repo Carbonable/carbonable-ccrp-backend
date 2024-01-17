@@ -33,17 +33,25 @@ export class StockManager {
         continue;
       }
 
-      // keep in mind that the allocation amount is a percentage
+      // INFO: keep in mind that the allocation amount is a percentage
       const splitStock = (availableStock.available * allocation.amount) / 100;
+
+      const purchased = availableStock.purchased;
+      const issued = availableStock.quantity;
+
       availableStock.lock(splitStock);
+
+      // FIX: Check wether stock is purchased or issued.
+      // For the moment stock is duplicated for purchased because `splitStock`
+      // is passed as quantity and not purchased
       const reservedStock = new Stock(
         this.idGenerator.generate(),
         businessUnit.id,
         project.id,
         vintage.year,
-        splitStock,
+        issued,
         allocation.id,
-        availableStock.purchased,
+        purchased,
         availableStock.purchasedPrice,
         availableStock.issuedPrice,
       );

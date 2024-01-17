@@ -51,6 +51,7 @@ type BusinessUnit {
     default_target: Int
     metadata: [Metadata]
     allocations: [Allocation]
+    actual_rate: String
     yearly_emissions: String
     yearly_contributions: String
 }

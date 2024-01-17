@@ -26,15 +26,15 @@ export class ImpactMetricsService {
     return {
       sdgs: linkedSdgs,
       protected_forest: Utils.formatString({
-        value: metrics.protected_forests,
+        value: metrics.protected_forests.toString(),
         suffix: 'ha',
       }),
       protected_species: Utils.formatString({
-        value: metrics.protected_species,
+        value: metrics.protected_species.toString(),
         prefix: '#',
       }),
       removed_tons: Utils.formatString({
-        value: metrics.absorbed_tons,
+        value: metrics.absorbed_tons.toString(),
         suffix: 't',
       }),
     };
@@ -66,11 +66,11 @@ ORDER BY s.number
         `;
     const metricsArr = await this.prismaClient.$queryRaw<Metrics[]>`
 SELECT
-    SUM(p.protected_forest) as protected_forests,
+    SUM(p.area) as protected_forests,
     SUM(p.protected_species) as protected_species,
-    SUM(v.capacity + v.purchased) as absorbed_tons
+    SUM(s.consumed) as absorbed_tons
 FROM projects p
-INNER JOIN vintage v on p.id = v.project_id and v.year::INTEGER < date_part('year', now())
+LEFT JOIN stock s on p.id = s.project_id
 WHERE p.company_id = ${companyId}
 ;
         `;
@@ -88,19 +88,26 @@ WHERE bu.id = ${businessUnitId}
 ORDER BY s.number
 ;
         `;
-    const metricsArr = await this.prismaClient.$queryRaw<Metrics[]>`
+    const projectMetrics = await this.prismaClient.$queryRaw<Metrics[]>`
 SELECT
-    SUM(p.protected_forest) as protected_forests,
-    SUM(p.protected_species) as protected_species,
-    SUM(s.quantity) as absorbed_tons
-FROM projects p
-INNER JOIN stock s2 on s2.project_id = p.id
-LEFT JOIN stock s on s.project_id = p.id and  s.vintage::INTEGER <= date_part('year', now())
-LEFT JOIN business_unit bu on bu.id = s2.business_unit_id
-WHERE bu.id = ${businessUnitId};
+    SUM(p.area) as protected_forests,
+    SUM(p.protected_species) as protected_species
+FROM allocation a
+inner join projects p on a.project_id = p.id
+inner JOIN business_unit bu on bu.id = a.business_unit_id
+WHERE a.business_unit_id = ${businessUnitId}
         `;
-
-    return { linkedSdgs, metricsArr };
+    const removalMetrics = await this.prismaClient.$queryRaw<Metrics[]>`
+SELECT
+    SUM(s.consumed) as absorbed_tons
+FROM projects p
+LEFT JOIN stock s on p.id = s.project_id
+WHERE s.business_unit_id = ${businessUnitId}
+`;
+    return {
+      linkedSdgs,
+      metricsArr: [{ ...projectMetrics.pop(), ...removalMetrics.pop() }],
+    };
   }
 
   async fetchProjectWide(projectId: string) {
@@ -113,16 +120,22 @@ WHERE p.id = ${projectId}
 ORDER BY s.number
 ;
         `;
-    const metricsArr = await this.prismaClient.$queryRaw<Metrics[]>`
+    const projectMetrics = await this.prismaClient.$queryRaw<Metrics[]>`
 SELECT
-    SUM(p.protected_forest) as protected_forests,
-    SUM(p.protected_species) as protected_species,
-    SUM(v.capacity + v.purchased) as absorbed_tons
+    p.protected_forest as protected_forests,
+    p.protected_species as protected_species
 FROM projects p
-INNER JOIN vintage v on p.id = v.project_id and v.year::INTEGER < date_part('year', now())
 WHERE p.id = ${projectId}
 ;
+`;
+    const removalMetrics = await this.prismaClient.$queryRaw<Metrics[]>`
+SELECT SUM(s.consumed) as absorbed_tons
+FROM stock s where s.project_id = ${projectId}
         `;
-    return { linkedSdgs, metricsArr };
+
+    return {
+      linkedSdgs,
+      metricsArr: [{ ...projectMetrics.pop(), ...removalMetrics.pop() }],
+    };
   }
 }
