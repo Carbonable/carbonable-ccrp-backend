@@ -23,9 +23,11 @@ type AnnualData {
   target: Int
   actual_rate: Float
   delta: Float
-  debt: Int
+  debt: Float
   ex_post_stock: Int
   ex_ante_stock: Int
+  total_ex_post: Int
+  total_ex_ante: Int
 }
 
 type Annual {
@@ -54,17 +56,18 @@ type Cumulative {
 
 type FinancialAnalysisData {
   year: String
-  purchased_price: Float
-  cumulative_purchased_price: Float
+  avg_purchased_price: Float
+  avg_issued_price: Float
+  avg_price: Float
   total_purchased_amount: Float
-  cumulative_total_purchased_amount: Float
-  issued_price: Float
   total_issued_amount: Float
-  cumulative_total_issued_amount: Float
-  gran_total_amount: Float
-  cumulative_gran_total_amount: Float
-  estimated_debt_amount: Float
-  cumulative_estimated_debt_amount: Float
+  total_amount: Float
+  all_time_avg_purchased_price: Float
+  all_time_avg_issued_price: Float
+  all_time_avg_price: Float
+  cumulative_total_amount: Float
+  emission_debt: Float
+  cumulative_emission_debt: Float
 }
 
 type FinancialAnalysis {

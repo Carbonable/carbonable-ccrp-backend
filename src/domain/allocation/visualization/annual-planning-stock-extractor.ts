@@ -2,8 +2,10 @@ import Utils from '../../../utils';
 import { Demand } from '../../business-unit';
 import { Order, Stock } from '../../order-book';
 import {
-  exPostStock as exPostStockComputer,
-  exAnteStock as exAnteStockComputer,
+  exPostStockAvailable as exPostStockComputer,
+  exAnteStockAvailable as exAnteStockComputer,
+  exPostStock as exPostStockTotalComputer,
+  exAnteStock as exAnteStockTotalComputer,
 } from '../../order-book/stock';
 
 export type AnnualPlanningVisualization = {
@@ -18,6 +20,8 @@ export type AnnualPlanningVisualization = {
   debt: number;
   exPostStock: number;
   exAnteStock: number;
+  totalExPost: number;
+  totalExAnte: number;
 };
 
 export class AnnualPlanningStockExtractor {
@@ -29,8 +33,11 @@ export class AnnualPlanningStockExtractor {
   ): AnnualPlanningVisualization[] {
     return stocks.reduce((acc, curr) => {
       const currentYear = parseInt(curr.vintage);
+
       const exPostStock = exPostStockComputer(stocks, currentYear);
       const exAnteStock = exAnteStockComputer(stocks, currentYear);
+      const totalExPost = exPostStockTotalComputer(stocks, currentYear);
+      const totalExAnte = exAnteStockTotalComputer(stocks, currentYear);
 
       const demand =
         demands.find((d) => d.year === curr.vintage) || Demand.default();
@@ -59,11 +66,13 @@ export class AnnualPlanningStockExtractor {
         exPostPurchased: curr.purchased,
         exPostRetired: curr.consumed,
         target: demand.target,
-        actualRate,
+        actualRate: !isFinite(actualRate) || isNaN(actualRate) ? 0 : actualRate,
         delta: Utils.round(demand.target - actualRate) ?? 0,
-        debt: Math.floor((actualRate / 100) * targetInTon) ?? 0,
+        debt: targetInTon - curr.consumed,
         exPostStock,
         exAnteStock,
+        totalExPost,
+        totalExAnte,
       });
 
       return acc;

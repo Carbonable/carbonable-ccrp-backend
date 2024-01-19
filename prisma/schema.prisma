@@ -344,7 +344,7 @@ enum CarbonCreditOrigin {
 
 enum CarbonCreditType {
   RESTORATION
-  CONCERVATION
+  CONSERVATION
   REFORESTATION
 }
 

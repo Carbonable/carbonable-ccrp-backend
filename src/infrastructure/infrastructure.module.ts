@@ -349,6 +349,7 @@ export const REDIS_CLIENT = 'REDIS_CLIENT';
         visualizationRepository: VisualizationRepositoryInterface,
         stockRepository: StockRepositoryInterface,
         businessUnitRepository: BusinessUnitRepositoryInterface,
+        orderRepository: OrderBookRepositoryInterface,
         companyRepository: CompanyRepositoryInterface,
       ) => {
         return new FinancialAnalysisVisualizationStrategy(
@@ -356,6 +357,7 @@ export const REDIS_CLIENT = 'REDIS_CLIENT';
           visualizationRepository,
           stockRepository,
           businessUnitRepository,
+          orderRepository,
           companyRepository,
         );
       },
@@ -364,6 +366,7 @@ export const REDIS_CLIENT = 'REDIS_CLIENT';
         VISUALIZATION_REPOSITORY,
         STOCK_REPOSITORY,
         BUSINESS_UNIT_REPOSITORY,
+        ORDER_BOOK_REPOSITORY,
         COMPANY_REPOSITORY,
       ],
     },
