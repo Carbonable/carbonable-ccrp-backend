@@ -164,7 +164,7 @@ GROUP BY ce.year
       { redd_plus_count: number; arr_count: number }[]
     >`
 SELECT
-    (SELECT COUNT(cc.id) FROM carbon_credits cc where cc.type = 'CONCERVATION' and cc.vintage = ${year}) as redd_plus_count,
+    (SELECT COUNT(cc.id) FROM carbon_credits cc where cc.type = 'CONSERVATION' and cc.vintage = ${year}) as redd_plus_count,
     (SELECT COUNT(cc.id) FROM carbon_credits cc where cc.type = 'RESTORATION' and cc.vintage = ${year}) as arr_count
 ;
             `;

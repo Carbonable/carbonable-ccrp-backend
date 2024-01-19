@@ -2,7 +2,7 @@ import { TON_IN_GRAM } from '../order-book';
 
 export enum CarbonCreditType {
   RESTORATION = 'RESTORATION',
-  CONCERVATION = 'CONCERVATION',
+  CONSERVATION = 'CONSERVATION',
 }
 
 export enum CarbonCreditOrigin {

@@ -42,6 +42,7 @@ describe('NetZeroStockExtractor', () => {
         target: 0,
         actual: 0,
         retired: 0,
+        consumed: 0,
       },
     ];
     const res = extractor.aggregate(visualizations, [], []);
@@ -60,6 +61,7 @@ describe('NetZeroStockExtractor', () => {
         target: 0,
         actual: 0,
         retired: 0,
+        consumed: 0,
       },
       {
         vintage: '2021',
@@ -69,6 +71,7 @@ describe('NetZeroStockExtractor', () => {
         target: 0,
         actual: 0,
         retired: 0,
+        consumed: 0,
       },
     ];
     const demands = [
@@ -95,6 +98,7 @@ describe('NetZeroStockExtractor', () => {
         target: 0,
         actual: 0,
         retired: 0,
+        consumed: 0,
       },
       {
         vintage: '2021',
@@ -104,6 +108,7 @@ describe('NetZeroStockExtractor', () => {
         target: 0,
         actual: 0,
         retired: 0,
+        consumed: 0,
       },
     ];
     const actuals = [
@@ -138,8 +143,9 @@ describe('NetZeroStockExtractor', () => {
     );
 
     expect(visualization.length).toBe(3);
-    expect(visualization[0].actual).toBe(50);
-    expect(visualization[1].actual).toBe(60);
+    // take consumed into account
+    expect(visualization[0].actual).toBe(0);
+    expect(visualization[1].actual).toBe(0);
     expect(visualization[0].target).toBe(50);
     expect(visualization[1].target).toBe(60);
   });
@@ -166,7 +172,7 @@ describe('NetZeroStockExtractor', () => {
 
     expect(visualization.length).toBe(3);
     expect(visualization[0].actual).toBe(0);
-    expect(visualization[1].actual).toBe(60);
+    expect(visualization[1].actual).toBe(0);
     expect(visualization[0].target).toBe(0);
     expect(visualization[1].target).toBe(60);
   });

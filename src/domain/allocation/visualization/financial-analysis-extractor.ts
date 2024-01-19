@@ -1,62 +1,83 @@
 import Utils from '../../../utils';
-import { Stock } from '../../order-book';
+import { Demand } from '../../business-unit';
+import { Order, Stock } from '../../order-book';
 
 export type FinancialAnalysisItem = {
   year: string;
-  purchasedPrice: number;
-  cumulativePurchasedPrice: number;
+  avgPurchasedPrice: number;
+  avgIssuedPrice: number;
+  avgPrice: number;
   totalPurchasedAmount: number;
-  cumulativeTotalPurchasedAmount: number;
-  issuedPrice: number;
-  averageIssuedPrice: number;
   totalIssuedAmount: number;
-  cumulativeTotalIssuedAmount: number;
-  granTotalAmount: number;
-  cumulativeGranTotalAmount: number;
-  estimatedDebtAmount: number;
-  cumulativeEstimatedDebtAmount: number;
+  totalAmount: number;
+  allTimeAvgPurchasedPrice: number;
+  allTimeAvgIssuedPrice: number;
+  allTimeAvgPrice: number;
+  cumulativeTotalAmount: number;
+  emissionDebt: number;
+  cumulativeEmissionDebt: number;
 };
 
 function defaultFinancialAnalysisItem(): FinancialAnalysisItem {
   return {
     year: '',
-    purchasedPrice: 0,
-    cumulativePurchasedPrice: 0,
+    avgPurchasedPrice: 0,
+    avgIssuedPrice: 0,
+    avgPrice: 0,
     totalPurchasedAmount: 0,
-    cumulativeTotalPurchasedAmount: 0,
-    issuedPrice: 0,
-    averageIssuedPrice: 0,
     totalIssuedAmount: 0,
-    cumulativeTotalIssuedAmount: 0,
-    granTotalAmount: 0,
-    cumulativeGranTotalAmount: 0,
-    estimatedDebtAmount: 0,
-    cumulativeEstimatedDebtAmount: 0,
+    totalAmount: 0,
+    allTimeAvgPurchasedPrice: 0,
+    allTimeAvgIssuedPrice: 0,
+    allTimeAvgPrice: 0,
+    cumulativeTotalAmount: 0,
+    emissionDebt: 0,
+    cumulativeEmissionDebt: 0,
   };
 }
 
+export function avg(numbers: number[]): number {
+  const coeff = numbers.reduce((acc, curr) => acc + (curr > 0 ? 1 : 0), 0);
+  if (coeff === 0) {
+    return 0;
+  }
+  return numbers.reduce((acc, curr) => acc + curr, 0) / coeff;
+}
+
 export class FinancialAnalysisExtractor {
-  extract(stock: Stock[]): FinancialAnalysisItem[] {
+  extract(
+    stock: Stock[],
+    demands: Demand[],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    orders: Order[],
+  ): FinancialAnalysisItem[] {
     const items = stock.map((s) => {
+      const demand =
+        demands.find((d) => d.year === s.vintage) || Demand.default();
+      const targetInTon = demand.emission * (demand.target / 100);
+
       // prices are stored as ints with 4 digits. divide by 100 to keep 2 digits precision
       const totalPurchasedAmount =
         s.purchased * Utils.priceDecimal(s.purchasedPrice);
       const totalIssuedAmount = s.issued * Utils.priceDecimal(s.issuedPrice);
+      const avgPrice = Utils.priceDecimal(
+        avg([s.purchasedPrice, s.issuedPrice]),
+      );
+
       return {
         year: s.vintage,
-        purchasedPrice: Utils.priceDecimal(s.purchasedPrice),
-        cumulativePurchasedPrice: 0,
+        avgPurchasedPrice: Utils.priceDecimal(s.purchasedPrice),
+        avgIssuedPrice: Utils.priceDecimal(s.issuedPrice),
+        avgPrice,
         totalPurchasedAmount,
-        cumulativeTotalPurchasedAmount: 0,
-        issuedPrice: Utils.priceDecimal(s.issuedPrice),
-        // TODO: check how this is calculated
-        averageIssuedPrice: 0,
         totalIssuedAmount,
-        cumulativeTotalIssuedAmount: 0,
-        granTotalAmount: totalPurchasedAmount + totalIssuedAmount,
-        cumulativeGranTotalAmount: 0,
-        estimatedDebtAmount: 0,
-        cumulativeEstimatedDebtAmount: 0,
+        totalAmount: Utils.round(totalPurchasedAmount + totalIssuedAmount),
+        allTimeAvgPurchasedPrice: 0,
+        allTimeAvgIssuedPrice: 0,
+        allTimeAvgPrice: 0,
+        cumulativeTotalAmount: 0,
+        emissionDebt: Utils.round(avgPrice * targetInTon),
+        cumulativeEmissionDebt: 0,
       };
     });
 
@@ -87,18 +108,21 @@ export class FinancialAnalysisExtractor {
     previous: FinancialAnalysisItem,
     curr: FinancialAnalysisItem,
   ): FinancialAnalysisItem {
+    // console.log('cumulate', previous, curr);
     return {
       ...curr,
-      cumulativePurchasedPrice:
-        curr.purchasedPrice + previous.cumulativePurchasedPrice,
-      cumulativeTotalPurchasedAmount:
-        curr.totalPurchasedAmount + previous.cumulativeTotalPurchasedAmount,
-      cumulativeTotalIssuedAmount:
-        curr.totalIssuedAmount + previous.cumulativeTotalIssuedAmount,
-      cumulativeGranTotalAmount:
-        curr.granTotalAmount + previous.cumulativeGranTotalAmount,
-      cumulativeEstimatedDebtAmount:
-        curr.estimatedDebtAmount + previous.cumulativeEstimatedDebtAmount,
+      allTimeAvgPurchasedPrice: Utils.round(
+        avg([previous.allTimeAvgPurchasedPrice, curr.avgPurchasedPrice]),
+      ),
+      allTimeAvgIssuedPrice: Utils.round(
+        avg([previous.allTimeAvgIssuedPrice, curr.avgIssuedPrice]),
+      ),
+      allTimeAvgPrice: Utils.round(
+        avg([previous.allTimeAvgPrice, curr.avgPrice]),
+      ),
+      cumulativeTotalAmount: previous.cumulativeTotalAmount + curr.totalAmount,
+      cumulativeEmissionDebt:
+        previous.cumulativeEmissionDebt + curr.emissionDebt,
     };
   }
 
@@ -108,23 +132,36 @@ export class FinancialAnalysisExtractor {
   ): FinancialAnalysisItem {
     return {
       year: lhs.year,
-      purchasedPrice: lhs.purchasedPrice + rhs.purchasedPrice,
-      cumulativePurchasedPrice:
-        lhs.cumulativePurchasedPrice + rhs.cumulativePurchasedPrice,
-      totalPurchasedAmount: lhs.totalPurchasedAmount + rhs.totalPurchasedAmount,
-      cumulativeTotalPurchasedAmount:
-        lhs.cumulativeTotalPurchasedAmount + rhs.cumulativeTotalPurchasedAmount,
-      issuedPrice: lhs.issuedPrice + rhs.issuedPrice,
-      averageIssuedPrice: lhs.averageIssuedPrice + rhs.averageIssuedPrice,
-      totalIssuedAmount: lhs.totalIssuedAmount + rhs.totalIssuedAmount,
-      cumulativeTotalIssuedAmount:
-        lhs.cumulativeTotalIssuedAmount + rhs.cumulativeTotalIssuedAmount,
-      granTotalAmount: lhs.granTotalAmount + rhs.granTotalAmount,
-      cumulativeGranTotalAmount:
-        lhs.cumulativeGranTotalAmount + rhs.cumulativeGranTotalAmount,
-      estimatedDebtAmount: lhs.estimatedDebtAmount + rhs.estimatedDebtAmount,
-      cumulativeEstimatedDebtAmount:
-        lhs.cumulativeEstimatedDebtAmount + rhs.cumulativeEstimatedDebtAmount,
+      avgPurchasedPrice: Utils.round(
+        avg([lhs.avgPurchasedPrice, rhs.avgPurchasedPrice]),
+      ),
+      avgIssuedPrice: Utils.round(
+        avg([lhs.avgIssuedPrice, rhs.avgIssuedPrice]),
+      ),
+      avgPrice: Utils.round(avg([lhs.avgPrice, rhs.avgPrice])),
+      totalPurchasedAmount: Utils.round(
+        avg([lhs.totalPurchasedAmount, rhs.totalPurchasedAmount]),
+      ),
+      totalIssuedAmount: Utils.round(
+        avg([lhs.totalIssuedAmount, rhs.totalIssuedAmount]),
+      ),
+      totalAmount: Utils.round(avg([lhs.totalAmount, rhs.totalAmount])),
+      allTimeAvgPurchasedPrice: Utils.round(
+        avg([lhs.allTimeAvgPurchasedPrice, rhs.allTimeAvgPurchasedPrice]),
+      ),
+      allTimeAvgIssuedPrice: Utils.round(
+        avg([lhs.allTimeAvgIssuedPrice, rhs.allTimeAvgIssuedPrice]),
+      ),
+      allTimeAvgPrice: Utils.round(
+        avg([lhs.allTimeAvgPrice, rhs.allTimeAvgPrice]),
+      ),
+      cumulativeTotalAmount: Utils.round(
+        avg([lhs.cumulativeTotalAmount, rhs.cumulativeTotalAmount]),
+      ),
+      emissionDebt: Utils.round(avg([lhs.emissionDebt, rhs.emissionDebt])),
+      cumulativeEmissionDebt: Utils.round(
+        avg([lhs.cumulativeEmissionDebt, rhs.cumulativeEmissionDebt]),
+      ),
     };
   }
 }

@@ -1,5 +1,8 @@
 import { Stock } from '../../order-book';
-import { FinancialAnalysisExtractor } from './financial-analysis-extractor';
+import {
+  FinancialAnalysisExtractor,
+  avg,
+} from './financial-analysis-extractor';
 
 describe('FiancialAnalysisExtractor', () => {
   let extractor: FinancialAnalysisExtractor;
@@ -7,8 +10,16 @@ describe('FiancialAnalysisExtractor', () => {
     extractor = new FinancialAnalysisExtractor();
   });
 
+  it('should avg correctly', () => {
+    expect(avg([0, 0, 0])).toEqual(0);
+    expect(avg([10, 0])).toEqual(10);
+    expect(avg([10, 10])).toEqual(10);
+    expect(avg([10, 10, 10])).toEqual(10);
+    expect(avg([10, 20])).toEqual(15);
+  });
+
   it('should extract nothing if nothing is provided', () => {
-    const visualization = extractor.extract([]);
+    const visualization = extractor.extract([], [], []);
     expect(visualization).toEqual([]);
   });
 
@@ -18,7 +29,7 @@ describe('FiancialAnalysisExtractor', () => {
       new Stock('2', 'businessUnit1', 'project1', '2024', 10),
       new Stock('3', 'businessUnit1', 'project1', '2025', 10),
     ];
-    const visualization = extractor.extract(stocks);
+    const visualization = extractor.extract(stocks, [], []);
     expect(visualization.length).toEqual(3);
     expect(visualization[0].year).toEqual('2023');
     expect(visualization[1].year).toEqual('2024');
@@ -67,23 +78,24 @@ describe('FiancialAnalysisExtractor', () => {
         1000,
       ),
     ];
-    const visualization = extractor.extract(stocks);
+    const visualization = extractor.extract(stocks, [], []);
+
     expect(visualization.length).toEqual(3);
     expect(visualization[0].year).toEqual('2023');
     expect(visualization[1].year).toEqual('2024');
     expect(visualization[2].year).toEqual('2025');
     // check prices
-    expect(visualization[0].issuedPrice).toEqual(10);
+    expect(visualization[0].avgIssuedPrice).toEqual(10);
     expect(visualization[0].totalIssuedAmount).toEqual(100);
-    expect(visualization[0].cumulativeTotalIssuedAmount).toEqual(100);
+    expect(visualization[0].allTimeAvgIssuedPrice).toEqual(10);
 
-    expect(visualization[1].issuedPrice).toEqual(10);
+    expect(visualization[1].avgIssuedPrice).toEqual(10);
     expect(visualization[1].totalIssuedAmount).toEqual(100);
-    expect(visualization[1].cumulativeTotalIssuedAmount).toEqual(200);
+    expect(visualization[1].allTimeAvgIssuedPrice).toEqual(10);
 
-    expect(visualization[2].issuedPrice).toEqual(10);
+    expect(visualization[2].avgIssuedPrice).toEqual(10);
     expect(visualization[2].totalIssuedAmount).toEqual(100);
-    expect(visualization[2].cumulativeTotalIssuedAmount).toEqual(300);
+    expect(visualization[2].allTimeAvgIssuedPrice).toEqual(10);
   });
 
   it('should extract financial analysis data for purchased cc with prices set', () => {
@@ -92,23 +104,23 @@ describe('FiancialAnalysisExtractor', () => {
       new Stock('2', 'businessUnit1', 'project1', '2024', 0, null, 10, 1000),
       new Stock('3', 'businessUnit1', 'project1', '2025', 0, null, 10, 1000),
     ];
-    const visualization = extractor.extract(stocks);
+    const visualization = extractor.extract(stocks, [], []);
     expect(visualization.length).toEqual(3);
     expect(visualization[0].year).toEqual('2023');
     expect(visualization[1].year).toEqual('2024');
     expect(visualization[2].year).toEqual('2025');
     // check prices
-    expect(visualization[0].purchasedPrice).toEqual(10);
+    expect(visualization[0].avgPurchasedPrice).toEqual(10);
     expect(visualization[0].totalPurchasedAmount).toEqual(100);
-    expect(visualization[0].cumulativeTotalPurchasedAmount).toEqual(100);
+    expect(visualization[0].allTimeAvgPurchasedPrice).toEqual(10);
 
-    expect(visualization[1].purchasedPrice).toEqual(10);
+    expect(visualization[1].avgPurchasedPrice).toEqual(10);
     expect(visualization[1].totalPurchasedAmount).toEqual(100);
-    expect(visualization[1].cumulativeTotalPurchasedAmount).toEqual(200);
+    expect(visualization[1].allTimeAvgPurchasedPrice).toEqual(10);
 
-    expect(visualization[2].purchasedPrice).toEqual(10);
+    expect(visualization[2].avgPurchasedPrice).toEqual(10);
     expect(visualization[2].totalPurchasedAmount).toEqual(100);
-    expect(visualization[2].cumulativeTotalPurchasedAmount).toEqual(300);
+    expect(visualization[2].allTimeAvgPurchasedPrice).toEqual(10);
   });
 
   it('should extract financial analysis data for both issued and purchased cc with prices set', () => {
@@ -147,39 +159,39 @@ describe('FiancialAnalysisExtractor', () => {
         1000,
       ),
     ];
-    const visualization = extractor.extract(stocks);
+    const visualization = extractor.extract(stocks, [], []);
     expect(visualization.length).toEqual(3);
     expect(visualization[0].year).toEqual('2023');
     expect(visualization[1].year).toEqual('2024');
     expect(visualization[2].year).toEqual('2025');
 
     // check prices
-    expect(visualization[0].purchasedPrice).toEqual(10);
+    expect(visualization[0].avgPurchasedPrice).toEqual(10);
     expect(visualization[0].totalPurchasedAmount).toEqual(100);
-    expect(visualization[0].cumulativeTotalPurchasedAmount).toEqual(100);
-    expect(visualization[0].issuedPrice).toEqual(10);
+    expect(visualization[0].allTimeAvgPurchasedPrice).toEqual(10);
+    expect(visualization[0].avgIssuedPrice).toEqual(10);
     expect(visualization[0].totalIssuedAmount).toEqual(100);
-    expect(visualization[0].cumulativeTotalIssuedAmount).toEqual(100);
-    expect(visualization[0].granTotalAmount).toEqual(200);
-    expect(visualization[0].cumulativeGranTotalAmount).toEqual(200);
+    expect(visualization[0].allTimeAvgIssuedPrice).toEqual(10);
+    expect(visualization[0].avgPrice).toEqual(10);
+    expect(visualization[0].allTimeAvgPrice).toEqual(10);
 
-    expect(visualization[1].purchasedPrice).toEqual(10);
+    expect(visualization[1].avgPurchasedPrice).toEqual(10);
     expect(visualization[1].totalPurchasedAmount).toEqual(100);
-    expect(visualization[1].cumulativeTotalPurchasedAmount).toEqual(200);
-    expect(visualization[1].issuedPrice).toEqual(10);
+    expect(visualization[1].allTimeAvgPurchasedPrice).toEqual(10);
+    expect(visualization[1].avgIssuedPrice).toEqual(10);
     expect(visualization[1].totalIssuedAmount).toEqual(100);
-    expect(visualization[1].cumulativeTotalIssuedAmount).toEqual(200);
-    expect(visualization[1].granTotalAmount).toEqual(200);
-    expect(visualization[1].cumulativeGranTotalAmount).toEqual(400);
+    expect(visualization[1].allTimeAvgIssuedPrice).toEqual(10);
+    expect(visualization[1].avgPrice).toEqual(10);
+    expect(visualization[1].allTimeAvgPrice).toEqual(10);
 
-    expect(visualization[2].purchasedPrice).toEqual(10);
+    expect(visualization[2].avgPurchasedPrice).toEqual(10);
     expect(visualization[2].totalPurchasedAmount).toEqual(100);
-    expect(visualization[2].cumulativeTotalPurchasedAmount).toEqual(300);
-    expect(visualization[2].issuedPrice).toEqual(10);
+    expect(visualization[2].allTimeAvgPurchasedPrice).toEqual(10);
+    expect(visualization[2].avgIssuedPrice).toEqual(10);
     expect(visualization[2].totalIssuedAmount).toEqual(100);
-    expect(visualization[2].cumulativeTotalIssuedAmount).toEqual(300);
-    expect(visualization[2].granTotalAmount).toEqual(200);
-    expect(visualization[2].cumulativeGranTotalAmount).toEqual(600);
+    expect(visualization[2].allTimeAvgIssuedPrice).toEqual(10);
+    expect(visualization[2].avgPrice).toEqual(10);
+    expect(visualization[2].allTimeAvgPrice).toEqual(10);
   });
 
   it('should group stocks by year', () => {
@@ -196,7 +208,7 @@ describe('FiancialAnalysisExtractor', () => {
       new Stock('10', 'businessUnit1', 'project1', '2025', 10),
       new Stock('11', 'businessUnit1', 'project1', '2025', 10),
     ];
-    const visualization = extractor.extract(stocks);
+    const visualization = extractor.extract(stocks, [], []);
     expect(visualization.length).toEqual(3);
     expect(visualization[0].year).toEqual('2023');
     expect(visualization[1].year).toEqual('2024');
@@ -208,7 +220,4 @@ describe('FiancialAnalysisExtractor', () => {
       Object.values(values).forEach((v) => expect(v).toEqual(0));
     }
   });
-
-  // TODO: Implement logic for debt calculation
-  //it('should calculate emission debt based on orders', () => {});
 });

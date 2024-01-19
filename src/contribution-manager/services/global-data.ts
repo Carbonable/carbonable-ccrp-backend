@@ -56,7 +56,7 @@ export class GlobalDataService {
     return {
       actual: Utils.formatString({
         value: actual.toString(),
-        suffix: 't',
+        suffix: '%',
       }),
       target: Utils.formatString({
         value: target.toString(),

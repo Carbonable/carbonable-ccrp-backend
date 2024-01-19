@@ -1,16 +1,40 @@
 import { IdGeneratorInterface } from '../common';
 import { Vintage } from '../portfolio';
 
-export const exPostStock = (stocks: Stock[], currentYear: number): number =>
+export const exPostStockAvailable = (
+  stocks: Stock[],
+  currentYear: number,
+): number =>
   stocks.reduce(
     (acc, curr) =>
       acc + (parseInt(curr.vintage) < currentYear ? curr.available : 0),
     0,
   );
-export const exAnteStock = (stocks: Stock[], currentYear: number): number =>
+export const exAnteStockAvailable = (
+  stocks: Stock[],
+  currentYear: number,
+): number =>
   stocks.reduce(
     (acc, curr) =>
       acc + (parseInt(curr.vintage) >= currentYear ? curr.available : 0),
+    0,
+  );
+export const exPostStock = (stocks: Stock[], currentYear: number): number =>
+  stocks.reduce(
+    (acc, curr) =>
+      acc +
+      (parseInt(curr.vintage) < currentYear
+        ? curr.quantity + curr.purchased
+        : 0),
+    0,
+  );
+export const exAnteStock = (stocks: Stock[], currentYear: number): number =>
+  stocks.reduce(
+    (acc, curr) =>
+      acc +
+      (parseInt(curr.vintage) >= currentYear
+        ? curr.quantity + curr.purchased
+        : 0),
     0,
   );
 

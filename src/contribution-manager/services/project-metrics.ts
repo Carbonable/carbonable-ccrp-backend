@@ -116,8 +116,8 @@ SELECT
     AVG((p.color = 'BLUE')::int) * 100 as blue_count,
     AVG((p.color = 'GREEN')::int) * 100 as green_count,
     AVG((p.color = 'ORANGE')::int) * 100 as orange_count,
-    AVG((p.origin = 'DIRECT_PURCHASE')::int) * 100 as avoidance,
-    AVG((p.origin = 'FORWARD_FINANCE')::int) * 100 as removal
+    AVG((p.type = 'CONSERVATION')::int) * 100 as avoidance,
+    AVG((p.type = 'RESTORATION')::int) * 100 as removal
 FROM projects p
 WHERE p.company_id = ${companyId}
 LIMIT 1
@@ -156,8 +156,8 @@ SELECT
     AVG((p.color = 'BLUE')::int) * 100 as blue_count,
     AVG((p.color = 'GREEN')::int) * 100 as green_count,
     AVG((p.color = 'ORANGE')::int) * 100 as orange_count,
-    AVG((p.origin = 'DIRECT_PURCHASE')::int) * 100 as avoidance,
-    AVG((p.origin = 'FORWARD_FINANCE')::int) * 100 as removal
+    AVG((p.type = 'CONSERVATION')::int) * 100 as avoidance,
+    AVG((p.type = 'RESTORATION')::int) * 100 as removal
 FROM projects p
 INNER JOIN allocation a on a.project_id = p.id
 INNER JOIN business_unit bu on bu.id = a.business_unit_id

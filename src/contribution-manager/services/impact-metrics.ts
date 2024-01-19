@@ -64,17 +64,24 @@ WHERE p.company_id = ${companyId}
 ORDER BY s.number
 ;
         `;
-    const metricsArr = await this.prismaClient.$queryRaw<Metrics[]>`
+    const projectMetrics = await this.prismaClient.$queryRaw<Metrics[]>`
 SELECT
     SUM(p.area) as protected_forests,
-    SUM(p.protected_species) as protected_species,
+    SUM(p.protected_species) as protected_species
+FROM projects p 
+WHERE p.company_id = ${companyId}
+        `;
+    const removalMetrics = await this.prismaClient.$queryRaw<Metrics[]>`
+SELECT
     SUM(s.consumed) as absorbed_tons
 FROM projects p
 LEFT JOIN stock s on p.id = s.project_id
-WHERE p.company_id = ${companyId}
-;
-        `;
-    return { linkedSdgs, metricsArr };
+WHERE p.company_id = ${companyId} and s.business_unit_id is null and s.allocation_id is null
+`;
+    return {
+      linkedSdgs,
+      metricsArr: [{ ...projectMetrics.pop(), ...removalMetrics.pop() }],
+    };
   }
   async fetchBusinessUnitWide(businessUnitId: string) {
     const linkedSdgs = await this.prismaClient.$queryRaw<Sdg[]>`

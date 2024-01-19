@@ -306,7 +306,7 @@ export const ProjectDataFixtures = ({
       type: CarbonCreditType.RESTORATION,
       origin: CarbonCreditOrigin.FORWARD_FINANCE,
       fundingAmount: 1669306.64,
-      color: ProjectColor.BLUE,
+      color: ProjectColor.ORANGE,
       protectedForest: 228,
       protectedSpecies: 104,
       riskAnalysis: 'AA',

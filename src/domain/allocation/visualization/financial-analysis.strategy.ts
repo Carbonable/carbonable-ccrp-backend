@@ -5,7 +5,10 @@ import {
   BusinessUnitRepositoryInterface,
   CompanyRepositoryInterface,
 } from '../../business-unit';
-import { StockRepositoryInterface } from '../../order-book';
+import {
+  OrderBookRepositoryInterface,
+  StockRepositoryInterface,
+} from '../../order-book';
 import { VisualizationRepositoryInterface } from '../visualization-repositoy.interface';
 import { FinancialAnalysisExtractor } from './financial-analysis-extractor';
 import { financialAnalysisKey } from './utils';
@@ -20,6 +23,7 @@ export class FinancialAnalysisVisualizationStrategy
     private readonly repository: VisualizationRepositoryInterface,
     private readonly stockRepository: StockRepositoryInterface,
     private readonly businessUnitRepository: BusinessUnitRepositoryInterface,
+    private readonly orderRepository: OrderBookRepositoryInterface,
     private readonly companyRepository: CompanyRepositoryInterface,
     private readonly extractor: FinancialAnalysisExtractor = new FinancialAnalysisExtractor(),
   ) {}
@@ -78,7 +82,14 @@ export class FinancialAnalysisVisualizationStrategy
 
   async hydrateCompanyWideData(company: Company) {
     const stock = await this.stockRepository.findCompanyStock(company.id);
-    const visualization = this.extractor.extract(stock);
+    const actuals = await this.orderRepository.getCompanyOrders(company.id);
+
+    const businessUnits = await this.businessUnitRepository.byCompanyId(
+      company.id,
+    );
+    const demands = Company.mergeDemands(businessUnits);
+
+    const visualization = this.extractor.extract(stock, demands, actuals);
     await this.repository.put(
       financialAnalysisKey({ companyId: company.id }),
       JSON.stringify(visualization),
@@ -89,7 +100,14 @@ export class FinancialAnalysisVisualizationStrategy
     const stock = await this.stockRepository.findBusinessUnitStock(
       businessUnit.id,
     );
-    const visualization = this.extractor.extract(stock);
+    const orders = await this.orderRepository.findByBusinessUnitIds([
+      businessUnit.id,
+    ]);
+    const visualization = this.extractor.extract(
+      stock,
+      businessUnit.getDemands(),
+      orders,
+    );
     await this.repository.put(
       financialAnalysisKey({ businessUnitId: businessUnit.id }),
       JSON.stringify(visualization),
@@ -98,7 +116,8 @@ export class FinancialAnalysisVisualizationStrategy
 
   async hydrateProjectWideData(projectId: string) {
     const stock = await this.stockRepository.findProjectStock(projectId);
-    const visualization = this.extractor.extract(stock);
+    const orders = await this.orderRepository.getProjectOrders(projectId);
+    const visualization = this.extractor.extract(stock, [], orders);
     await this.repository.put(
       financialAnalysisKey({ projectId }),
       JSON.stringify(visualization),

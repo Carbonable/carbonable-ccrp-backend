@@ -9,6 +9,7 @@ type NetZeroStockVisualization = {
   target: number;
   actual: number;
   retired: number;
+  consumed: number;
 };
 export class NetZeroStockExtractor {
   extract(stocks: Stock[]): NetZeroStockVisualization[] {
@@ -17,13 +18,20 @@ export class NetZeroStockExtractor {
       parseInt(a.vintage) < parseInt(b.vintage) ? -1 : 1,
     );
     // total amount of cc throughout all stock
-    const total = stocks.reduce((acc, curr) => acc + curr.quantity, 0);
+    const total = stocks.reduce(
+      (acc, curr) => acc + curr.quantity + curr.purchased,
+      0,
+    );
 
     return stocks.reduce((acc, curr) => {
       const last = acc[acc.length - 1];
-      const lastExPostCount = last ? last.exPostCount : 0;
-      const exPostCount = lastExPostCount + curr.quantity;
 
+      const lastExPostCount = last ? last.exPostCount : 0;
+      // INFO: Display real exPost stock
+      const exPostCount =
+        lastExPostCount + curr.quantity + curr.purchased - curr.consumed;
+
+      // remove (year - 1) retired + consumed to exPost and exAnte
       if (last && last.vintage === curr.vintage) {
         return [
           ...acc.slice(0, acc.length - 1),
@@ -32,6 +40,7 @@ export class NetZeroStockExtractor {
             exAnteCount: total - exPostCount,
             exPostCount,
             retired: last.retired + curr.consumed,
+            consumed: last.consumed + curr.consumed,
           },
         ];
       }
@@ -44,6 +53,7 @@ export class NetZeroStockExtractor {
         target: 0,
         actual: 0,
         retired: (last?.retired ?? 0) + curr.consumed,
+        consumed: curr.consumed,
       });
       return acc;
     }, []);
@@ -71,8 +81,7 @@ export class NetZeroStockExtractor {
         v.target = demand.target;
       }
       if (compensation && demand) {
-        const compensationPercentage =
-          (compensation.compensation / demand.emission) * 100;
+        const compensationPercentage = (v.consumed / demand.emission) * 100;
         v.actual = compensationPercentage;
       }
       return v;
