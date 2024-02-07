@@ -78,8 +78,8 @@ type CompanyCarbonAssetAllocationData {
     total_allocated_to_date: Int
     total_available_to_date: Int
     allocation_rate: String
-    price: Int
-    total_amount: Int
+    price: Float
+    total_amount: Float
 }
 type CompanyCarbonAssetAllocation {
     data: [CompanyCarbonAssetAllocationData]!

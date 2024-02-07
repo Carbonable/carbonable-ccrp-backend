@@ -21,7 +21,7 @@ export class Order {
 
   async reserve(
     idGenerator: IdGeneratorInterface,
-    vintage: string,
+    reservedForYear: string,
     stock: Stock,
   ): Promise<void> {
     const actualQuantity =
@@ -37,7 +37,8 @@ export class Order {
         new Reservation(
           idGenerator.generate(),
           this.id,
-          vintage,
+          stock.vintage,
+          reservedForYear,
           stock.available,
           stock.id,
         ),
@@ -49,7 +50,8 @@ export class Order {
       new Reservation(
         idGenerator.generate(),
         this.id,
-        vintage,
+        stock.vintage,
+        reservedForYear,
         actualQuantity,
         stock.id,
       ),

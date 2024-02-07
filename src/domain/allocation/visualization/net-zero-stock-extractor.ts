@@ -37,7 +37,7 @@ export class NetZeroStockExtractor {
           ...acc.slice(0, acc.length - 1),
           {
             ...last,
-            exAnteCount: total - exPostCount,
+            exAnteCount: total - exPostCount - last.retired,
             exPostCount,
             retired: last.retired + curr.consumed,
             consumed: last.consumed + curr.consumed,
@@ -47,7 +47,7 @@ export class NetZeroStockExtractor {
 
       acc.push({
         vintage: curr.vintage,
-        exAnteCount: total - exPostCount,
+        exAnteCount: total - exPostCount - (last?.retired ?? 0),
         exPostCount,
         emission: 0,
         target: 0,
@@ -80,7 +80,7 @@ export class NetZeroStockExtractor {
         v.emission = demand.emission;
         v.target = demand.target;
       }
-      if (compensation && demand) {
+      if (compensation && demand?.target > 0) {
         const compensationPercentage = (v.consumed / demand.emission) * 100;
         v.actual = compensationPercentage;
       }

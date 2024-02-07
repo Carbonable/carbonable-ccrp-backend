@@ -110,7 +110,7 @@ export class Booker {
           );
         }
 
-        await order.reserve(this.idGenerator, item.vintage, item);
+        await order.reserve(this.idGenerator, demand.year, item);
         await this.orderBookRepository.save([order]);
         await this.stockRepository.reserve(item, quantity);
 

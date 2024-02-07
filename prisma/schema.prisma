@@ -265,10 +265,12 @@ model Reservation {
 
   quantity Int @default(0)
 
-  orderId String @map("order_id")
-  order   Order  @relation(fields: [orderId], references: [id])
-  stockId String @map("stock_id")
-  stock   Stock  @relation(fields: [stockId], references: [id])
+  orderId            String @map("order_id")
+  order              Order  @relation(fields: [orderId], references: [id])
+  stockId            String @map("stock_id")
+  stock              Stock  @relation(fields: [stockId], references: [id])
+  reservationForYear String @map("reservation_for_year")
+  vintage            String
 
   @@map("reservation")
 }
