@@ -70,7 +70,10 @@ export class CarbonAssetAllocationService {
           name: a.project.name,
           metadata,
         },
-        total_cu: a.stock.reduce((acc, curr) => acc + curr.quantity, 0),
+        total_cu: a.stock.reduce(
+          (acc, curr) => acc + curr.quantity + curr.purchased,
+          0,
+        ),
         allocated: a.quantity,
         generated: a.stock.reduce(
           (acc, curr) =>

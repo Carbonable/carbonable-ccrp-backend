@@ -108,7 +108,6 @@ export class FinancialAnalysisExtractor {
     previous: FinancialAnalysisItem,
     curr: FinancialAnalysisItem,
   ): FinancialAnalysisItem {
-    // console.log('cumulate', previous, curr);
     return {
       ...curr,
       allTimeAvgPurchasedPrice: Utils.round(

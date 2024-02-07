@@ -12,6 +12,7 @@ type NetZeroPlanning {
     target: Int
     actual: Float
     retired: Int
+    consumed: Int
 }
 
 type AnnualData {

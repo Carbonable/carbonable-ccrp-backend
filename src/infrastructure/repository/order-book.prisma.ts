@@ -78,11 +78,15 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
             orderId: reservation.orderId,
             quantity: reservation.count,
             stockId: reservation.stockId,
+            vintage: reservation.vintage,
+            reservationForYear: reservation.reservedFor,
           },
           update: {
             orderId: reservation.orderId,
             quantity: reservation.count,
             stockId: reservation.stockId,
+            vintage: reservation.vintage,
+            reservationForYear: reservation.reservedFor,
           },
         });
       }
@@ -241,7 +245,15 @@ function prismaToOrder(orders: OrdersModel[]): Order[] {
         o.reservations.map(
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          (r) => new Reservation(r.id, o.id, o.year, r.quantity, r.stockId),
+          (r) =>
+            new Reservation(
+              r.id,
+              o.id,
+              r.vintage,
+              r.reservationForYear,
+              r.quantity,
+              r.stockId,
+            ),
         ) ?? [],
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
