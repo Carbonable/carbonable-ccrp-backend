@@ -81,7 +81,10 @@ export class AnnualPlanningVisualizationStrategy
   }
 
   async hydrateCompanyWideData(company: Company) {
-    const stocks = await this.stockRepository.findCompanyStock(company.id);
+    //eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { stock, reservations } = await this.stockRepository.findCompanyStock(
+      company.id,
+    );
     const actuals = await this.orderRepository.getCompanyOrders(company.id);
 
     const businessUnits = await this.businessUnitRepository.byCompanyId(
@@ -89,7 +92,7 @@ export class AnnualPlanningVisualizationStrategy
     );
     const demands = Company.mergeDemands(businessUnits);
 
-    const visualization = this.extractor.extract(stocks, demands, actuals);
+    const visualization = this.extractor.extract(stock, demands, actuals);
     await this.repository.put(
       annualPlanningKey({ companyId: company.id }),
       JSON.stringify(visualization),
@@ -97,14 +100,14 @@ export class AnnualPlanningVisualizationStrategy
   }
 
   async hydrateBusinessUnitWideData(businessUnit: BusinessUnit) {
-    const stocks = await this.stockRepository.findBusinessUnitStock(
-      businessUnit.id,
-    );
+    //eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { stock, reservations } =
+      await this.stockRepository.findBusinessUnitStock(businessUnit.id);
     const orders = await this.orderRepository.findByBusinessUnitIds([
       businessUnit.id,
     ]);
     const visualization = this.extractor.extract(
-      stocks,
+      stock,
       businessUnit.getDemands(),
       orders,
     );
@@ -116,9 +119,12 @@ export class AnnualPlanningVisualizationStrategy
   }
 
   async hydrateProjectWideData(projectId: string) {
-    const stocks = await this.stockRepository.findProjectStock(projectId);
+    //eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { stock, reservations } = await this.stockRepository.findProjectStock(
+      projectId,
+    );
     const orders = await this.orderRepository.getProjectOrders(projectId);
-    const visualization = this.extractor.extract(stocks, [], orders);
+    const visualization = this.extractor.extract(stock, [], orders);
 
     await this.repository.put(
       annualPlanningKey({ projectId: projectId }),
