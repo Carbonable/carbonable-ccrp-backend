@@ -81,7 +81,10 @@ export class FinancialAnalysisVisualizationStrategy
   }
 
   async hydrateCompanyWideData(company: Company) {
-    const stock = await this.stockRepository.findCompanyStock(company.id);
+    //eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { stock, reservations } = await this.stockRepository.findCompanyStock(
+      company.id,
+    );
     const actuals = await this.orderRepository.getCompanyOrders(company.id);
 
     const businessUnits = await this.businessUnitRepository.byCompanyId(
@@ -97,9 +100,9 @@ export class FinancialAnalysisVisualizationStrategy
   }
 
   async hydrateBusinessWideData(businessUnit: BusinessUnit) {
-    const stock = await this.stockRepository.findBusinessUnitStock(
-      businessUnit.id,
-    );
+    //eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { stock, reservations } =
+      await this.stockRepository.findBusinessUnitStock(businessUnit.id);
     const orders = await this.orderRepository.findByBusinessUnitIds([
       businessUnit.id,
     ]);
@@ -115,7 +118,10 @@ export class FinancialAnalysisVisualizationStrategy
   }
 
   async hydrateProjectWideData(projectId: string) {
-    const stock = await this.stockRepository.findProjectStock(projectId);
+    //eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { stock, reservations } = await this.stockRepository.findProjectStock(
+      projectId,
+    );
     const orders = await this.orderRepository.getProjectOrders(projectId);
     const visualization = this.extractor.extract(stock, [], orders);
     await this.repository.put(

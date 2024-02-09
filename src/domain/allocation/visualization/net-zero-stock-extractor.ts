@@ -1,10 +1,11 @@
 import { Demand } from '../../business-unit';
-import { EffectiveCompensation, Stock } from '../../order-book';
+import { EffectiveCompensation, Stock, Reservation } from '../../order-book';
 
 type NetZeroStockVisualization = {
   vintage: string;
   exAnteCount: number;
   exPostCount: number;
+  exPostSum: number;
   emission: number;
   target: number;
   actual: number;
@@ -12,9 +13,15 @@ type NetZeroStockVisualization = {
   consumed: number;
 };
 export class NetZeroStockExtractor {
-  extract(stocks: Stock[]): NetZeroStockVisualization[] {
+  extract(
+    stocks: Stock[],
+    reservations: Reservation[] = [],
+  ): NetZeroStockVisualization[] {
     // sort stock as this may not be properly sorted out
     stocks = stocks.sort((a, b) =>
+      parseInt(a.vintage) < parseInt(b.vintage) ? -1 : 1,
+    );
+    reservations = reservations.sort((a, b) =>
       parseInt(a.vintage) < parseInt(b.vintage) ? -1 : 1,
     );
     // total amount of cc throughout all stock
@@ -25,11 +32,18 @@ export class NetZeroStockExtractor {
 
     return stocks.reduce((acc, curr) => {
       const last = acc[acc.length - 1];
+      const retired = reservations
+        .filter((r) => r.reservedFor === curr.vintage)
+        .reduce((acc, curr) => acc + curr.count, 0);
+      const consumed = reservations
+        .filter((r) => parseInt(r.reservedFor) <= parseInt(curr.vintage))
+        .reduce((acc, curr) => acc + curr.count, 0);
 
+      const currentExPost = curr.quantity + curr.purchased;
       const lastExPostCount = last ? last.exPostCount : 0;
-      // INFO: Display real exPost stock
-      const exPostCount =
-        lastExPostCount + curr.quantity + curr.purchased - curr.consumed;
+      const exPostCount = lastExPostCount + currentExPost;
+      const lastExPostSum = last ? last.exPostSum : 0;
+      const exPostSum = lastExPostSum + currentExPost;
 
       // remove (year - 1) retired + consumed to exPost and exAnte
       if (last && last.vintage === curr.vintage) {
@@ -37,23 +51,23 @@ export class NetZeroStockExtractor {
           ...acc.slice(0, acc.length - 1),
           {
             ...last,
-            exAnteCount: total - exPostCount - last.retired,
+            exAnteCount: last.exAnteCount - currentExPost,
             exPostCount,
-            retired: last.retired + curr.consumed,
-            consumed: last.consumed + curr.consumed,
+            exPostSum,
           },
         ];
       }
 
       acc.push({
         vintage: curr.vintage,
-        exAnteCount: total - exPostCount - (last?.retired ?? 0),
-        exPostCount,
+        exAnteCount: total - exPostSum,
+        exPostCount: exPostSum - (last?.consumed ?? 0),
+        exPostSum,
         emission: 0,
         target: 0,
         actual: 0,
-        retired: (last?.retired ?? 0) + curr.consumed,
-        consumed: curr.consumed,
+        retired,
+        consumed,
       });
       return acc;
     }, []);

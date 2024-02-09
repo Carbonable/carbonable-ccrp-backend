@@ -1,5 +1,9 @@
 import { Demand } from '../../domain/business-unit';
-import { Stock, StockRepositoryInterface } from '../../domain/order-book';
+import {
+  Stock,
+  StockRepositoryInterface,
+  StockAndReservation,
+} from '../../domain/order-book';
 import { StockAvailability } from '../../domain/order-book/stock';
 
 export class InMemoryStockRepository implements StockRepositoryInterface {
@@ -41,14 +45,22 @@ export class InMemoryStockRepository implements StockRepositoryInterface {
   }
 
   //eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async findCompanyStock(companyId: string): Promise<Stock[]> {
+  async findCompanyStock(companyId: string): Promise<StockAndReservation> {
     throw new Error('Operation not supported');
   }
-  async findBusinessUnitStock(businessUnitId: string): Promise<Stock[]> {
-    return this.stock.filter((s) => s.businessUnitId === businessUnitId);
+  async findBusinessUnitStock(
+    businessUnitId: string,
+  ): Promise<StockAndReservation> {
+    return {
+      stock: this.stock.filter((s) => s.businessUnitId === businessUnitId),
+      reservations: [],
+    };
   }
-  async findProjectStock(projectId: string): Promise<Stock[]> {
-    return this.stock.filter((s) => s.projectId === projectId);
+  async findProjectStock(projectId: string): Promise<StockAndReservation> {
+    return {
+      stock: this.stock.filter((s) => s.projectId === projectId),
+      reservations: [],
+    };
   }
 
   async availableToAllocate(

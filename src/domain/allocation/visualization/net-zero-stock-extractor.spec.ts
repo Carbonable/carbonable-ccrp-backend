@@ -1,5 +1,5 @@
 import { Demand } from '../../business-unit';
-import { EffectiveCompensation, Stock } from '../../order-book';
+import { EffectiveCompensation, Reservation, Stock } from '../../order-book';
 import { NetZeroStockExtractor } from './net-zero-stock-extractor';
 
 describe('NetZeroStockExtractor', () => {
@@ -37,6 +37,7 @@ describe('NetZeroStockExtractor', () => {
       {
         vintage: '2020',
         exPostCount: 10,
+        exPostSum: 10,
         exAnteCount: 40,
         emission: 0,
         target: 0,
@@ -56,6 +57,7 @@ describe('NetZeroStockExtractor', () => {
       {
         vintage: '2020',
         exPostCount: 10,
+        exPostSum: 10,
         exAnteCount: 40,
         emission: 0,
         target: 0,
@@ -66,6 +68,7 @@ describe('NetZeroStockExtractor', () => {
       {
         vintage: '2021',
         exPostCount: 20,
+        exPostSum: 20,
         exAnteCount: 30,
         emission: 0,
         target: 0,
@@ -93,6 +96,7 @@ describe('NetZeroStockExtractor', () => {
       {
         vintage: '2020',
         exPostCount: 10,
+        exPostSum: 10,
         exAnteCount: 40,
         emission: 0,
         target: 0,
@@ -103,6 +107,7 @@ describe('NetZeroStockExtractor', () => {
       {
         vintage: '2021',
         exPostCount: 20,
+        exPostSum: 20,
         exAnteCount: 30,
         emission: 0,
         target: 0,
@@ -178,21 +183,153 @@ describe('NetZeroStockExtractor', () => {
   });
 
   it('should take retired in account', () => {
-    let stocks = [
+    const stocks = [
       new Stock('1', 'businessUnit1', 'project1', '2022', 10),
       new Stock('2', 'businessUnit1', 'project1', '2023', 10),
-      new Stock('3', 'businessUnit1', 'project1', '2025', 10),
+      new Stock('3', 'businessUnit1', 'project1', '2024', 10),
+      new Stock('4', 'businessUnit1', 'project1', '2025', 10),
+      new Stock('5', 'businessUnit1', 'project1', '2026', 10),
+      new Stock('6', 'businessUnit1', 'project1', '2027', 10),
+      new Stock('7', 'businessUnit1', 'project1', '2028', 10),
+      new Stock('8', 'businessUnit1', 'project1', '2029', 10),
+      new Stock('9', 'businessUnit1', 'project1', '2030', 10),
+      new Stock('10', 'businessUnit1', 'project1', '2031', 10),
     ];
-    stocks = stocks.map((s) => {
-      s.lock(10);
-      return s;
-    });
-    const visualizationData = extractor.extract(stocks);
+    const reservations = [
+      new Reservation('1', 'orderId', '2022', '2026', 10, '1'),
+      new Reservation('2', 'orderId', '2023', '2026', 10, '2'),
+      new Reservation('3', 'orderId', '2024', '2026', 10, '3'),
+      new Reservation('4', 'orderId', '2025', '2026', 10, '4'),
+      new Reservation('5', 'orderId', '2026', '2026', 10, '5'),
+      new Reservation('6', 'orderId', '2027', '2027', 10, '6'),
+      new Reservation('7', 'orderId', '2028', '2028', 10, '7'),
+      new Reservation('8', 'orderId', '2029', '2029', 10, '8'),
+      new Reservation('9', 'orderId', '2030', '2030', 10, '9'),
+      new Reservation('10', 'orderId', '2031', '2031', 10, '10'),
+    ];
+    const visualizationData = extractor.extract(stocks, reservations);
 
-    expect(visualizationData.length).toBe(3);
-    expect(visualizationData[0].retired).toBe(10);
-    expect(visualizationData[1].retired).toBe(20);
-    expect(visualizationData[2].retired).toBe(30);
+    expect(visualizationData.length).toBe(10);
+
+    expect(visualizationData[0].exAnteCount).toBe(90);
+    expect(visualizationData[0].exPostCount).toBe(10);
+    expect(visualizationData[0].retired).toBe(0);
+    expect(visualizationData[0].consumed).toBe(0);
+
+    expect(visualizationData[1].exAnteCount).toBe(80);
+    expect(visualizationData[1].exPostCount).toBe(20);
+    expect(visualizationData[1].retired).toBe(0);
+    expect(visualizationData[1].consumed).toBe(0);
+
+    expect(visualizationData[2].exAnteCount).toBe(70);
+    expect(visualizationData[2].exPostCount).toBe(30);
+    expect(visualizationData[2].retired).toBe(0);
+    expect(visualizationData[2].consumed).toBe(0);
+
+    expect(visualizationData[3].exAnteCount).toBe(60);
+    expect(visualizationData[3].exPostCount).toBe(40);
+    expect(visualizationData[3].retired).toBe(0);
+    expect(visualizationData[3].consumed).toBe(0);
+
+    expect(visualizationData[4].exAnteCount).toBe(50);
+    expect(visualizationData[4].exPostCount).toBe(50);
+    expect(visualizationData[4].retired).toBe(50);
+    expect(visualizationData[4].consumed).toBe(50);
+
+    expect(visualizationData[5].exAnteCount).toBe(40);
+    expect(visualizationData[5].exPostCount).toBe(10);
+    expect(visualizationData[5].retired).toBe(10);
+    expect(visualizationData[5].consumed).toBe(60);
+
+    expect(visualizationData[6].exAnteCount).toBe(30);
+    expect(visualizationData[6].exPostCount).toBe(10);
+    expect(visualizationData[6].retired).toBe(10);
+    expect(visualizationData[6].consumed).toBe(70);
+
+    expect(visualizationData[7].exAnteCount).toBe(20);
+    expect(visualizationData[7].exPostCount).toBe(10);
+    expect(visualizationData[7].retired).toBe(10);
+    expect(visualizationData[7].consumed).toBe(80);
+
+    expect(visualizationData[8].exAnteCount).toBe(10);
+    expect(visualizationData[8].exPostCount).toBe(10);
+    expect(visualizationData[8].retired).toBe(10);
+    expect(visualizationData[8].consumed).toBe(90);
+
+    expect(visualizationData[9].exAnteCount).toBe(0);
+    expect(visualizationData[9].exPostCount).toBe(10);
+    expect(visualizationData[9].retired).toBe(10);
+    expect(visualizationData[9].consumed).toBe(100);
+  });
+
+  it('should work with duplicated vintages too', () => {
+    const stocks = [
+      new Stock('1', 'businessUnit1', 'project1', '2022', 10),
+      new Stock('2', 'businessUnit1', 'project1', '2022', 10),
+      new Stock('3', 'businessUnit1', 'project1', '2022', 10),
+      new Stock('4', 'businessUnit1', 'project1', '2025', 10),
+      new Stock('5', 'businessUnit1', 'project1', '2026', 10),
+      new Stock('6', 'businessUnit1', 'project1', '2027', 10),
+      new Stock('7', 'businessUnit1', 'project1', '2028', 10),
+      new Stock('8', 'businessUnit1', 'project1', '2029', 10),
+      new Stock('9', 'businessUnit1', 'project1', '2030', 10),
+      new Stock('10', 'businessUnit1', 'project1', '2031', 10),
+    ];
+    const reservations = [
+      new Reservation('1', 'orderId', '2022', '2026', 10, '1'),
+      new Reservation('2', 'orderId', '2022', '2026', 10, '2'),
+      new Reservation('3', 'orderId', '2022', '2026', 10, '3'),
+      new Reservation('4', 'orderId', '2025', '2026', 10, '4'),
+      new Reservation('5', 'orderId', '2026', '2026', 10, '5'),
+      new Reservation('6', 'orderId', '2027', '2027', 10, '6'),
+      new Reservation('7', 'orderId', '2028', '2028', 10, '7'),
+      new Reservation('8', 'orderId', '2029', '2029', 10, '8'),
+      new Reservation('9', 'orderId', '2030', '2030', 10, '9'),
+      new Reservation('10', 'orderId', '2031', '2031', 10, '10'),
+    ];
+    const visualizationData = extractor.extract(stocks, reservations);
+
+    expect(visualizationData.length).toBe(8);
+
+    expect(visualizationData[0].exAnteCount).toBe(70);
+    expect(visualizationData[0].exPostCount).toBe(30);
+    expect(visualizationData[0].retired).toBe(0);
+    expect(visualizationData[0].consumed).toBe(0);
+
+    expect(visualizationData[1].exAnteCount).toBe(60);
+    expect(visualizationData[1].exPostCount).toBe(40);
+    expect(visualizationData[1].retired).toBe(0);
+    expect(visualizationData[1].consumed).toBe(0);
+
+    expect(visualizationData[2].exAnteCount).toBe(50);
+    expect(visualizationData[2].exPostCount).toBe(50);
+    expect(visualizationData[2].retired).toBe(50);
+    expect(visualizationData[2].consumed).toBe(50);
+
+    expect(visualizationData[3].exAnteCount).toBe(40);
+    expect(visualizationData[3].exPostCount).toBe(10);
+    expect(visualizationData[3].retired).toBe(10);
+    expect(visualizationData[3].consumed).toBe(60);
+
+    expect(visualizationData[4].exAnteCount).toBe(30);
+    expect(visualizationData[4].exPostCount).toBe(10);
+    expect(visualizationData[4].retired).toBe(10);
+    expect(visualizationData[4].consumed).toBe(70);
+
+    expect(visualizationData[5].exAnteCount).toBe(20);
+    expect(visualizationData[5].exPostCount).toBe(10);
+    expect(visualizationData[5].retired).toBe(10);
+    expect(visualizationData[5].consumed).toBe(80);
+
+    expect(visualizationData[6].exAnteCount).toBe(10);
+    expect(visualizationData[6].exPostCount).toBe(10);
+    expect(visualizationData[6].retired).toBe(10);
+    expect(visualizationData[6].consumed).toBe(90);
+
+    expect(visualizationData[7].exAnteCount).toBe(0);
+    expect(visualizationData[7].exPostCount).toBe(10);
+    expect(visualizationData[7].retired).toBe(10);
+    expect(visualizationData[7].consumed).toBe(100);
   });
 
   afterAll(() => jest.useRealTimers());

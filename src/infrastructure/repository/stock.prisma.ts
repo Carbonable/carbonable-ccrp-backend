@@ -1,8 +1,16 @@
-import { Stock as StockModel } from '@prisma/client';
-import { Stock, StockRepositoryInterface } from '../../domain/order-book';
+import {
+  Stock as StockModel,
+  Reservation as ReservationModel,
+} from '@prisma/client';
+import {
+  Stock,
+  StockRepositoryInterface,
+  StockAvailability,
+  StockAndReservation,
+  Reservation,
+} from '../../domain/order-book';
 import { PrismaService } from '../prisma.service';
 import { Demand } from '../../domain/business-unit';
-import { StockAvailability } from '../../domain/order-book/stock';
 
 export const STOCK_REPOSITORY = 'STOCK_REPOSITORY';
 export class PrismaStockRepository implements StockRepositoryInterface {
@@ -84,36 +92,81 @@ export class PrismaStockRepository implements StockRepositoryInterface {
     });
   }
 
-  async findCompanyStock(companyId: string): Promise<Stock[]> {
-    return this.prismaToStock(
-      await this.prisma.stock.findMany({
+  async findCompanyStock(companyId: string): Promise<StockAndReservation> {
+    const reservations = this.prismaToReservation(
+      await this.prisma.reservation.findMany({
         where: {
-          project: { companyId },
-          allocationId: null,
+          stock: {
+            project: { companyId },
+          },
         },
         orderBy: [{ vintage: 'asc' }],
       }),
     );
+    // const hasAllocations = await this.companyHasAllocations(companyId);
+    //
+    // if (hasAllocations) {
+    //   return this.prismaToStock(
+    //     await this.prisma.stock.findMany({
+    //       where: {
+    //         project: { companyId },
+    //         NOT: { allocationId: null, businessUnitId: null },
+    //       },
+    //       orderBy: [{ vintage: 'asc' }],
+    //     }),
+    //   );
+    // }
+
+    return {
+      stock: this.prismaToStock(
+        await this.prisma.stock.findMany({
+          where: {
+            project: { companyId },
+            allocationId: null,
+          },
+          orderBy: [{ vintage: 'asc' }],
+        }),
+      ),
+      reservations,
+    };
   }
-  async findBusinessUnitStock(businessUnitId: string): Promise<Stock[]> {
-    return this.prismaToStock(
-      await this.prisma.stock.findMany({
-        where: {
-          businessUnitId,
-        },
-        orderBy: [{ vintage: 'asc' }],
-      }),
-    );
+  async findBusinessUnitStock(
+    businessUnitId: string,
+  ): Promise<StockAndReservation> {
+    return {
+      stock: this.prismaToStock(
+        await this.prisma.stock.findMany({
+          where: {
+            businessUnitId,
+          },
+          orderBy: [{ vintage: 'asc' }],
+        }),
+      ),
+      reservations: this.prismaToReservation(
+        await this.prisma.reservation.findMany({
+          where: { stock: { businessUnitId } },
+          orderBy: [{ vintage: 'asc' }],
+        }),
+      ),
+    };
   }
-  async findProjectStock(projectId: string): Promise<Stock[]> {
-    return this.prismaToStock(
-      await this.prisma.stock.findMany({
-        where: {
-          projectId,
-        },
-        orderBy: [{ vintage: 'asc' }],
-      }),
-    );
+  async findProjectStock(projectId: string): Promise<StockAndReservation> {
+    return {
+      stock: this.prismaToStock(
+        await this.prisma.stock.findMany({
+          where: {
+            projectId,
+          },
+          orderBy: [{ vintage: 'asc' }],
+        }),
+      ),
+      reservations: this.prismaToReservation(
+        await this.prisma.reservation.findMany({
+          where: { stock: { projectId } },
+          orderBy: [{ vintage: 'asc' }],
+        }),
+      ),
+    };
   }
 
   async availableToAllocate(
@@ -166,5 +219,26 @@ export class PrismaStockRepository implements StockRepositoryInterface {
       stock.retire(s.retired);
       return stock;
     });
+  }
+  prismaToReservation(reservation: ReservationModel[]): Reservation[] {
+    return reservation.map((r) => {
+      return new Reservation(
+        r.id,
+        r.orderId,
+        r.vintage,
+        r.reservationForYear,
+        r.quantity,
+        r.stockId,
+      );
+    });
+  }
+  async companyHasAllocations(companyId: string): Promise<boolean> {
+    const res = await this.prisma.allocation.count({
+      where: {
+        businessUnit: { company: { id: companyId } },
+      },
+    });
+
+    return res > 0;
   }
 }

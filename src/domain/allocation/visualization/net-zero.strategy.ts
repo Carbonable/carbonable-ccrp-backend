@@ -76,8 +76,10 @@ export class NetZeroVisualizationStrategy
   }
 
   async hydrateProjectWideData(projectId: string) {
-    const stock = await this.stockRepository.findProjectStock(projectId);
-    let visualization = this.extractor.extract(stock);
+    const { stock, reservations } = await this.stockRepository.findProjectStock(
+      projectId,
+    );
+    let visualization = this.extractor.extract(stock, reservations);
     const actuals =
       await this.orderRepository.getProjectYearlyEffectiveCompensation(
         projectId,
@@ -91,10 +93,9 @@ export class NetZeroVisualizationStrategy
   }
 
   async hydrateBusinessUnitWideData(businessUnit: BusinessUnit) {
-    const stock = await this.stockRepository.findBusinessUnitStock(
-      businessUnit.id,
-    );
-    let visualization = this.extractor.extract(stock);
+    const { stock, reservations } =
+      await this.stockRepository.findBusinessUnitStock(businessUnit.id);
+    let visualization = this.extractor.extract(stock, reservations);
 
     const actuals =
       await this.orderRepository.getBusinessUnitYearlyEffectiveCompensation(
@@ -110,8 +111,10 @@ export class NetZeroVisualizationStrategy
   }
 
   async hydrateCompanyWideData(companyId: string) {
-    const stock = await this.stockRepository.findCompanyStock(companyId);
-    let visualization = this.extractor.extract(stock);
+    const { stock, reservations } = await this.stockRepository.findCompanyStock(
+      companyId,
+    );
+    let visualization = this.extractor.extract(stock, reservations);
     const actuals =
       await this.orderRepository.getCompanyYearlyEffectiveCompensation(
         companyId,

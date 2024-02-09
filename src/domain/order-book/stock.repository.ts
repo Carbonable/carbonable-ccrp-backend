@@ -1,6 +1,11 @@
-import { Stock } from '.';
+import { Reservation, Stock } from '.';
 import { Demand } from '../business-unit';
 import { StockAvailability } from './stock';
+
+export type StockAndReservation = {
+  stock: Stock[];
+  reservations: Reservation[];
+};
 
 export interface StockRepositoryInterface {
   findProjectStockForVintage(
@@ -14,9 +19,9 @@ export interface StockRepositoryInterface {
   save(stock: Stock[]): Promise<void>;
   reserve(stock: Stock, quantity: number): Promise<void>;
 
-  findCompanyStock(companyId: string): Promise<Stock[]>;
-  findBusinessUnitStock(businessUnitId: string): Promise<Stock[]>;
-  findProjectStock(projectId: string): Promise<Stock[]>;
+  findCompanyStock(companyId: string): Promise<StockAndReservation>;
+  findBusinessUnitStock(businessUnitId: string): Promise<StockAndReservation>;
+  findProjectStock(projectId: string): Promise<StockAndReservation>;
 
   availableToAllocate(
     projectId: string,
