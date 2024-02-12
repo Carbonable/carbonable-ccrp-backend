@@ -1,8 +1,11 @@
-import { ulid } from 'ulid';
 import { PrismaService } from '../../prisma.service';
 import { PrismaCompanyRepository } from '../company.prisma';
 import { BusinessUnit } from '../../../domain/business-unit';
-import { createCompany } from './common';
+import {
+  BUSINESS_UNIT_ID_1,
+  BUSINESS_UNIT_ID_2,
+  createCompany,
+} from './common';
 
 describe('Company Prisma Repository Adapter', () => {
   let prismaService: PrismaService;
@@ -21,9 +24,8 @@ describe('Company Prisma Repository Adapter', () => {
 
   test('should create a company with business units', async () => {
     const company = await createCompany(companyRepository);
-    const businessUnitId1 = ulid().toString();
     const businessUnit1 = new BusinessUnit(
-      businessUnitId1,
+      BUSINESS_UNIT_ID_1,
       'Usine',
       "Coeur de l'activité",
       100,
@@ -36,9 +38,8 @@ describe('Company Prisma Repository Adapter', () => {
         { key: 'color', value: 'red' },
       ],
     );
-    const businessUnitId2 = ulid().toString();
     const businessUnit2 = new BusinessUnit(
-      businessUnitId2,
+      BUSINESS_UNIT_ID_2,
       'Bureaux',
       'Centre décisionnel',
       50,

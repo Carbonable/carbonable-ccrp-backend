@@ -41,9 +41,6 @@ export class StockManager {
 
       availableStock.lock(splitStock);
 
-      // FIX: Check wether stock is purchased or issued.
-      // For the moment stock is duplicated for purchased because `splitStock`
-      // is passed as quantity and not purchased
       const reservedStock = new Stock(
         this.idGenerator.generate(),
         businessUnit.id,

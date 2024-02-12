@@ -21,9 +21,6 @@ export class NetZeroStockExtractor {
     stocks = stocks.sort((a, b) =>
       parseInt(a.vintage) < parseInt(b.vintage) ? -1 : 1,
     );
-    reservations = reservations.sort((a, b) =>
-      parseInt(a.vintage) < parseInt(b.vintage) ? -1 : 1,
-    );
     // total amount of cc throughout all stock
     const total = stocks.reduce(
       (acc, curr) => acc + curr.quantity + curr.purchased,
@@ -33,10 +30,24 @@ export class NetZeroStockExtractor {
     return stocks.reduce((acc, curr) => {
       const last = acc[acc.length - 1];
       const retired = reservations
-        .filter((r) => r.reservedFor === curr.vintage)
+        .filter((r) => {
+          const rf = parseInt(r.reservedFor);
+          const v = parseInt(r.vintage);
+          if (rf > v) {
+            return rf === parseInt(curr.vintage);
+          }
+          return v === parseInt(curr.vintage);
+        })
         .reduce((acc, curr) => acc + curr.count, 0);
       const consumed = reservations
-        .filter((r) => parseInt(r.reservedFor) <= parseInt(curr.vintage))
+        .filter((r) => {
+          const rf = parseInt(r.reservedFor);
+          const v = parseInt(r.vintage);
+          if (rf > v) {
+            return rf <= parseInt(curr.vintage);
+          }
+          return v <= parseInt(curr.vintage);
+        })
         .reduce((acc, curr) => acc + curr.count, 0);
 
       const currentExPost = curr.quantity + curr.purchased;
@@ -61,13 +72,14 @@ export class NetZeroStockExtractor {
       acc.push({
         vintage: curr.vintage,
         exAnteCount: total - exPostSum,
-        exPostCount: exPostSum - (last?.consumed ?? 0),
+        exPostCount: exPostSum - (last?.cumulatedRetired ?? 0),
         exPostSum,
         emission: 0,
         target: 0,
         actual: 0,
         retired,
         consumed,
+        cumulatedRetired: retired + (last?.cumulatedRetired ?? 0),
       });
       return acc;
     }, []);
@@ -95,7 +107,8 @@ export class NetZeroStockExtractor {
         v.target = demand.target;
       }
       if (compensation && demand?.target > 0) {
-        const compensationPercentage = (v.consumed / demand.emission) * 100;
+        const compensationPercentage =
+          (v.retired / (demand.emission * (demand.target / 100))) * 100;
         v.actual = compensationPercentage;
       }
       return v;

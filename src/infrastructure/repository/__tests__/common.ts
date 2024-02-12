@@ -6,8 +6,15 @@ import {
   CompanyRepositoryInterface,
 } from '../../../domain/business-unit';
 import { Project, ProjectRepositoryInterface } from '../../../domain/portfolio';
+import {
+  Allocation,
+  AllocationRepositoryInterface,
+} from '../../../domain/allocation';
 
 let createdCompany: Company = null;
+export const COMPANY_ID = '01H5739RTVV0JV8M3DAN0C10ME';
+export const BUSINESS_UNIT_ID_1 = '01HPETEBCZM2KZXM4FHE2GZ9QM';
+export const BUSINESS_UNIT_ID_2 = '01HPETEBD0NMYXS3N4K77WFVST';
 
 export async function createCompany(
   repository: CompanyRepositoryInterface,
@@ -65,5 +72,22 @@ export async function createBusinessUnit(
   return businessUnit;
 }
 export async function createProject(): Promise<Project> {
+  return null;
+}
+
+export async function createAllocationsFor(
+  repo: AllocationRepositoryInterface,
+  businessUnitId: string,
+  projectId: string,
+  quantity: number,
+): Promise<void> {
+  const allocation = new Allocation(
+    ulid().toString(),
+    projectId,
+    businessUnitId,
+    quantity,
+    new Date(),
+  );
+  await repo.save(allocation);
   return null;
 }

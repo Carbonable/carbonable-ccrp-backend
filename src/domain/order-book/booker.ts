@@ -49,6 +49,7 @@ export class Booker {
       const businessUnit = await this.businessUnitRepository.byId(
         businessUnitId,
       );
+
       // all stock for every allocations ordered by vintage.
       const stocks = await this.stockRepository.findAllocatedStockByVintage(
         businessUnit.id,
