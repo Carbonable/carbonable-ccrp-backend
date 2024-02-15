@@ -1,7 +1,6 @@
 import Utils from '../../../utils';
 import { Demand } from '../../business-unit';
 import {
-  Order,
   Reservation,
   Stock,
   consumedSinceYear,
@@ -39,7 +38,6 @@ export class AnnualPlanningStockExtractor {
     return stocks.reduce((acc, curr) => {
       const currentYear = parseInt(curr.vintage);
       const retired = retiredForYear(reservations, curr.vintage);
-      const consumed = consumedSinceYear(reservations, curr.vintage);
 
       const exPostStock = exPostStockComputer(stocks, currentYear);
       const exAnteStock = exAnteStockComputer(stocks, currentYear);
