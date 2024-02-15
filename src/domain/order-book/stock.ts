@@ -7,23 +7,24 @@ export const exPostStockAvailable = (
 ): number =>
   stocks.reduce(
     (acc, curr) =>
-      acc + (parseInt(curr.vintage) < currentYear ? curr.available : 0),
+      acc + (parseInt(curr.vintage) <= currentYear ? curr.available : 0),
     0,
   );
+// FIX: exAnteStock should not include purchased stock
 export const exAnteStockAvailable = (
   stocks: Stock[],
   currentYear: number,
 ): number =>
   stocks.reduce(
     (acc, curr) =>
-      acc + (parseInt(curr.vintage) >= currentYear ? curr.available : 0),
+      acc + (parseInt(curr.vintage) > currentYear ? curr.available : 0),
     0,
   );
 export const exPostStock = (stocks: Stock[], currentYear: number): number =>
   stocks.reduce(
     (acc, curr) =>
       acc +
-      (parseInt(curr.vintage) < currentYear
+      (parseInt(curr.vintage) <= currentYear
         ? curr.quantity + curr.purchased
         : 0),
     0,
@@ -31,10 +32,7 @@ export const exPostStock = (stocks: Stock[], currentYear: number): number =>
 export const exAnteStock = (stocks: Stock[], currentYear: number): number =>
   stocks.reduce(
     (acc, curr) =>
-      acc +
-      (parseInt(curr.vintage) >= currentYear
-        ? curr.quantity + curr.purchased
-        : 0),
+      acc + (parseInt(curr.vintage) > currentYear ? curr.quantity : 0),
     0,
   );
 

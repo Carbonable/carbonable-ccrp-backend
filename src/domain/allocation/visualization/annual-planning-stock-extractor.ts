@@ -1,6 +1,12 @@
 import Utils from '../../../utils';
 import { Demand } from '../../business-unit';
-import { Order, Stock } from '../../order-book';
+import {
+  Order,
+  Reservation,
+  Stock,
+  consumedSinceYear,
+  retiredForYear,
+} from '../../order-book';
 import {
   exPostStockAvailable as exPostStockComputer,
   exAnteStockAvailable as exAnteStockComputer,
@@ -28,14 +34,16 @@ export class AnnualPlanningStockExtractor {
   extract(
     stocks: Stock[],
     demands: Demand[],
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    orders: Order[],
+    reservations: Reservation[],
   ): AnnualPlanningVisualization[] {
     return stocks.reduce((acc, curr) => {
       const currentYear = parseInt(curr.vintage);
+      const retired = retiredForYear(reservations, curr.vintage);
+      const consumed = consumedSinceYear(reservations, curr.vintage);
 
       const exPostStock = exPostStockComputer(stocks, currentYear);
       const exAnteStock = exAnteStockComputer(stocks, currentYear);
+      // FIX: These 2 cols makes no sense as exAnte is not stock yet
       const totalExPost = exPostStockTotalComputer(stocks, currentYear);
       const totalExAnte = exAnteStockTotalComputer(stocks, currentYear);
 
@@ -47,7 +55,6 @@ export class AnnualPlanningStockExtractor {
         const existantIdx = acc.findIndex((a) => a.timePeriod === curr.vintage);
         existant.exPostIssued += curr.issued;
         existant.exPostPurchased += curr.purchased;
-        existant.exPostRetired += curr.consumed;
 
         return [
           ...acc.slice(0, existantIdx),
@@ -56,19 +63,18 @@ export class AnnualPlanningStockExtractor {
         ];
       }
 
-      const targetInTon = demand.emission * (demand.target / 100);
-      const actualRate = Utils.round((curr.consumed / targetInTon) * 100) ?? 0;
+      const actualRate = demand.compensationRate(retired);
 
       acc.push({
         timePeriod: curr.vintage,
         emissions: demand.emission,
         exPostIssued: curr.issued,
         exPostPurchased: curr.purchased,
-        exPostRetired: curr.consumed,
+        exPostRetired: retired,
         target: demand.target,
         actualRate: !isFinite(actualRate) || isNaN(actualRate) ? 0 : actualRate,
         delta: Utils.round(demand.target - actualRate) ?? 0,
-        debt: targetInTon - curr.consumed,
+        debt: demand.targetInTon() - retired,
         exPostStock,
         exAnteStock,
         totalExPost,
