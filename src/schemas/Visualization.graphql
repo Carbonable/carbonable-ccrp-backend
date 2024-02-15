@@ -44,7 +44,7 @@ type CumulativeData {
   ex_post_retired: Int
   target: Int
   actual_rate: Float
-  delta: Int
+  delta: Float
   debt: Int
   ex_post_stock: Int
   ex_ante_stock: Int
