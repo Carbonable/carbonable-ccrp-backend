@@ -43,6 +43,7 @@ export class Order {
           stock.id,
         ),
       );
+      this._debt = actualQuantity - stock.available;
       return;
     }
 
@@ -56,6 +57,8 @@ export class Order {
         stock.id,
       ),
     );
+
+    this._debt = this.quantity - actualQuantity;
 
     return;
   }

@@ -80,6 +80,9 @@ export class Booker {
       // The idea here is to consume cc's until demand is fullfilled.
       // from bottom up, take every ccs of lower vintage until all are consumed
       for (const item of stock) {
+        if (parseInt(item.vintage) >= parseInt(demand.year)) {
+          continue;
+        }
         if (quantityForDemand <= 0) {
           continue;
         }

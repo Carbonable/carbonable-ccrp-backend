@@ -1,5 +1,11 @@
 import { Demand } from '../../business-unit';
-import { EffectiveCompensation, Stock, Reservation } from '../../order-book';
+import {
+  EffectiveCompensation,
+  Stock,
+  Reservation,
+  retiredForYear,
+  consumedSinceYear,
+} from '../../order-book';
 
 type NetZeroStockVisualization = {
   vintage: string;
@@ -29,26 +35,8 @@ export class NetZeroStockExtractor {
 
     return stocks.reduce((acc, curr) => {
       const last = acc[acc.length - 1];
-      const retired = reservations
-        .filter((r) => {
-          const rf = parseInt(r.reservedFor);
-          const v = parseInt(r.vintage);
-          if (rf > v) {
-            return rf === parseInt(curr.vintage);
-          }
-          return v === parseInt(curr.vintage);
-        })
-        .reduce((acc, curr) => acc + curr.count, 0);
-      const consumed = reservations
-        .filter((r) => {
-          const rf = parseInt(r.reservedFor);
-          const v = parseInt(r.vintage);
-          if (rf > v) {
-            return rf <= parseInt(curr.vintage);
-          }
-          return v <= parseInt(curr.vintage);
-        })
-        .reduce((acc, curr) => acc + curr.count, 0);
+      const retired = retiredForYear(reservations, curr.vintage);
+      const consumed = consumedSinceYear(reservations, curr.vintage);
 
       const currentExPost = curr.quantity + curr.purchased;
       const lastExPostCount = last ? last.exPostCount : 0;
@@ -107,9 +95,7 @@ export class NetZeroStockExtractor {
         v.target = demand.target;
       }
       if (compensation && demand?.target > 0) {
-        const compensationPercentage =
-          (v.retired / (demand.emission * (demand.target / 100))) * 100;
-        v.actual = compensationPercentage;
+        v.actual = demand.compensationRate(v.retired);
       }
       return v;
     });

@@ -1,4 +1,4 @@
-import { Stock } from '../../order-book';
+import { Reservation, Stock } from '../../order-book';
 import { AnnualPlanningStockExtractor } from './annual-planning-stock-extractor';
 
 describe('AnnualPlanningStockExtractor', () => {
@@ -40,7 +40,7 @@ describe('AnnualPlanningStockExtractor', () => {
   });
 
   it('should take in account retired', () => {
-    let stocks = [
+    const stocks = [
       new Stock(
         '1',
         'businessUnit1',
@@ -53,16 +53,17 @@ describe('AnnualPlanningStockExtractor', () => {
       new Stock('2', 'businessUnit1', 'project1', '2024', 10),
       new Stock('3', 'businessUnit1', 'project1', '2025', 10),
     ];
-    stocks = stocks.map((s) => {
-      s.lock(10);
-      return s;
-    });
+    const reservations = [
+      new Reservation('1', '1', '2023', '2025', 5, '1'),
+      new Reservation('1', '1', '2024', '2025', 5, '2'),
+      new Reservation('1', '1', '2025', '2025', 5, '3'),
+    ];
 
-    const visualization = extractor.extract(stocks, [], []);
+    const visualization = extractor.extract(stocks, [], reservations);
     expect(visualization.length).toBe(3);
-    expect(visualization[0].exPostRetired).toBe(10);
-    expect(visualization[1].exPostRetired).toBe(10);
-    expect(visualization[2].exPostRetired).toBe(10);
+    expect(visualization[0].exPostRetired).toBe(0);
+    expect(visualization[1].exPostRetired).toBe(0);
+    expect(visualization[2].exPostRetired).toBe(15);
   });
 
   afterAll(() => jest.useRealTimers());

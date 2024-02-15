@@ -81,18 +81,16 @@ export class AnnualPlanningVisualizationStrategy
   }
 
   async hydrateCompanyWideData(company: Company) {
-    //eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { stock, reservations } = await this.stockRepository.findCompanyStock(
       company.id,
     );
-    const actuals = await this.orderRepository.getCompanyOrders(company.id);
 
     const businessUnits = await this.businessUnitRepository.byCompanyId(
       company.id,
     );
     const demands = Company.mergeDemands(businessUnits);
 
-    const visualization = this.extractor.extract(stock, demands, actuals);
+    const visualization = this.extractor.extract(stock, demands, reservations);
     await this.repository.put(
       annualPlanningKey({ companyId: company.id }),
       JSON.stringify(visualization),
@@ -100,16 +98,12 @@ export class AnnualPlanningVisualizationStrategy
   }
 
   async hydrateBusinessUnitWideData(businessUnit: BusinessUnit) {
-    //eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { stock, reservations } =
       await this.stockRepository.findBusinessUnitStock(businessUnit.id);
-    const orders = await this.orderRepository.findByBusinessUnitIds([
-      businessUnit.id,
-    ]);
     const visualization = this.extractor.extract(
       stock,
       businessUnit.getDemands(),
-      orders,
+      reservations,
     );
 
     await this.repository.put(
@@ -119,12 +113,10 @@ export class AnnualPlanningVisualizationStrategy
   }
 
   async hydrateProjectWideData(projectId: string) {
-    //eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { stock, reservations } = await this.stockRepository.findProjectStock(
       projectId,
     );
-    const orders = await this.orderRepository.getProjectOrders(projectId);
-    const visualization = this.extractor.extract(stock, [], orders);
+    const visualization = this.extractor.extract(stock, [], reservations);
 
     await this.repository.put(
       annualPlanningKey({ projectId: projectId }),
