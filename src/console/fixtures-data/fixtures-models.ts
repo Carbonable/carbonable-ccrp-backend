@@ -18,6 +18,9 @@ import { ManjarisoaCurvePoints } from './manjarisoa';
 import { BokpynCurvePoints } from './bokpyn';
 import { ChacoCurvePoints } from './chaco';
 import { BraulioCurvePoints } from './braulio';
+import { HeirZoomCurvePoints } from './heirzoom';
+import { BioConcepcionAZCurvePoints } from './bio-concepcion';
+import { BhadiaCurvePoints } from './bhadia';
 
 const curvePointsMapping = {
   'Las Delicias': LasDeliciasCurvePoints,
@@ -26,6 +29,9 @@ const curvePointsMapping = {
   'Bokpyn-Karathuru': BokpynCurvePoints,
   'Chaco Agroforestry': ChacoCurvePoints,
   'Braulio Carrillo': BraulioCurvePoints,
+  HeirZoom: HeirZoomCurvePoints,
+  'BioConcepcion AZ': BioConcepcionAZCurvePoints,
+  'Bhadia ALSP': BhadiaCurvePoints,
 };
 const projectLinkedSdgs = {
   'Las Delicias': [8, 13, 14, 15],
@@ -34,6 +40,9 @@ const projectLinkedSdgs = {
   'Bokpyn-Karathuru': [4, 5, 8, 13, 14, 15],
   'Chaco Agroforestry': [5, 8, 11, 12, 13],
   'Braulio Carrillo': [12, 13, 15],
+  HeirZoom: [13],
+  'BioConcepcion AZ': [7, 8, 9, 11, 12, 13, 15],
+  'Bhadia ALSP': [7, 8, 13],
 };
 
 type Reference<T> = {
@@ -74,6 +83,7 @@ export const CertifierDataFixtures = ({
     { name: 'Verra', slug: 'serra' },
     { name: 'Gold Standard', slug: 'gold-standard' },
     { name: 'ERS', slug: 'ers' },
+    { name: 'PuroEarth', slug: 'puroearth' },
   ],
 });
 
@@ -134,6 +144,21 @@ export const DevelopperDataFixtures = ({
       id: '01HHY2EGR5D8T29V0CJEFX3TMQ',
       name: 'Baum',
       slug: 'baum',
+    },
+    {
+      id: '01HHY2EGR5D8T29V0CJEFX3TMS',
+      name: 'ClimeWorks',
+      slug: 'climeworks',
+    },
+    {
+      id: '01HHY2EGR5D8T29V0CJEFX3TGQ',
+      name: 'Exomad Green',
+      slug: 'exomad-green',
+    },
+    {
+      id: '01HHY2EGR5D8T29V0CJEFX3TGW',
+      name: 'Clean Solar Power',
+      slug: 'clean-solar-power',
     },
   ],
 });
@@ -258,7 +283,7 @@ export const ProjectDataFixtures = ({
     {
       id: '01HHPZ4E2VX0RYE5X7YANHRNCT',
       name: 'Manjarisoa',
-      slug: 'forest-restoration-manjarisoa-madagascar',
+      slug: 'forest-regeneration-manjarisoa-madagascar',
       description:
         'Manjarisoa a project of 152 hectares of real forest in Manjarisoa, the future planting of 125,117 trees, and the creation of a carbon sink that stocks 77,219 tonnes of carbon in 20 years.',
       localization: '-18.455755744135708,49.103883937895546',
@@ -296,7 +321,7 @@ export const ProjectDataFixtures = ({
     {
       id: '01HHQ0YPXR6H5D3AQGY4SK2JZT',
       name: 'Bokpyn-Karathuru',
-      slug: 'mangrove-regeneration-bokpyn-karathuru-myanmar',
+      slug: 'mangroves-regeneration-karathuru-myanmar',
       description:
         'The project involves the regeneration of 228 ha in 2023 with the planting of 570,000 trees (2,500 per  ha), and the restoration of a carbon sink that will result in a forecasted amount of 374,285 certified carbon units amongst which 187,142 Carbon Units will be reserved for investors and the other half to local communities',
       localization: '10.5513, 98.3827',
@@ -406,6 +431,121 @@ export const ProjectDataFixtures = ({
           'https://imagedelivery.net/d5pVww362CQAQXDX2IiwAA/1f89cd6e-2797-4f47-0a93-9e53868dfa00/public',
         impact_report_url:
           'https://carbonable.sextan.app/public/report/project/mjpigwpr519dah162',
+      },
+    },
+    {
+      id: '01HHY25ZSHQAQM9CRM4AADMFRH',
+      name: 'HeirZoom',
+      slug: 'heirzoom-dac-project-iceland',
+      description:
+        'In Heirzoom’s process, crushed limestone is heated to remove the CO₂ stored in the rock and then spread on stacked trays and hydrated to expose the now highly reactive rock to the ambient air. Over the course of three days (as opposed to the months to years it would take in nature) the minerals absorb CO₂. They’re then moved into an electric kiln and heated for a few seconds, resulting in a stream of CO₂ that can be paired with any type of permanent storage. The same crushed rock is then redistributed back onto the trays, and the cycle begins again.',
+      localization: '64.043878, -21.399590',
+      startDate: '2025',
+      endDate: '2030',
+      area: 0,
+      type: CarbonCreditType.DAC,
+      origin: CarbonCreditOrigin.FORWARD_FINANCE,
+      fundingAmount: 26600000,
+      color: ProjectColor.NA,
+      protectedForest: 0,
+      protectedSpecies: 0,
+      riskAnalysis: 'A',
+      developperId: '01HHY2EGR5D8T29V0CJEFX3TMS',
+      companyId: '01H5739RTVV0JV8M3DAN0C10ME',
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      certifierId: (references: any) => {
+        return references['certifier'].find((c) => c.name === 'PuroEarth').id;
+      },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      countryId: (references: any) => {
+        return references['country'].find((c) => c.name === 'Iceland').id;
+      },
+      metadata: {
+        sft_image_url:
+          'https://imagedelivery.net/d5pVww362CQAQXDX2IiwAA/d4afbdf1-e75a-406a-9472-65e8e026a100/public',
+        collection_image_url:
+          'https://imagedelivery.net/d5pVww362CQAQXDX2IiwAA/f1b18862-78e4-4081-bfb4-dfc0156bf100/public',
+        impact_report_url:
+          'https://carbonable.sextan.app/public/report/project/unfmb7pr514dah162',
+      },
+    },
+    {
+      id: '01HHY25ZSHQAQM9CRM4AADMFGH',
+      name: 'BioConcepcion AZ',
+      slug: 'biochar-bioconcepcion-az-bolivia',
+      description:
+        "In March 2023 we launched our first biochar facility in Concepción, Bolivia. With the remaining two set to begin operations by December 2023 and March 2024. Together, these facilities will leverage the power of Biochar to sequester up to 200,000 tons of CO2 annually. But our vision goes beyond environmental impact. Exomad Green is about creating a better, more sustainable world for everyone. We're striving to improve the quality of life for over 250,000 regional inhabitants, generate green jobs, foster local economic growth, and champion environmental justice across the region. Join us as we embark on this transformative journey, turning residues into wealth and cultivating a more sustainable future.",
+      localization: '-16.130514, -62.032408',
+      startDate: '2023',
+      endDate: '2028',
+      area: 0,
+      type: CarbonCreditType.BIOCHAR,
+      origin: CarbonCreditOrigin.DIRECT_PURCHASE,
+      fundingAmount: 4000000,
+      color: ProjectColor.NA,
+      protectedForest: 0,
+      protectedSpecies: 0,
+      riskAnalysis: 'AA',
+      developperId: '01HHY2EGR5D8T29V0CJEFX3TMQ',
+      companyId: '01H5739RTVV0JV8M3DAN0C10ME',
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      certifierId: (references: any) => {
+        return references['certifier'].find((c) => c.name === 'PuroEarth').id;
+      },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      countryId: (references: any) => {
+        return references['country'].find((c) => c.name === 'Bolivia').id;
+      },
+      metadata: {
+        sft_image_url:
+          'https://imagedelivery.net/d5pVww362CQAQXDX2IiwAA/d1d31f04-ffac-4ffb-d0cc-d90141b7a800/public',
+        collection_image_url:
+          'https://imagedelivery.net/d5pVww362CQAQXDX2IiwAA/bad4cfbc-a543-4753-23de-7d836de85800/public',
+        impact_report_url:
+          'https://carbonable.sextan.app/public/report/project/unfmb7pr514dah162',
+      },
+    },
+    {
+      id: '01HHY25ZSHQAQM9CRE4AADMFGH',
+      name: 'Bhadia ALSP',
+      slug: 'solar-panel-India-bhadia-alsp',
+      description:
+        'This large scale solar energy project by Clean Solar Power (Bhadla) Pvt. Ltd generates electricity using renewable solar energy. The project replaces emissions of greenhouse gases (GHG’s) estimated to be approximately 693,327 tCO2e per annum, thereby displacing 741,845 MWh/year amount of electricity from the generation-mix of power plants connected to the Indian electricity grid, which is mainly dominated by thermal/ fossil fuel-based power plant.',
+      localization: '27.383833, 73.205540',
+      startDate: '2019',
+      endDate: '2038',
+      area: 0,
+      type: CarbonCreditType.SOLAR_PANEL,
+      origin: CarbonCreditOrigin.DIRECT_PURCHASE,
+      fundingAmount: 4000000,
+      color: ProjectColor.NA,
+      protectedForest: 0,
+      protectedSpecies: 0,
+      riskAnalysis: 'BB',
+      developperId: '01HHY2EGR5D8T29V0CJEFX3TGW',
+      companyId: '01H5739RTVV0JV8M3DAN0C10ME',
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      certifierId: (references: any) => {
+        return references['certifier'].find((c) => c.name === 'Gold Standard')
+          .id;
+      },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      countryId: (references: any) => {
+        return references['country'].find((c) => c.name === 'India').id;
+      },
+      metadata: {
+        sft_image_url:
+          'https://imagedelivery.net/d5pVww362CQAQXDX2IiwAA/7ce224ea-36f4-4e65-1f1d-fc188e0dbd00/public',
+        collection_image_url:
+          'https://imagedelivery.net/d5pVww362CQAQXDX2IiwAA/f7425135-58b8-4212-25c3-eab0959e0b00/public',
+        impact_report_url:
+          'https://carbonable.sextan.app/public/report/project/unfmb7pr514dah162',
       },
     },
   ],

@@ -348,12 +348,16 @@ enum CarbonCreditType {
   RESTORATION
   CONSERVATION
   REFORESTATION
+  DAC
+  BIOCHAR
+  SOLAR_PANEL
 }
 
 enum ProjectColor {
   BLUE
   ORANGE
   GREEN
+  NA
 }
 
 enum CarbonCreditAuditStatus {

@@ -18,6 +18,9 @@ enum CarbonCreditType {
   RESTORATION
   CONCERVATION
   REFORESTATION
+  DAC
+  BIOCHAR
+  SOLAR_PANEL
 }
 
 enum ProjectType {
