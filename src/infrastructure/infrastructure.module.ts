@@ -79,6 +79,7 @@ export const REDIS_CLIENT = 'REDIS_CLIENT';
       },
       inject: [PrismaService],
     },
+
     {
       provide: CreateForecastedTargetsUseCase,
       useFactory: (
