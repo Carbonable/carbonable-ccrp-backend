@@ -6,6 +6,11 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import * as path from 'path';
 import { ContributionManagerModule } from './contribution-manager/contribution-manager.module';
 import { ConsoleModule } from './console/console.module';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './roles/roles.guard';
 
 @Module({
   imports: [
@@ -18,9 +23,22 @@ import { ConsoleModule } from './console/console.module';
       },
       resolvers: { JSON: GraphQLJSON },
     }),
+
     ContributionManagerModule,
     ConsoleModule,
     EventEmitterModule.forRoot(),
+    AuthModule,
+    UsersModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
   ],
 })
 export class AppModule {}
