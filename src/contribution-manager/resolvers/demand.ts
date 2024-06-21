@@ -10,6 +10,7 @@ import {
   ForecastTarget,
 } from '../../domain/business-unit';
 import { Logger } from '@nestjs/common';
+import { Public } from '../../auth/auth.public.decorator';
 
 type ForecastedData = {
   year: string;
@@ -29,6 +30,7 @@ export class DemandResolver {
     private readonly createTargetsUseCase: CreateForecastedTargetsUseCase,
   ) {}
 
+  @Public()
   @Mutation('createForecastedEmissions')
   async createForecastedEmissions(
     @Args('request') input: CreateDemandInput,
@@ -44,6 +46,7 @@ export class DemandResolver {
     return await this.createEmissionsUseCase.execute(request);
   }
 
+  @Public()
   @Mutation('createForecastedTargets')
   async createForecastedTargets(
     @Args('request') requestInput: CreateDemandInput,

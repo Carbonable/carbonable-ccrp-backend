@@ -8,6 +8,7 @@ import { BusinessUnitRepositoryInterface } from '../../domain/business-unit';
 import { StockRepositoryInterface } from '../../domain/order-book';
 import { STOCK_REPOSITORY } from '../../infrastructure/repository/stock.prisma';
 import { BUSINESS_UNIT_REPOSITORY } from '../../infrastructure/repository/business-unit.prisma';
+import { Public } from '../../auth/auth.public.decorator';
 
 @Resolver('Project')
 export class ProjectResolver {
@@ -21,15 +22,19 @@ export class ProjectResolver {
     private readonly stockRepository: StockRepositoryInterface,
   ) {}
 
+  @Public()
   @Query('projects')
   async getProjects() {
     return await this.prisma.project.findMany();
   }
+
+  @Public()
   @Query('projectBy')
   async projectsBy(@Args('field') field: string, @Args('value') value: string) {
     return this.prisma.project.findFirst({ where: { [field]: value } });
   }
 
+  @Public()
   @Query('availableToAllocate')
   async availableToAllocate(
     @Args('project_id') projectId: string,
@@ -53,11 +58,14 @@ export class ProjectResolver {
     };
   }
 
+  @Public()
   @ResolveField('vintages')
   async carbonCredits(@Parent() project: Project) {
     const { id } = project;
     return this.prisma.vintage.findMany({ where: { projectId: id } });
   }
+
+  @Public()
   @ResolveField()
   async global_data(@Parent() project: Project) {
     const { id, riskAnalysis } = project;
@@ -88,18 +96,21 @@ export class ProjectResolver {
     };
   }
 
+  @Public()
   @ResolveField()
   async certifier(@Parent() project: Project) {
     const { certifierId } = project;
     return this.prisma.certifier.findFirst({ where: { id: certifierId } });
   }
 
+  @Public()
   @ResolveField()
   async developper(@Parent() project: Project) {
     const { developperId } = project;
     return this.prisma.developper.findFirst({ where: { id: developperId } });
   }
 
+  @Public()
   @ResolveField()
   async country(@Parent() project: Project) {
     const { countryId } = project;

@@ -20,6 +20,7 @@ import {
   NetZeroVisualizationStrategy,
 } from '../../domain/allocation/visualization';
 import { FinancialAnalysisVisualizationStrategy } from '../../domain/allocation/visualization/financial-analysis.strategy';
+import { Public } from '../../auth/auth.public.decorator';
 
 @Resolver('Visualization')
 export class VisualizationResolver {
@@ -32,6 +33,7 @@ export class VisualizationResolver {
     private readonly financialAnalysisStrategy: FinancialAnalysisVisualizationStrategy,
   ) {}
 
+  @Public()
   @Query()
   async netZeroPlanning(@Args('view') view: any) {
     const data = await getVisualizationView(netZeroKey)(
@@ -49,6 +51,7 @@ export class VisualizationResolver {
     );
   }
 
+  @Public()
   @Query()
   async annual(@Args('view') view: any, @Args('pagination') pagination: any) {
     const data = await getVisualizationView(annualPlanningKey)(
@@ -69,6 +72,7 @@ export class VisualizationResolver {
     );
   }
 
+  @Public()
   @Query()
   async cumulative(
     @Args('view') view: any,
@@ -91,6 +95,7 @@ export class VisualizationResolver {
     );
   }
 
+  @Public()
   @Query()
   async financialAnalysis(
     @Args('view') view: any,

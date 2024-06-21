@@ -4,16 +4,10 @@ import { CARBONABE_SALT } from '../auth/constants';
 import { PrismaService } from '../infrastructure/prisma.service';
 import { Role } from '../roles/role.enum';
 import { Logger } from '@nestjs/common';
-export type User = {
-  id: number;
-  name: string;
-  password: string;
-  roles: Role[];
-};
 
 @Injectable()
 export class UsersService {
-  private readonly logger = new Logger('UsersService');
+  private readonly logger = new Logger(UsersService.name);
   constructor(private prisma: PrismaService) {}
 
   async findOneByName(name: string) {
