@@ -6,7 +6,7 @@ import { Role } from './roles/role.enum';
 
 const logger = new Logger('AuthManagement');
 
-export async function checkIfAdminAndPush() {
+export async function bootstrapAuthAndUsers() {
   const prisma = new PrismaClient();
   logger.log('Checking if admin user exists...');
 
