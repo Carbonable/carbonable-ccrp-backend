@@ -328,6 +328,13 @@ model Sdg {
 
   @@map("sdg")
 }
+model User {
+  id           String  @id @default(uuid())
+  name         String  @unique
+  password     String
+  roles        String[]
+  @@map("user")
+}
 
 model ProjectsSdgs {
   project   Project @relation(fields: [projectId], references: [id])

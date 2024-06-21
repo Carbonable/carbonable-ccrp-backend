@@ -8,7 +8,7 @@ import { ContributionManagerModule } from './contribution-manager/contribution-m
 import { ConsoleModule } from './console/console.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from './auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './roles/roles.guard';
 

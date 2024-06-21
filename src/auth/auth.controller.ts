@@ -1,19 +1,10 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { Public } from './auth.public.decorator';
-import { AuthGuard } from './auth.guard';
+
 import { AuthService } from './auth.service';
-import { Roles } from 'src/roles/roles.decorator';
-import { Role } from 'src/roles/role.enum';
-import { UserDto } from 'src/users/createuser.dto';
+import { Roles } from '../roles/roles.decorator';
+import { Role } from '../roles/role.enum';
+import { UserDto } from '../users/createuser.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -31,11 +22,5 @@ export class AuthController {
   @Post('createuser')
   createUser(@Body() req: UserDto) {
     return this.authService.createUser(req.username, req.password);
-  }
-
-  @UseGuards(AuthGuard)
-  @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
   }
 }

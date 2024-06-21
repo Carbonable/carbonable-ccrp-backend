@@ -1,48 +1,56 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { CARBONABE_SALT } from '../auth/constants';
-import { Role } from 'src/roles/role.enum';
+import { PrismaService } from '../infrastructure/prisma.service';
+import { Role } from '../roles/role.enum';
+import { Logger } from '@nestjs/common';
 export type User = {
-  userId: number;
-  username: string;
+  id: number;
+  name: string;
   password: string;
   roles: Role[];
 };
 
 @Injectable()
 export class UsersService {
-  private users = [
-    {
-      userId: 1,
-      username: 'john',
-      password: '$2b$12$4pyBNlNbQQL80xjBKWZdtu/x1w9DjLNk1iJrWI8w1JBCWgQa5KAL.',
-      roles: [Role.Admin],
-    },
-    {
-      userId: 2,
-      username: 'maria',
-      password: '$2b$12$a3omihnGsdNquFsnU9zKROSp8Sel8HxNPQH7REoW.BIHyDZeaHbd6',
-      roles: [Role.User],
-    },
-  ];
+  private readonly logger = new Logger('UsersService');
+  constructor(private prisma: PrismaService) {}
 
-  async findOne(username: string): Promise<User | undefined> {
-    return this.users.find((user) => user.username === username);
+  async findOneByName(name: string) {
+    return this.prisma.user.findFirst({
+      where: { name },
+    });
+  }
+  async findOneById(id: string) {
+    return this.prisma.user.findUnique({
+      where: { id },
+    });
+  }
+  async fetchAll() {
+    return this.prisma.user.findMany();
   }
 
-  async createUser(username: string, password: string): Promise<User> {
-    const existingUser = await this.findOne(username);
+  async createUser(
+    name: string,
+    password: string,
+  ): Promise<{ id: string; name: string; roles: string[] }> {
+    const existingUser = await this.findOneByName(name);
     if (existingUser) {
       throw new ConflictException('Username already exists');
     }
-    const userCreated: User = {
-      userId: Date.now(),
-      username,
-      password: await bcrypt.hash(password, CARBONABE_SALT),
-      roles: Role[Role.User],
+    const hashedPassword = await bcrypt.hash(password, CARBONABE_SALT);
+    const userCreated = await this.prisma.user.create({
+      data: {
+        name,
+        password: hashedPassword,
+        roles: [Role.User],
+      },
+    });
+    this.logger.log(`User created: ${userCreated.name}  id:${userCreated.id}`);
+    return {
+      id: userCreated.id,
+      name: userCreated.name,
+      roles: userCreated.roles,
     };
-    console.log(userCreated);
-    this.users.push(userCreated);
-    return userCreated;
   }
 }
