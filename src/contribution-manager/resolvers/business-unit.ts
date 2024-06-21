@@ -1,5 +1,7 @@
 import { Inject, Logger } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
+import { Public } from '../../auth/auth.public.decorator';
+import { Roles } from '../../roles/roles.decorator';
 
 import {
   CreateBusinessUnitRequest,
@@ -12,6 +14,7 @@ import { prismaToBusinessUnit } from '../../infrastructure/repository/business-u
 import Utils from '../../utils';
 import { ORDER_BOOK_REPOSITORY } from '../../infrastructure/repository/order-book.prisma';
 import { OrderBookRepositoryInterface } from '../../domain/order-book';
+import { Role } from 'src/roles/role.enum';
 
 @Resolver('BusinessUnit')
 export class BusinessUnitResolver {
@@ -45,7 +48,6 @@ export class BusinessUnitResolver {
 
     return await this.createBusinessUnitUseCase.execute(request);
   }
-
   @Query('businessUnits')
   async getBusinessUnits() {
     const now = new Date().getFullYear();
