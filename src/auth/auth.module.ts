@@ -10,8 +10,7 @@ import { jwtConstants } from './constants';
     UsersModule,
     JwtModule.register({
       global: true,
-      secret:
-        '189c982c0554bcb313390dc4b233faefa073696900dc7d85122c9b37cf4cc4ce',
+      secret: jwtConstants.secret,
       signOptions: { expiresIn: jwtConstants.duration },
     }),
   ],

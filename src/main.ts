@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { LogLevel, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { checkIfAdminAndPush } from './admin-verification';
 
 const LOG_LEVEL: LogLevel[] =
   process.env.NODE_ENV === 'production'
@@ -17,6 +18,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('CCPM')
     .build();
+  await checkIfAdminAndPush();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 

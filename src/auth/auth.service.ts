@@ -14,13 +14,13 @@ export class AuthService {
     username: string,
     pass: string,
   ): Promise<{ access_token: string }> {
-    const user = await this.usersService.findOne(username);
+    const user = await this.usersService.findOneByName(username);
     if (!bcrypt.compare(user?.password, pass)) {
       throw new UnauthorizedException();
     }
     const payload = {
-      sub: user.userId,
-      username: user.username,
+      sub: user.id,
+      username: user.id,
       roles: user.roles,
     };
     return {
