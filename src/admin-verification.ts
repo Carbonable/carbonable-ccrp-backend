@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { CARBONABE_SALT } from './auth/constants';
 import { Role } from './roles/role.enum';
+import { ulid } from 'ulid';
 
 const logger = new Logger('AuthManagement');
 
@@ -36,6 +37,7 @@ export async function bootstrapAuthAndUsers() {
 
     await prisma.user.create({
       data: {
+        id: ulid(),
         name,
         password: hashedPassword,
         roles,

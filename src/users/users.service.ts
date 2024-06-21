@@ -4,6 +4,7 @@ import { CARBONABE_SALT } from '../auth/constants';
 import { PrismaService } from '../infrastructure/prisma.service';
 import { Role } from '../roles/role.enum';
 import { Logger } from '@nestjs/common';
+import { ulid } from 'ulid';
 
 @Injectable()
 export class UsersService {
@@ -35,6 +36,7 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(password, CARBONABE_SALT);
     const userCreated = await this.prisma.user.create({
       data: {
+        id: ulid(),
         name,
         password: hashedPassword,
         roles: [Role.User],
