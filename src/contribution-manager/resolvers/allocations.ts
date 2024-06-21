@@ -5,6 +5,7 @@ import {
   AddAllocationUseCase,
 } from '../../domain/allocation';
 import { Logger } from '@nestjs/common';
+import { Public } from '../../auth/auth.public.decorator';
 
 type AddAllocationRequestItem = {
   project_id?: string;
@@ -17,7 +18,7 @@ type AddAllocationRequestItem = {
 export class AllocationResolver {
   private readonly logger = new Logger(AllocationResolver.name);
   constructor(private readonly addAllocationUseCase: AddAllocationUseCase) {}
-
+  @Public()
   @Mutation('addAllocations')
   async addAllocations(
     @Args('request') requestInput: Array<AddAllocationRequestItem>,

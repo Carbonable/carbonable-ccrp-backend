@@ -6,6 +6,7 @@ import {
   AllocationTarget,
   getMetadata,
 } from '../services/carbon-asset-allocation';
+import { Public } from '../../auth/auth.public.decorator';
 
 type StockItem = {
   project: AllocationTarget;
@@ -17,6 +18,7 @@ type StockItem = {
 export class StockResolver {
   constructor(private readonly prisma: PrismaService) {}
 
+  @Public()
   @Query('getStock')
   async getStock(@Args('view') view: any, @Args('pagination') pagination: any) {
     const stock = await this.resolveStock(view);

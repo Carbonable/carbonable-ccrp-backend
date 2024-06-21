@@ -1,8 +1,6 @@
 import { Inject, Logger } from '@nestjs/common';
 import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
 import { Public } from '../../auth/auth.public.decorator';
-import { Roles } from '../../roles/roles.decorator';
-
 import {
   CreateBusinessUnitRequest,
   CreateBusinessUnitResponse,
@@ -14,7 +12,6 @@ import { prismaToBusinessUnit } from '../../infrastructure/repository/business-u
 import Utils from '../../utils';
 import { ORDER_BOOK_REPOSITORY } from '../../infrastructure/repository/order-book.prisma';
 import { OrderBookRepositoryInterface } from '../../domain/order-book';
-import { Role } from 'src/roles/role.enum';
 
 @Resolver('BusinessUnit')
 export class BusinessUnitResolver {
@@ -27,6 +24,7 @@ export class BusinessUnitResolver {
     private readonly orderBookRepository: OrderBookRepositoryInterface,
   ) {}
 
+  @Public()
   @Mutation()
   async createBusinessUnit(
     @Args('request') requestInput: any,
@@ -48,6 +46,8 @@ export class BusinessUnitResolver {
 
     return await this.createBusinessUnitUseCase.execute(request);
   }
+
+  @Public()
   @Query('businessUnits')
   async getBusinessUnits() {
     const now = new Date().getFullYear();
@@ -103,6 +103,7 @@ export class BusinessUnitResolver {
     });
   }
 
+  @Public()
   @Query('businessUnitsBy')
   async projectsBy(@Args('field') field: string, @Args('value') value: string) {
     const bu = await this.prisma.businessUnit.findFirst({
@@ -112,6 +113,7 @@ export class BusinessUnitResolver {
     return prismaToBusinessUnit([bu]).pop();
   }
 
+  @Public()
   @Query('businessUnitDetails')
   async businessUnitDetails(@Args('id') id: string) {
     const now = new Date().getFullYear();
