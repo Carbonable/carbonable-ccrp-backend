@@ -9,6 +9,8 @@ import { jwtConstants } from './constants';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from './auth.public.decorator';
 import { Reflector } from '@nestjs/core';
+import { GqlExecutionContext } from '@nestjs/graphql';
+
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private jwtService: JwtService, private reflector: Reflector) {}
@@ -19,26 +21,28 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ]);
     if (isPublic) {
-      // 💡 See this condition
       return true;
     }
 
-    const request = context.switchToHttp().getRequest();
+    const request = this.getRequest(context);
     const token = this.extractTokenFromHeader(request);
     if (!token) {
       throw new UnauthorizedException();
     }
     try {
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: jwtConstants.secret, // -> here it's in my .env
+        secret: jwtConstants.secret,
       });
-      // 💡 We're assigning the payload to the request object here
-      // so that we can access it in our route handlers
       request['user'] = payload;
     } catch {
       throw new UnauthorizedException();
     }
     return true;
+  }
+
+  private getRequest(context: ExecutionContext): Request {
+    const ctx = GqlExecutionContext.create(context);
+    return ctx.getContext().req || context.switchToHttp().getRequest();
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
