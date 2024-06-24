@@ -3,4 +3,4 @@ export const jwtConstants = {
   duration: '1h',
 };
 
-export const CARBONABE_SALT = 78860;
+export const CARBONABLE_SALT = 78860;
