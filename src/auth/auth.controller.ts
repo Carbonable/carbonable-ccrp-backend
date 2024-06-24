@@ -17,7 +17,6 @@ import {
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @HttpCode(HttpStatus.OK)
   @Public()
   @Post('login')
   @ApiOperation({ summary: 'User login' })
@@ -28,7 +27,6 @@ export class AuthController {
     return this.authService.signIn(req.username, req.password);
   }
 
-  @HttpCode(HttpStatus.OK)
   @Roles(Role.Admin)
   @Post('createuser')
   @ApiOperation({ summary: 'Create new user' })
