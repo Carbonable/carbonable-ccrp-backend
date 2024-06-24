@@ -1,6 +1,6 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { CARBONABE_SALT } from '../auth/constants';
+import { CARBONABLE_SALT } from '../auth/constants';
 import { PrismaService } from '../infrastructure/prisma.service';
 import { Role } from '../roles/role.enum';
 import { Logger } from '@nestjs/common';
@@ -33,10 +33,10 @@ export class UsersService {
     if (existingUser) {
       throw new ConflictException('Username already exists');
     }
-    const hashedPassword = await bcrypt.hash(password, CARBONABE_SALT);
+    const hashedPassword = await bcrypt.hash(password, CARBONABLE_SALT);
     const userCreated = await this.prisma.user.create({
       data: {
-        id: ulid(),
+        id: ulid().toString(),
         name,
         password: hashedPassword,
         roles: [Role.User],
