@@ -29,7 +29,10 @@ export class AuthService {
       access_token: await this.jwtService.signAsync(payload),
     };
   }
-  async createUser(username: string, pass: string): Promise<any> {
-    await this.usersService.createUser(username, pass);
+  async createUser(
+    username: string,
+    pass: string,
+  ): Promise<{ id: string; name: string; roles: string[] }> {
+    return this.usersService.createUser(username, pass);
   }
 }
