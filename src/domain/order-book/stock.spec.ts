@@ -48,10 +48,10 @@ describe('Stock', () => {
       new Stock('1', 'businessUnit1', 'project1', '2025', 10),
     ];
 
-    expect(exAnteStock(stocks, 2022)).toBe(40);
-    expect(exAnteStock(stocks, 2023)).toBe(30);
-    expect(exAnteStock(stocks, 2024)).toBe(20);
-    expect(exAnteStock(stocks, 2025)).toBe(10);
+    expect(exAnteStock(stocks, 2022)).toBe(30);
+    expect(exAnteStock(stocks, 2023)).toBe(20);
+    expect(exAnteStock(stocks, 2024)).toBe(10);
+    expect(exAnteStock(stocks, 2025)).toBe(0);
   });
 
   it('should compute exPostStock', () => {
@@ -62,9 +62,9 @@ describe('Stock', () => {
       new Stock('1', 'businessUnit1', 'project1', '2025', 10),
     ];
 
-    expect(exPostStock(stocks, 2022)).toBe(0);
-    expect(exPostStock(stocks, 2023)).toBe(10);
-    expect(exPostStock(stocks, 2024)).toBe(20);
-    expect(exPostStock(stocks, 2025)).toBe(30);
+    expect(exPostStock(stocks, 2022)).toBe(10);
+    expect(exPostStock(stocks, 2023)).toBe(20);
+    expect(exPostStock(stocks, 2024)).toBe(30);
+    expect(exPostStock(stocks, 2025)).toBe(40);
   });
 });

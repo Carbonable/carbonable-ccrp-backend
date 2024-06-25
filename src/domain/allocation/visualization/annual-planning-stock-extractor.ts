@@ -1,11 +1,6 @@
 import Utils from '../../../utils';
 import { Demand } from '../../business-unit';
-import {
-  Reservation,
-  Stock,
-  consumedSinceYear,
-  retiredForYear,
-} from '../../order-book';
+import { Reservation, Stock, retiredForYear } from '../../order-book';
 import {
   exPostStockAvailable as exPostStockComputer,
   exAnteStockAvailable as exAnteStockComputer,

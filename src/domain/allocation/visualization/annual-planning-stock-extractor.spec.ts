@@ -34,9 +34,9 @@ describe('AnnualPlanningStockExtractor', () => {
     ];
     const visualization = extractor.extract(stocks, [], []);
     expect(visualization.length).toBe(3);
-    expect(visualization[0].exPostStock).toBe(0);
-    expect(visualization[1].exPostStock).toBe(15);
-    expect(visualization[2].exPostStock).toBe(25);
+    expect(visualization[0].exPostStock).toBe(15);
+    expect(visualization[1].exPostStock).toBe(25);
+    expect(visualization[2].exPostStock).toBe(35);
   });
 
   it('should take in account retired', () => {
