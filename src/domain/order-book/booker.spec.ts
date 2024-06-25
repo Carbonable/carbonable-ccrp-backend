@@ -112,6 +112,7 @@ describe('Booker', () => {
     const orders = orderRepository.orders;
 
     // NOTE: only first order should have reservations because we allocated 100 % of the stock to fullfill it
+    //TODO : recheck tests
     expect(orders[0].reservations.length).toBe(4);
     expect(orders[1].reservations.length).toBe(1);
     for (let i = 2; i < 10; i++) {
