@@ -1,6 +1,6 @@
 import BaseConfig from './jest.config';
 
-export default async () => {
+async () => {
   const baseConfig = await BaseConfig();
   return {
     ...baseConfig,

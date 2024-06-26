@@ -8,8 +8,9 @@ export default async (): Promise<Config> => {
     transform: {
       '^.+\\.(t|j)s$': 'ts-jest',
     },
-    collectCoverageFrom: ['**/*.(t|j)s'],
-    coverageDirectory: '../coverage',
+    collectCoverageFrom: ['src/**/*.(t|j)s', '!src/**/*.spec.ts'],
+    coverageReporters: ['text', 'lcov'],
+    coverageDirectory: 'coverage',
     testEnvironment: 'node',
   };
 };
