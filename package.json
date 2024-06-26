@@ -18,7 +18,7 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest -c jest.config.ts --watch",
-    "test:cov": "jest -c jest.config.ts --coverage",
+    "test:cov": "jest -c jest.config.ts --coverage --detectOpenHandles  --verbose",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:integration": "dotenv -e .env.test -- jest -c jest.integration.ts --runInBand",
     "test:e1e": "jest --config ./test/jest-e2e.json --detectOpenHandles",
