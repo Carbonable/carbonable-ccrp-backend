@@ -4,7 +4,6 @@
 // import * as request from 'supertest';
 // import { Role } from '../roles/role.enum';
 // import * as bcrypt from 'bcrypt';
-// import { CARBONABLE_SALT } from '../auth/constants';
 // import { INestApplication } from '@nestjs/common';
 // import { AppModule } from '../app.module';
 // import { ValidationPipe } from '@nestjs/common';
@@ -15,6 +14,7 @@ describe('AuthController (e2e)', () => {
   // let prismaService: PrismaService;
   // let adminToken: string;
   // let userToken: string;
+  // const CARBONABLE_SALT = parseInt(process.env.CARBONABLE_SALT);
   // beforeAll(async () => {
   //   const moduleFixture: TestingModule = await Test.createTestingModule({
   //     imports: [AppModule],

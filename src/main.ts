@@ -16,6 +16,7 @@ async function bootstrap() {
     .setDescription('The carbonable CCPM API description')
     .setVersion('1.0')
     .addTag('CCPM')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
