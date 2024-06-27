@@ -13,7 +13,6 @@ import {
   VintageDataFixtures,
 } from './fixtures-data/fixtures-models';
 import * as bcrypt from 'bcrypt';
-import { CARBONABLE_SALT } from '../auth/constants';
 
 const ulid = monotonicFactory();
 
@@ -178,10 +177,15 @@ export class BuildFixturesCommand extends CommandRunner {
     return await res.json();
   }
   async seedUsers() {
-    const data = await this.getAdmin();
-    await this.prisma.user.create({
-      data,
+    const adminExists = await this.prisma.user.findFirst({
+      where: { roles: { has: 'admin' } },
     });
+    if (!adminExists) {
+      const data = await this.getAdmin();
+      await this.prisma.user.create({
+        data,
+      });
+    }
   }
 
   async getAdmin(): Promise<any> {
@@ -196,6 +200,7 @@ export class BuildFixturesCommand extends CommandRunner {
     }
 
     const roles = rolesEnv.replace(/[\[\]']/g, '').split(',');
+    const CARBONABLE_SALT = parseInt(process.env.CARBONABLE_SALT);
     const hashedPassword = await bcrypt.hash(password, CARBONABLE_SALT);
     return {
       id: ulid().toString(),

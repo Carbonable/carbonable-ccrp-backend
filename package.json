@@ -24,6 +24,7 @@
     "test:e1e": "jest --config ./test/jest-e2e.json --detectOpenHandles",
     "fixtures": "ts-node src/fixtures/index.ts",
     "db:reset": "prisma db push --force-reset && prisma db seed && pnpm console fixtures",
+    "db:init": "prisma db push --force-reset && prisma db seed",
     "test:integration:suite": "just test_integration",
     "test:db:reset": "dotenv -e .env.test -- pnpm db:reset",
     "prepare": "husky install"
