@@ -1,4 +1,4 @@
-name: ci
+name: integration
 on:
   pull_request:
     branches: ["*"]
@@ -39,11 +39,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Lint code
-        run: pnpm run lint
+      - name: Build package
+        run: pnpm run build
+
+      - name: Init db
+        run: pnpm run test:db:reset
 
       - name: Run tests
-        run: pnpm run test
-
-      - name: Run coverage tests
-        run: pnpm run test:cov
+        run: pnpm run test:integration
