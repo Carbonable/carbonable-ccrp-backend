@@ -1,10 +1,11 @@
+import { Config } from 'jest';
 import BaseConfig from './jest.config';
 
-async () => {
+export default async (): Promise<Config> => {
   const baseConfig = await BaseConfig();
   return {
     ...baseConfig,
     testRegex: 'integration\\.ts',
-    detectOpenHandles: true,
+    forceExit: true,
   };
 };
