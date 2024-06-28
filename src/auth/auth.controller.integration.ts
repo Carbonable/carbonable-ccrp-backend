@@ -1,4 +1,4 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../infrastructure/prisma.service';
 import * as request from 'supertest';
@@ -109,5 +109,18 @@ describe('AuthController (e2e)', () => {
       .set('Authorization', `Bearer ${userToken}`)
       .send({ username: 'newuser2', password: 'newpassword' })
       .expect(403);
+  });
+  it('shoud return user profile when called with correct jwt', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/auth/profile')
+      .set('Authorization', `Bearer ${userToken}`)
+      .expect(200);
+    expect(response.body).toHaveProperty('username');
+  });
+  it('shoud throw a Forbidden Exception when called with incorrect jwt', async () => {
+    await request(app.getHttpServer())
+      .get('/auth/profile')
+      .set('Authorization', `Bearer ${userToken}_wrong`)
+      .expect(401);
   });
 });
