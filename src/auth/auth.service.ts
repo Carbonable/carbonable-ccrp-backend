@@ -35,4 +35,12 @@ export class AuthService {
   ): Promise<{ id: string; name: string; roles: string[] }> {
     return this.usersService.createUser(username, pass);
   }
+
+  async getUserProfile(userId: string) {
+    const user = await this.usersService.findOneById(userId);
+    return {
+      username: user.name,
+      roles: user.roles,
+    };
+  }
 }
