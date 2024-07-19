@@ -9,6 +9,7 @@ const ulid = monotonicFactory();
 async function seed() {
   try {
     await seedCountries();
+    await seedSdgs();
     await seedUsers();
   } catch (e) {
     console.error(e);
@@ -44,6 +45,18 @@ async function seedUsers() {
   });
 }
 
+async function seedSdgs() {
+  const sdgs = await getSdgs();
+  for (const sdg of sdgs) {
+    await prisma.sdg.create({
+      data: {
+        id: ulid().toString(),
+        ...sdg,
+      },
+    });
+  }
+}
+
 async function getAdmin(): Promise<any> {
   const name = process.env.DEFAULT_ADMIN_NAME;
   const password = process.env.DEFAULT_ADMIN_PASSWORD;
@@ -77,4 +90,26 @@ async function getCountries(): Promise<any[]> {
     'https://raw.githubusercontent.com/mledoze/countries/master/countries.json',
   );
   return await res.json();
+}
+
+async function getSdgs(): Promise<any[]> {
+  return [
+    { number: 1, name: 'No Poverty' },
+    { number: 2, name: 'Zero Hunger' },
+    { number: 3, name: 'Good Health and Well-being' },
+    { number: 4, name: 'Quality Education' },
+    { number: 5, name: 'Sex equalities' },
+    { number: 6, name: 'Clean Water and Sanitation' },
+    { number: 7, name: 'Affordable and Clean Energy' },
+    { number: 8, name: 'Decent Work and Economic Growth' },
+    { number: 9, name: 'Industry, Innovation and Infrastructure' },
+    { number: 10, name: 'Reduced Inequalities' },
+    { number: 11, name: 'Sustainable Cities and Communities' },
+    { number: 12, name: 'Responsible Consumption and Production' },
+    { number: 13, name: 'Climate Action' },
+    { number: 14, name: 'Life Below Water' },
+    { number: 15, name: 'Life on Land' },
+    { number: 16, name: 'Peace and Justice Strong Institutions' },
+    { number: 17, name: 'Partnerships to achieve the Goal' },
+  ];
 }
