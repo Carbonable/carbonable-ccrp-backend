@@ -6,18 +6,13 @@ import {
 } from '../../domain/allocation';
 import { Logger } from '@nestjs/common';
 import { Public } from '../../auth/auth.public.decorator';
-
-type AddAllocationRequestItem = {
-  project_id?: string;
-  project_name?: string;
-  business_unit_id: string;
-  amount: number;
-};
+import { AddAllocationRequestItem } from './types';
 
 @Resolver('Allocation')
 export class AllocationResolver {
   private readonly logger = new Logger(AllocationResolver.name);
   constructor(private readonly addAllocationUseCase: AddAllocationUseCase) {}
+
   @Public()
   @Mutation('addAllocations')
   async addAllocations(
@@ -33,6 +28,7 @@ export class AllocationResolver {
         amount: r.amount,
       })),
     );
+
     return await this.addAllocationUseCase.execute(request);
   }
 }
