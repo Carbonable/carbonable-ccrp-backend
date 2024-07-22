@@ -12,6 +12,7 @@ import {
   VisualizationResolver,
   StockResolver,
 } from './resolvers';
+
 import {
   GlobalDataService,
   ImpactMetricsService,
@@ -21,6 +22,7 @@ import {
   CarbonAssetAllocationService,
 } from './services';
 import { InfrastructureModule } from '../infrastructure/infrastructure.module';
+import { CsvModule } from '../../src/csv/csv.module';
 
 @Module({
   providers: [
@@ -34,6 +36,7 @@ import { InfrastructureModule } from '../infrastructure/infrastructure.module';
     AllocationResolver,
     VintageResolver,
     VisualizationResolver,
+    AllocationResolver,
     StockResolver,
     GlobalDataService,
     ProjectedDecarbonationService,
@@ -42,6 +45,7 @@ import { InfrastructureModule } from '../infrastructure/infrastructure.module';
     ProjectFundingAllocationService,
     CarbonAssetAllocationService,
   ],
+
   exports: [
     CertifierResolver,
     CountryResolver,
@@ -61,6 +65,6 @@ import { InfrastructureModule } from '../infrastructure/infrastructure.module';
     ProjectFundingAllocationService,
     CarbonAssetAllocationService,
   ],
-  imports: [InfrastructureModule],
+  imports: [InfrastructureModule, CsvModule],
 })
 export class ContributionManagerModule {}

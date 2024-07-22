@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/prisma.service';
-import { PaginationDTO } from '../resolvers/carbon-credits';
+import { PaginationDTO } from '../carbon-credits/carbon-credits.resolver';
 import Utils from '../../utils';
 
 @Injectable()

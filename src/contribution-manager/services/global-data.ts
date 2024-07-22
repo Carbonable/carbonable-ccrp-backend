@@ -1,7 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/prisma.service';
 import Utils from '../../utils';
-import { CARBONABLE_COMPANY_ID } from '../resolvers/carbon-credits';
+import { CARBONABLE_COMPANY_ID } from '../carbon-credits/carbon-credits.resolver';
 import {
   BusinessUnitRepositoryInterface,
   Company,
