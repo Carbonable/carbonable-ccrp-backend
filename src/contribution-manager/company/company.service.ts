@@ -51,6 +51,6 @@ export class CompanyService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-    return { message: 'Company uploaded successfully' };
+    return { message: 'Companies file uploaded successfully' };
   }
 }

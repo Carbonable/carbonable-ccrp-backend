@@ -12,7 +12,6 @@ import { AuthGuard } from './auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './roles/roles.guard';
 import { CsvModule } from './csv/csv.module';
-import { CompanyModule } from './contribution-manager/company/company.module';
 
 @Module({
   imports: [
@@ -31,7 +30,6 @@ import { CompanyModule } from './contribution-manager/company/company.module';
     EventEmitterModule.forRoot(),
     AuthModule,
     UsersModule,
-    CompanyModule,
   ],
   providers: [
     {

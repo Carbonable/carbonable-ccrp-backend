@@ -23,6 +23,8 @@ import {
 } from './services';
 import { InfrastructureModule } from '../infrastructure/infrastructure.module';
 import { CsvModule } from '../../src/csv/csv.module';
+import { CompanyController } from './company/company.controller';
+import { CompanyService } from './company/company.service';
 
 @Module({
   providers: [
@@ -44,8 +46,9 @@ import { CsvModule } from '../../src/csv/csv.module';
     ProjectMetricsService,
     ProjectFundingAllocationService,
     CarbonAssetAllocationService,
+    CompanyService,
   ],
-
+  controllers: [CompanyController],
   exports: [
     CertifierResolver,
     CountryResolver,
@@ -65,6 +68,7 @@ import { CsvModule } from '../../src/csv/csv.module';
     ProjectFundingAllocationService,
     CarbonAssetAllocationService,
   ],
+
   imports: [InfrastructureModule, CsvModule],
 })
 export class ContributionManagerModule {}
