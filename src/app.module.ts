@@ -12,6 +12,7 @@ import { AuthGuard } from './auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './roles/roles.guard';
 import { CsvModule } from './csv/csv.module';
+import { DevelopperModule } from './contribution-manager/developper/developper.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { CsvModule } from './csv/csv.module';
       resolvers: { JSON: GraphQLJSON },
     }),
     CsvModule,
+    DevelopperModule,
     ContributionManagerModule,
     ConsoleModule,
     EventEmitterModule.forRoot(),
