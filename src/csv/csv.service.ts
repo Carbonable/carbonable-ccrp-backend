@@ -4,7 +4,7 @@ import { Readable } from 'stream';
 
 @Injectable()
 export class CsvService {
-  async parseCsv<T>(fileBuffer: Buffer): Promise<T[]> {
+  async parseCsvToArray<T>(fileBuffer: Buffer): Promise<T[]> {
     return new Promise((resolve, reject) => {
       const results: T[] = [];
       const stream = Readable.from(fileBuffer);
