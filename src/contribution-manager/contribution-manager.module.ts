@@ -23,6 +23,8 @@ import {
 } from './services';
 import { InfrastructureModule } from '../infrastructure/infrastructure.module';
 import { CsvModule } from '../../src/csv/csv.module';
+import { CompanyController } from './company/company.controller';
+import { CompanyService } from './company/company.service';
 import { DevelopperController } from './developper/developper.controller';
 import { DevelopperService } from './developper/developper.service';
 
@@ -47,8 +49,9 @@ import { DevelopperService } from './developper/developper.service';
     ProjectFundingAllocationService,
     CarbonAssetAllocationService,
     DevelopperService,
+    CompanyService,
   ],
-  controllers: [DevelopperController],
+  controllers: [DevelopperController, CompanyController],
   exports: [
     CertifierResolver,
     CountryResolver,
@@ -68,6 +71,7 @@ import { DevelopperService } from './developper/developper.service';
     ProjectFundingAllocationService,
     CarbonAssetAllocationService,
   ],
+
   imports: [InfrastructureModule, CsvModule],
 })
 export class ContributionManagerModule {}
