@@ -32,7 +32,9 @@ export class CompanyService {
     let records: Company[];
 
     try {
-      records = await this.csvService.parseCsvToArray<Company>(fileBuffer);
+      records = await this.csvService.parseCsvToArrayOfStrMap<Company>(
+        fileBuffer,
+      );
       this.logger.debug(`Companies: ${JSON.stringify(records)}`);
     } catch (error) {
       this.logger.error(`Error parsing CSV file: ${error}`);
