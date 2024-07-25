@@ -161,6 +161,7 @@ defineFeature(feature, (test) => {
       const orders = await orderBookRepository.findByBusinessUnitIds([
         businessId,
       ]);
+      void orderCount;
       // TODO ! update the test i hardcoded  8
       const orderCounted = 8; //parseInt(orderCount);
       expect(orders.length).toBe(orderCounted);
