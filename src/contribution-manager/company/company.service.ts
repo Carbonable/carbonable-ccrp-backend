@@ -1,10 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/prisma.service';
 import { CsvService } from '../../csv/csv.service';
 import { Prisma } from '@prisma/client';
@@ -19,6 +13,7 @@ type Company = Prisma.CompanyGetPayload<{
   };
 }>;
 
+const COMPANY_TABLE = 'company';
 @Injectable()
 export class CompanyService {
   private readonly logger = new Logger(CompanyService.name);
@@ -41,15 +36,7 @@ export class CompanyService {
       throw new BadRequestException('Invalid file format');
     }
 
-    try {
-      await this.prisma.company.createMany({
-        data: records,
-        skipDuplicates: true,
-      });
-    } catch (error) {
-      this.logger.error(`Error creating records: ${error}`);
-      throw new BadRequestException(`Prisma:  ${error}`);
-    }
+    await this.prisma.createManyOfType(COMPANY_TABLE, records);
     return { message: 'Companies file uploaded successfully' };
   }
 }
