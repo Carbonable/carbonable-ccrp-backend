@@ -50,7 +50,7 @@ export class DevelopperService {
       this.logger.error(`Error creating records: ${error}`);
       throw new HttpException(
         'Failed to create records. Please try again.',
-        HttpStatus.INTERNAL_SERVER_ERROR,
+        HttpStatus.BAD_REQUEST,
       );
     }
     return { message: 'Company uploaded successfully' };

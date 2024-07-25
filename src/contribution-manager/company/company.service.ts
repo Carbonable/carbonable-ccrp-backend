@@ -48,10 +48,7 @@ export class CompanyService {
       });
     } catch (error) {
       this.logger.error(`Error creating records: ${error}`);
-      throw new HttpException(
-        'Failed to create records. Please try again.',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new BadRequestException(`Prisma:  ${error}`);
     }
     return { message: 'Companies file uploaded successfully' };
   }
