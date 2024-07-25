@@ -5,7 +5,6 @@ import { Logger } from '@nestjs/common';
 import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { BadRequestException } from '@nestjs/common';
-// import { HttpStatus, HttpException } from '@nestjs/common';
 
 describe('DevelopperController', () => {
   let app: INestApplication;
