@@ -27,6 +27,8 @@ import { CompanyController } from './company/company.controller';
 import { CompanyService } from './company/company.service';
 import { DevelopperController } from './developper/developper.controller';
 import { DevelopperService } from './developper/developper.service';
+import { BusinessUnitService } from './business-unit/business-unit.service';
+import { BusinessUnitController } from './business-unit/business-unit.controller';
 
 @Module({
   providers: [
@@ -50,8 +52,13 @@ import { DevelopperService } from './developper/developper.service';
     CarbonAssetAllocationService,
     DevelopperService,
     CompanyService,
+    BusinessUnitService,
   ],
-  controllers: [DevelopperController, CompanyController],
+  controllers: [
+    DevelopperController,
+    CompanyController,
+    BusinessUnitController,
+  ],
   exports: [
     CertifierResolver,
     CountryResolver,
