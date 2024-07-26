@@ -1,9 +1,23 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import * as csv from 'csv-parser';
 import { Readable } from 'stream';
 
 @Injectable()
 export class CsvService {
+  parseIntSafe = (value: string): number => {
+    const parsed = parseInt(value, 10);
+    if (isNaN(parsed)) throw new Error(`Invalid number: ${value}`);
+    return parsed;
+  };
+
+  parseJSONSafe = (value: string): Prisma.JsonValue => {
+    try {
+      return JSON.parse(value);
+    } catch (error) {
+      throw new Error(`Invalid JSON: ${value}`);
+    }
+  };
   async parseCsvToArrayOfStrMap<T extends { [key: string]: string }>(
     fileBuffer: Buffer,
   ): Promise<T[]> {

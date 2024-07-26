@@ -7,6 +7,7 @@ import {
 import { PrismaService } from '../../infrastructure/prisma.service';
 import { BadRequestException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+import { CsvModule } from '../../csv/csv.module';
 
 describe('BusinessUnitService', () => {
   let service: BusinessUnitService;
@@ -14,6 +15,7 @@ describe('BusinessUnitService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [CsvModule],
       providers: [
         BusinessUnitService,
         {

@@ -6,6 +6,7 @@ import { BadRequestException } from '@nestjs/common';
 import * as csv from 'csv-parser';
 import { Readable } from 'stream';
 import { PrismaService } from '../../infrastructure/prisma.service';
+import { CsvService } from '../../csv/csv.service';
 
 export type BusinessUnit = Prisma.BusinessUnitGetPayload<{
   include: {
@@ -21,7 +22,7 @@ export const BUSINESS_UNIT_MODEL = 'businessUnit';
 @Injectable()
 export class BusinessUnitService {
   logger = new Logger(BusinessUnitService.name);
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private csv: CsvService) {}
 
   async processCsv(fileBuffer: Buffer): Promise<{ message: string }> {
     const data = await this.parseCSV(fileBuffer);
@@ -30,19 +31,7 @@ export class BusinessUnitService {
 
     return { message: `BusinessUnits uploaded successfully` };
   }
-  private parseIntSafe = (value: string): number => {
-    const parsed = parseInt(value, 10);
-    if (isNaN(parsed)) throw new Error(`Invalid number: ${value}`);
-    return parsed;
-  };
 
-  private parseJSONSafe = (value: string): any => {
-    try {
-      return JSON.parse(value);
-    } catch (error) {
-      throw new Error(`Invalid JSON: ${value}`);
-    }
-  };
   parseCSV(buffer: Buffer): Promise<BusinessUnit[]> {
     return new Promise((resolve, reject) => {
       const results: BusinessUnit[] = [];
@@ -56,10 +45,10 @@ export class BusinessUnitService {
               id: data.id,
               name: data.name,
               description: data.description,
-              defaultEmission: this.parseIntSafe(data.defaultEmission),
-              defaultTarget: this.parseIntSafe(data.defaultTarget),
-              debt: this.parseIntSafe(data.debt),
-              metadata: this.parseJSONSafe(data.metadata),
+              defaultEmission: this.csv.parseIntSafe(data.defaultEmission),
+              defaultTarget: this.csv.parseIntSafe(data.defaultTarget),
+              debt: this.csv.parseIntSafe(data.debt),
+              metadata: this.csv.parseJSONSafe(data.metadata),
               companyId: data.companyId,
             };
             results.push(businessUnit);
