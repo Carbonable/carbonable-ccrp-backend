@@ -1,4 +1,4 @@
 id,name,description,defaultEmission,defaultTarget,debt,metadata,companyId
-1,Unit1,Desc1,100,200,300,{"key":"value"},comp1
+1,Unit1,Desc1,100,200,LouGel,{"key":"value"},comp1
 2,Unit2,Desc1,100,200,300,{"key":"value"},comp2
 3,Unit3,Desc1,100,200,300,{"key":"value"},comp3

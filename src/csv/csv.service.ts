@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { error } from 'console';
 import * as csv from 'csv-parser';
 import { Readable } from 'stream';
 
@@ -12,13 +13,15 @@ export class CsvService {
       const stream = Readable.from(fileBuffer);
 
       stream
-        .pipe(csv())
-        .on('data', (data) => results.push(data as T))
+        .pipe(csv({ strict: true }))
+        .on('data', (data) => {
+          results.push(data as T);
+        })
         .on('end', () => {
           resolve(results);
         })
         .on('error', (error) => {
-          reject(error);
+          reject(new BadRequestException(`${error}`));
         });
     });
   }

@@ -30,39 +30,43 @@ export class BusinessUnitService {
 
     return { message: `BusinessUnits uploaded successfully` };
   }
+  private parseIntSafe = (value: string): number => {
+    const parsed = parseInt(value, 10);
+    if (isNaN(parsed)) throw new Error(`Invalid number: ${value}`);
+    return parsed;
+  };
 
+  private parseJSONSafe = (value: string): any => {
+    try {
+      return JSON.parse(value);
+    } catch (error) {
+      throw new Error(`Invalid JSON: ${value}`);
+    }
+  };
   parseCSV(buffer: Buffer): Promise<BusinessUnit[]> {
     return new Promise((resolve, reject) => {
       const results: BusinessUnit[] = [];
 
       const stream = Readable.from(buffer);
       stream
-        .pipe(csv())
+        .pipe(csv({ strict: true }))
         .on('data', (data) => {
           try {
-            const defaultEmission = parseInt(data.defaultEmission);
-            const defaultTarget = parseInt(data.defaultTarget);
-            const debt = parseInt(data.debt);
-            const metadata = JSON.parse(data.metadata);
-
-            if (isNaN(defaultEmission) || isNaN(defaultTarget) || isNaN(debt)) {
-              throw new Error('Invalid number format');
-            }
-
             const businessUnit: BusinessUnit = {
               id: data.id,
               name: data.name,
               description: data.description,
-              defaultEmission,
-              defaultTarget,
-              debt,
-              metadata,
+              defaultEmission: this.parseIntSafe(data.defaultEmission),
+              defaultTarget: this.parseIntSafe(data.defaultTarget),
+              debt: this.parseIntSafe(data.debt),
+              metadata: this.parseJSONSafe(data.metadata),
               companyId: data.companyId,
             };
-
             results.push(businessUnit);
-          } catch (error) {
-            reject(new BadRequestException('Invalid file format: ' + error));
+          } catch (error: any) {
+            reject(
+              new BadRequestException('Invalid file format: ' + error.message),
+            );
           }
         })
         .on('end', () => {
