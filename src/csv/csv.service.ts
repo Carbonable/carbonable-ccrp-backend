@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { error } from 'console';
 import * as csv from 'csv-parser';
 import { Readable } from 'stream';
 

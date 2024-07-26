@@ -29,6 +29,7 @@ import { DevelopperController } from './developper/developper.controller';
 import { DevelopperService } from './developper/developper.service';
 import { BusinessUnitService } from './business-unit/business-unit.service';
 import { BusinessUnitController } from './business-unit/business-unit.controller';
+import { CertifierService } from './certifier/certifier.service';
 
 @Module({
   providers: [
@@ -51,6 +52,7 @@ import { BusinessUnitController } from './business-unit/business-unit.controller
     ProjectFundingAllocationService,
     CarbonAssetAllocationService,
     DevelopperService,
+    CertifierService,
     CompanyService,
     BusinessUnitService,
   ],
@@ -68,6 +70,7 @@ import { BusinessUnitController } from './business-unit/business-unit.controller
     GlobalDataService,
     BusinessUnitResolver,
     DemandResolver,
+    CertifierResolver,
     AllocationResolver,
     VintageResolver,
     VisualizationResolver,

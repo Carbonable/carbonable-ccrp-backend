@@ -11,8 +11,8 @@ import { CertifierService } from './certifier.service';
 import { Roles } from '../../roles/roles.decorator';
 import { Role } from '../../roles/role.enum';
 
-@ApiTags('dertifier')
-@Controller('dertifier')
+@ApiTags('certifier')
+@Controller('certifier')
 export class CertifierController {
   private readonly logger = new Logger(CertifierController.name);
 
