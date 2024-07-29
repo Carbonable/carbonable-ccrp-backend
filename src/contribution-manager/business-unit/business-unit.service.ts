@@ -27,7 +27,7 @@ export class BusinessUnitService {
   async processCsv(fileBuffer: Buffer): Promise<{ message: string }> {
     const data = await this.parseCSV(fileBuffer);
 
-    this.prisma.createManyOfType(BUSINESS_UNIT_MODEL, data);
+    await this.prisma.createManyOfType(BUSINESS_UNIT_MODEL, data);
 
     return { message: `BusinessUnits uploaded successfully` };
   }

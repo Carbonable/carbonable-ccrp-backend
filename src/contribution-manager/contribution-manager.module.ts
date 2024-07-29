@@ -30,6 +30,8 @@ import { DevelopperService } from './developper/developper.service';
 import { BusinessUnitService } from './business-unit/business-unit.service';
 import { BusinessUnitController } from './business-unit/business-unit.controller';
 import { CertifierService } from './certifier/certifier.service';
+import { ProjectSdgsService } from './project-sdgs/project-sdgs.service';
+import { ProjectSdgsController } from './project-sdgs/project-sdgs.controller';
 
 @Module({
   providers: [
@@ -54,12 +56,14 @@ import { CertifierService } from './certifier/certifier.service';
     DevelopperService,
     CertifierService,
     CompanyService,
+    ProjectSdgsService,
     BusinessUnitService,
   ],
   controllers: [
     DevelopperController,
     CompanyController,
     BusinessUnitController,
+    ProjectSdgsController,
   ],
   exports: [
     CertifierResolver,

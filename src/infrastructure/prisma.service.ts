@@ -81,7 +81,7 @@ const parsePrismaError = (error: any): ParsedError => {
   } else {
     return {
       statusCode: 500,
-      type: 'UnknownError',
+      type: error.name,
       message: error.message,
     };
   }
