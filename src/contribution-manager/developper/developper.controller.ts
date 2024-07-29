@@ -16,7 +16,7 @@ import { Role } from '../../roles/role.enum';
 export class DevelopperController {
   private readonly logger = new Logger(DevelopperController.name);
 
-  constructor(private companyService: DevelopperService) {}
+  constructor(private developperService: DevelopperService) {}
 
   @Roles(Role.Admin)
   @Post('upload')
@@ -29,6 +29,6 @@ export class DevelopperController {
   ): Promise<{ message: string }> {
     this.logger.debug(`File uploaded: ${file.originalname}`);
 
-    return await this.companyService.processCsv(file.buffer);
+    return await this.developperService.processCsv(file.buffer);
   }
 }

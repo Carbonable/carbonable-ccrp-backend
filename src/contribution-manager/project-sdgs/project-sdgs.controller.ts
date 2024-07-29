@@ -16,7 +16,7 @@ import { Role } from '../../roles/role.enum';
 export class ProjectSdgsController {
   private readonly logger = new Logger(ProjectSdgsController.name);
 
-  constructor(private companyService: ProjectSdgsService) {}
+  constructor(private projectsSdgService: ProjectSdgsService) {}
   @Roles(Role.Admin)
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
@@ -28,6 +28,6 @@ export class ProjectSdgsController {
   ): Promise<{ message: string }> {
     this.logger.debug(`File uploaded: ${file.originalname}`);
 
-    return await this.companyService.processCsv(file.buffer);
+    return await this.projectsSdgService.processCsv(file.buffer);
   }
 }
