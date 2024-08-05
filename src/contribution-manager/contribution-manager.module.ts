@@ -32,6 +32,8 @@ import { BusinessUnitController } from './business-unit/business-unit.controller
 import { CertifierService } from './certifier/certifier.service';
 import { ProjectSdgsService } from './project-sdgs/project-sdgs.service';
 import { ProjectSdgsController } from './project-sdgs/project-sdgs.controller';
+import { CountryService } from './country/country.service';
+import { CountryController } from './country/country.controller';
 
 @Module({
   providers: [
@@ -57,6 +59,7 @@ import { ProjectSdgsController } from './project-sdgs/project-sdgs.controller';
     CertifierService,
     CompanyService,
     ProjectSdgsService,
+    CountryService,
     BusinessUnitService,
   ],
   controllers: [
@@ -64,6 +67,7 @@ import { ProjectSdgsController } from './project-sdgs/project-sdgs.controller';
     CompanyController,
     BusinessUnitController,
     ProjectSdgsController,
+    CountryController,
   ],
   exports: [
     CertifierResolver,
