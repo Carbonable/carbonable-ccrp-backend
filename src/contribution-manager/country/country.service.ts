@@ -36,21 +36,21 @@ export class CountryService {
         .pipe(csv({ strict: true }))
         .on('data', (data) => {
           try {
+            const buffer_data = this.csvService.parseJSONSafe(data.data);
             const country: Country = {
               id: data.id,
               name: data.name,
               code: data.code,
-              data: this.csvService.parseJSONSafe(data.data),
+              data: buffer_data,
             };
             results.push(country);
-          } catch (error: any) {
+          } catch (error) {
             reject(
-              new BadRequestException('Invalid file format: ' + error.message),
+              new BadRequestException(
+                'Invalid file format: ' + JSON.stringify(error),
+              ),
             );
           }
-        })
-        .on('end', () => {
-          resolve(results);
         })
         .on('error', (error) => {
           reject(
@@ -58,6 +58,9 @@ export class CountryService {
               'Invalid file format: ' + JSON.stringify(error),
             ),
           );
+        })
+        .on('end', () => {
+          resolve(results);
         });
     });
   }

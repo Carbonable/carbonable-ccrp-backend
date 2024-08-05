@@ -12,8 +12,14 @@ export class CsvService {
   };
 
   parseJSONSafe = (value: string): Prisma.JsonValue => {
+    if (value === null) return null;
     try {
-      return JSON.parse(value);
+      const parsed = JSON.parse(value);
+      if (typeof parsed === 'object') {
+        return parsed;
+      } else {
+        throw new Error(`Invalid JSON object: ${value}`);
+      }
     } catch (error) {
       throw new Error(`Invalid JSON: ${value}`);
     }
