@@ -18,7 +18,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   async onModuleDestroy() {
     await this.$disconnect();
   }
-  async createManyOfType<T>(tableName: string, values: T[]) {
+  async createManyOfType(tableName: string, values: any[]) {
     try {
       await this[tableName].createMany({ data: values, skipDuplicates: true });
     } catch (error) {
@@ -30,6 +30,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     }
   }
 }
+
 interface ParsedError {
   type: string;
   message: string;
@@ -80,7 +81,7 @@ const parsePrismaError = (error: any): ParsedError => {
   } else {
     return {
       statusCode: 500,
-      type: 'UnknownError',
+      type: error.name,
       message: error.message,
     };
   }

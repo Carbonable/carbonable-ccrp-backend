@@ -27,6 +27,11 @@ import { CompanyController } from './company/company.controller';
 import { CompanyService } from './company/company.service';
 import { DevelopperController } from './developper/developper.controller';
 import { DevelopperService } from './developper/developper.service';
+import { BusinessUnitService } from './business-unit/business-unit.service';
+import { BusinessUnitController } from './business-unit/business-unit.controller';
+import { CertifierService } from './certifier/certifier.service';
+import { ProjectSdgsService } from './project-sdgs/project-sdgs.service';
+import { ProjectSdgsController } from './project-sdgs/project-sdgs.controller';
 
 @Module({
   providers: [
@@ -49,9 +54,17 @@ import { DevelopperService } from './developper/developper.service';
     ProjectFundingAllocationService,
     CarbonAssetAllocationService,
     DevelopperService,
+    CertifierService,
     CompanyService,
+    ProjectSdgsService,
+    BusinessUnitService,
   ],
-  controllers: [DevelopperController, CompanyController],
+  controllers: [
+    DevelopperController,
+    CompanyController,
+    BusinessUnitController,
+    ProjectSdgsController,
+  ],
   exports: [
     CertifierResolver,
     CountryResolver,
@@ -61,6 +74,7 @@ import { DevelopperService } from './developper/developper.service';
     GlobalDataService,
     BusinessUnitResolver,
     DemandResolver,
+    CertifierResolver,
     AllocationResolver,
     VintageResolver,
     VisualizationResolver,

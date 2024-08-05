@@ -7,16 +7,16 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Logger } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { DevelopperService } from './developper.service';
+import { CertifierService } from './certifier.service';
 import { Roles } from '../../roles/roles.decorator';
 import { Role } from '../../roles/role.enum';
 
-@ApiTags('developper')
-@Controller('developper')
-export class DevelopperController {
-  private readonly logger = new Logger(DevelopperController.name);
+@ApiTags('certifier')
+@Controller('certifier')
+export class CertifierController {
+  private readonly logger = new Logger(CertifierController.name);
 
-  constructor(private developperService: DevelopperService) {}
+  constructor(private certifierService: CertifierService) {}
 
   @Roles(Role.Admin)
   @Post('upload')
@@ -24,11 +24,11 @@ export class DevelopperController {
   @ApiOperation({ summary: 'Upload certifier CSV file' })
   @ApiResponse({ status: 201, description: 'File successfully processed.' })
   @ApiResponse({ status: 400, description: 'Invalid file format.' })
-  async uploadDevelopperCSV(
+  async uploadCertifierCSV(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<{ message: string }> {
     this.logger.debug(`File uploaded: ${file.originalname}`);
 
-    return await this.developperService.processCsv(file.buffer);
+    return await this.certifierService.processCsv(file.buffer);
   }
 }
