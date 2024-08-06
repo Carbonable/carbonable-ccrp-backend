@@ -34,6 +34,8 @@ import { ProjectSdgsService } from './project-sdgs/project-sdgs.service';
 import { ProjectSdgsController } from './project-sdgs/project-sdgs.controller';
 import { CountryService } from './country/country.service';
 import { CountryController } from './country/country.controller';
+import { ProjectService } from './project/project.service';
+import { ProjectController } from './project/project.controller';
 
 @Module({
   providers: [
@@ -49,6 +51,7 @@ import { CountryController } from './country/country.controller';
     VisualizationResolver,
     AllocationResolver,
     StockResolver,
+    ProjectService,
     GlobalDataService,
     ProjectedDecarbonationService,
     ImpactMetricsService,
@@ -63,6 +66,7 @@ import { CountryController } from './country/country.controller';
     BusinessUnitService,
   ],
   controllers: [
+    ProjectController,
     DevelopperController,
     CompanyController,
     BusinessUnitController,
