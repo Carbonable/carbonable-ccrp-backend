@@ -129,9 +129,13 @@ describe('BusinessUnitService', () => {
         'id,name,description,defaultEmission,defaultTarget,debt,metadata,companyId\n1,Unit1,Desc1,invalid,200,300,{"key":"value"},comp1',
       );
 
-      await expect(service.parseCSV(invalidCsvData)).rejects.toThrow(
-        BadRequestException,
-      );
+      try {
+        await service.parseCSV(invalidCsvData);
+        fail('Expected BadRequestException to be thrown');
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        // expect(error.message).toMatch(/^Invalid file format: /);
+      }
     });
 
     it('should throw BadRequestException with correct error message for invalid CSV data', async () => {

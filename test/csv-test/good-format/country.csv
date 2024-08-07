@@ -1,0 +1,4 @@
+id,name,code,data
+country1,Country A,CA,"{""population"": 1000000, ""gdp"": 50000}"
+country2,Country B,CB,"{""population"": 2000000, ""gdp"": 100000}"
+country3,Country C,CC,"{""population"": 3000000, ""gdp"": 150000}"
