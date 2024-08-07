@@ -35,7 +35,7 @@ describe('BusinessUnitController', () => {
       .spyOn(service, 'processCsv')
       .mockResolvedValue({ message: 'BusinessUnits uploaded successfully' });
 
-    const result = await controller.uploadCompanyCsv(mockFile);
+    const result = await controller.uploadBusinessUnitsCsv(mockFile);
 
     expect(result).toEqual({ message: 'BusinessUnits uploaded successfully' });
     expect(service.processCsv).toHaveBeenCalledWith(mockFile.buffer);
@@ -50,7 +50,7 @@ describe('BusinessUnitController', () => {
       .spyOn(service, 'processCsv')
       .mockRejectedValue(new BadRequestException('Invalid file format'));
 
-    await expect(controller.uploadCompanyCsv(mockFile)).rejects.toThrow(
+    await expect(controller.uploadBusinessUnitsCsv(mockFile)).rejects.toThrow(
       BadRequestException,
     );
   });
