@@ -16,6 +16,12 @@ export class CsvService {
     if (isNaN(parsed)) throw new Error(`Invalid number: ${value}`);
     return parsed;
   };
+  parseDateSafe = (value: string): Date => {
+    const parsed = new Date(value);
+    if (parsed.toString().includes('Invalid'))
+      throw new Error(`${parsed} : ${value}`);
+    return parsed;
+  };
   parseBigIntSafe = (value: string): bigint => {
     try {
       const parsed = BigInt(value);
