@@ -2,6 +2,11 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import * as csv from 'csv-parser';
 import { Readable } from 'stream';
+import {
+  CarbonCreditType,
+  CarbonCreditOrigin,
+  ProjectColor,
+} from '@prisma/client';
 
 @Injectable()
 export class CsvService {
@@ -10,7 +15,32 @@ export class CsvService {
     if (isNaN(parsed)) throw new Error(`Invalid number: ${value}`);
     return parsed;
   };
-
+  checkAndParseCarbonCreditType(value: string): CarbonCreditType {
+    if (!Object.values(CarbonCreditType).includes(value as CarbonCreditType)) {
+      throw Error(`${value} is not a CarbonCreditType`);
+    }
+    return value as CarbonCreditType;
+  }
+  checkAndParseCarbonCreditOrigin(value: string): CarbonCreditOrigin {
+    if (
+      !Object.values(CarbonCreditOrigin).includes(value as CarbonCreditOrigin)
+    ) {
+      throw Error(`${value} is not a CarbonCreditOrigin`);
+    }
+    return value as CarbonCreditOrigin;
+  }
+  checkAndParseProjectColor(value: string): ProjectColor {
+    if (!Object.values(ProjectColor).includes(value as ProjectColor)) {
+      throw Error(`${value} is not a ProjectColor`);
+    }
+    return value as ProjectColor;
+  }
+  parseFloatSafe = (value: string): number => {
+    if (!value.includes('.')) value += '.0';
+    const parsed = parseFloat(value);
+    if (isNaN(parsed)) throw new Error(`Invalid number: ${value}`);
+    return parsed;
+  };
   parseJSONSafe = (value: string): Prisma.JsonValue => {
     if (value === null) return null;
     try {

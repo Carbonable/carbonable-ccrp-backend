@@ -21,7 +21,7 @@ export class DevelopperController {
   @Roles(Role.Admin)
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  @ApiOperation({ summary: 'Upload certifier CSV file' })
+  @ApiOperation({ summary: 'Upload developper CSV file' })
   @ApiResponse({ status: 201, description: 'File successfully processed.' })
   @ApiResponse({ status: 400, description: 'Invalid file format.' })
   async uploadDevelopperCSV(
