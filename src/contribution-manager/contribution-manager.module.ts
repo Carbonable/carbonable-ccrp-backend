@@ -38,6 +38,13 @@ import { ProjectService } from './project/project.service';
 import { ProjectController } from './project/project.controller';
 import { CarbonCreditService } from './carbon-credits/carbon-credits.service';
 import { CarbonCreditController } from './carbon-credits/carbon-credits.controller';
+import { ForecastEmissionController } from './forecast/forecast-emission.controller';
+import { ForecastTargetController } from './forecast/forecast-target.controller';
+import { ForecastService } from './forecast/forecast.service';
+import { AllocationController } from './allocations/allocation.controller';
+import { AllocationService } from './allocations/allocations.service';
+import { VintageController } from './vintage/vintage.controllet';
+import { VintageService } from './vintage/vintage.service';
 
 @Module({
   providers: [
@@ -67,6 +74,9 @@ import { CarbonCreditController } from './carbon-credits/carbon-credits.controll
     CountryService,
     BusinessUnitService,
     CarbonCreditService,
+    VintageService,
+    AllocationService,
+    ForecastService,
   ],
   controllers: [
     ProjectController,
@@ -76,6 +86,10 @@ import { CarbonCreditController } from './carbon-credits/carbon-credits.controll
     ProjectSdgsController,
     CountryController,
     CarbonCreditController,
+    ForecastEmissionController,
+    ForecastTargetController,
+    VintageController,
+    AllocationController,
   ],
   exports: [
     CertifierResolver,

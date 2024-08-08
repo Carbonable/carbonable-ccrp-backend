@@ -24,7 +24,6 @@ export class VintageService {
 
   async processCsv(fileBuffer: Buffer): Promise<{ message: string }> {
     const data = await this.parseCSV(fileBuffer);
-    console.table(data);
     await this.prisma.createManyOfType(VINTAGE_TABLE, data);
     return { message: 'Vintages uploaded successfully' };
   }
@@ -62,7 +61,6 @@ export class VintageService {
     if (year.length !== 4) {
       throw new Error(`Wrong year number : ${year}`);
     }
-    console.log('Dataid ', data.id);
     return {
       id: data.id && data.id !== '' ? data.id : this.csv.emptyValueError('id'),
       year,
