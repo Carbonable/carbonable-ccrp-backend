@@ -4,33 +4,35 @@ import { CsvService } from '../../csv/csv.service';
 import { Prisma } from '@prisma/client';
 import * as csv from 'csv-parser';
 import { Readable } from 'stream';
+import { ForecastType } from './types';
 
-type ForecastEmission = Prisma.ForecastEmissionGetPayload<{
+type Forecast = Prisma.ForecastEmissionGetPayload<{
   include: {
     businessUnit: false;
   };
 }>;
 
-const FORECAST_EMISSSION_TABLE = 'forecast_emission';
-
 @Injectable()
-export class ForecastEmissionService {
-  private readonly logger = new Logger(ForecastEmissionService.name);
+export class ForecastService {
+  private readonly logger = new Logger(ForecastService.name);
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly csv: CsvService,
   ) {}
 
-  async processCsv(fileBuffer: Buffer): Promise<{ message: string }> {
+  async processCsv(
+    fileBuffer: Buffer,
+    type: ForecastType,
+  ): Promise<{ message: string }> {
     const data = await this.parseCSV(fileBuffer);
-    await this.prisma.createManyOfType(FORECAST_EMISSSION_TABLE, data);
-    return { message: 'ForecastEmissions uploaded successfully' };
+    await this.prisma.createManyOfType(type, data);
+    return { message: 'Forecasts uploaded successfully' };
   }
 
-  public parseCSV(buffer: Buffer): Promise<ForecastEmission[]> {
+  public parseCSV(buffer: Buffer): Promise<Forecast[]> {
     return new Promise((resolve, reject) => {
-      const results: ForecastEmission[] = [];
+      const results: Forecast[] = [];
       const stream = Readable.from(buffer);
 
       stream
@@ -45,18 +47,18 @@ export class ForecastEmissionService {
 
   private handleCsvData(
     data: any,
-    results: ForecastEmission[],
+    results: Forecast[],
     reject: (reason?: any) => void,
   ): void {
     try {
-      const carbonCredit = this.createForecastEmission(data);
+      const carbonCredit = this.createForecast(data);
       results.push(carbonCredit);
     } catch (error: any) {
       reject(new BadRequestException('Invalid file format: ' + error));
     }
   }
 
-  private createForecastEmission(data: any): ForecastEmission {
+  private createForecast(data: any): Forecast {
     return {
       id: data.id ?? this.csv.emptyValueError('id'),
       quantity: this.csv.parseIntSafe(data.quantity),
