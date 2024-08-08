@@ -120,7 +120,7 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
           new EffectiveContribution(
             o.vintage.toString(),
             Utils.priceDecimal(
-              o.quantity * o.issued_price + o.purchased * o.purchased_price,
+              o.quantity * o.issuedPrice + o.purchased * o.purchased_price,
             ),
           ),
       ),

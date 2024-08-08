@@ -15,15 +15,15 @@ export class Vintage {
     public readonly year: string,
     capacity: number,
     private _purchased: number = 0,
-    private _purchased_price: number = DEFAULT_PURCHASED_PRICE,
-    private _issued_price: number = DEFAULT_ISSUED_PRICE,
+    private _purchasedPrice: number = DEFAULT_PURCHASED_PRICE,
+    private _issuedPrice: number = DEFAULT_ISSUED_PRICE,
   ) {
     this._reserved = 0;
     this._available = capacity + _purchased;
     this._capacity = capacity;
 
-    this._purchased_price = _purchased_price * 100;
-    this._issued_price = _issued_price * 100;
+    this._purchasedPrice = _purchasedPrice * 100;
+    this._issuedPrice = _issuedPrice * 100;
   }
 
   get issued(): number {
@@ -62,10 +62,10 @@ export class Vintage {
     return this._purchased;
   }
   get purchasePrice(): number {
-    return this._purchased_price;
+    return this._purchasedPrice;
   }
   get issuedPrice(): number {
-    return this._issued_price;
+    return this._issuedPrice;
   }
 
   static exPostStockAt(
