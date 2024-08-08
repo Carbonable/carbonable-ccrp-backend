@@ -74,7 +74,7 @@ export class CsvService {
   parseFloatSafe = (value: string): number => {
     if (!value.includes('.')) value += '.0';
     const parsed = parseFloat(value);
-    if (isNaN(parsed)) throw new Error(`Invalid number: ${value}`);
+    if (isNaN(parsed)) throw new Error(`Invalid floating number: ${value}`);
     return parsed;
   };
   parseJSONSafe = (value: string): Prisma.JsonValue => {
