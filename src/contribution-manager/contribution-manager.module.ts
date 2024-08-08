@@ -37,8 +37,7 @@ import { CountryController } from './country/country.controller';
 import { ProjectService } from './project/project.service';
 import { ProjectController } from './project/project.controller';
 import { CarbonCreditService } from './carbon-credits/carbon-credits.service';
-import { CarbonCreditController } from './carbon-credits/carbon.credits.controller';
-import { CarbonCredit } from 'src/domain/portfolio';
+import { CarbonCreditController } from './carbon-credits/carbon-credits.controller';
 
 @Module({
   providers: [
