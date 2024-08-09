@@ -48,7 +48,7 @@ describe('CsvService Stress Test', () => {
   it('should process a large good-format project CSV file', async () => {
     const csvFilePath = path.resolve(
       __dirname,
-      '../../test/csv-test/good-format/project.csv',
+      '../../test/csv-test/good-format/projects.csv',
     );
     const buffer = fs.readFileSync(csvFilePath);
 

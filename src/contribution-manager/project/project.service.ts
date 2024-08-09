@@ -47,7 +47,7 @@ export class ProjectService {
       endDate: this.csv.nonNullString(data, 'end_date'),
       area: this.csv.parseIntSafe(data.area),
       type: this.csv.checkAndParseCarbonCreditType(data.type),
-      origin: this.csv.checkAndParseCarbonCreditOrigin(origin),
+      origin: this.csv.checkAndParseCarbonCreditOrigin(data.origin),
       fundingAmount: this.csv.parseFloatSafe(data.funding_amount),
       color: this.csv.checkAndParseProjectColor(data.color),
       protectedSpecies: this.csv.parseIntSafe(data.protected_species),

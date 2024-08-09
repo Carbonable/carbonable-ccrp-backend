@@ -30,7 +30,7 @@ export class AllocationService {
     return { message: 'Allocations uploaded successfully' };
   }
 
-  private createAllocation(data: any): Allocation {
+  createAllocation(data: any): Allocation {
     return {
       id: this.csv.nonNullString(data, 'id'),
       quantity: this.csv.parseIntSafe(data.quantity),
