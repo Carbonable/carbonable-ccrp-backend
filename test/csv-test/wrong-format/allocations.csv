@@ -1,5 +1,5 @@
 
-id,quantity,allocatedAt,businessUnitId,projectId
+id,quantity,allocated_at,business_unit_id,project_id
 1,,2024-01-01,10,20
 2,200,invalid-date,11,21
 3,300,2024-01-03,,22

@@ -10,6 +10,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { BusinessUnitService } from './business-unit.service';
 import { Roles } from '../../roles/roles.decorator';
 import { Role } from '../../roles/role.enum';
+// import { Public } from '../../auth/auth.public.decorator';
 
 @ApiTags('business-units')
 @Controller('business-units')
@@ -18,6 +19,7 @@ export class BusinessUnitController {
 
   constructor(private businessUnitService: BusinessUnitService) {}
 
+  // @Public()
   @Roles(Role.Admin)
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))

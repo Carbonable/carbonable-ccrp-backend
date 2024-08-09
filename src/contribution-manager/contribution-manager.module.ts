@@ -43,7 +43,7 @@ import { ForecastTargetController } from './forecast/forecast-target.controller'
 import { ForecastService } from './forecast/forecast.service';
 import { AllocationController } from './allocations/allocation.controller';
 import { AllocationService } from './allocations/allocations.service';
-import { VintageController } from './vintage/vintage.controllet';
+import { VintageController } from './vintage/vintage.controller';
 import { VintageService } from './vintage/vintage.service';
 
 @Module({

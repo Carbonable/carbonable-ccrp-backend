@@ -609,8 +609,8 @@ export const VintageDataFixtures = ({
           available: item.available,
           projectId: project.id,
           purchased: item.purchased,
-          purchased_price: item.purchasePrice,
-          issued_price: item.issuedPrice,
+          purchasedPrice: item.purchasePrice,
+          issuedPrice: item.issuedPrice,
         };
       }
     }
@@ -646,8 +646,8 @@ export const StockDataFixtures = ({
           available: v.available,
           consumed: 0,
           purchased: v.purchased,
-          purchased_price: v.purchased_price,
-          issued_price: v.issued_price,
+          purchasedPrice: v.purchasedPrice,
+          issuedPrice: v.issuedPrice,
           projectId: project.id,
         })),
       });

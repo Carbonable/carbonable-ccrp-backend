@@ -1,4 +1,4 @@
-id,quantity,allocatedAt,businessUnitId,projectId
+id,quantity,allocated_at,business_unit_id,project_id
 1,100,2024-01-01,2,01H5739RVDH5MFVTHD90TBR92J
 2,200,2024-01-02,3,01H5739RVSRKHFVNM47AE4NHMK
 3,300,2024-01-03,6,01H5739RVSRKHFVNM47AE4NHMK

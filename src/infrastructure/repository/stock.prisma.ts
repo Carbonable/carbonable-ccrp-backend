@@ -73,8 +73,8 @@ export class PrismaStockRepository implements StockRepositoryInterface {
             businessUnitId: s.businessUnitId,
             allocationId: s.allocationId,
             purchased: s.purchased,
-            purchased_price: s.purchasedPrice,
-            issued_price: s.issuedPrice,
+            purchasedPrice: s.purchasedPrice,
+            issuedPrice: s.issuedPrice,
           },
         });
       }),
@@ -212,8 +212,8 @@ export class PrismaStockRepository implements StockRepositoryInterface {
         s.quantity,
         s.allocationId,
         s.purchased,
-        s.purchased_price,
-        s.issued_price,
+        s.purchasedPrice,
+        s.issuedPrice,
       );
       stock.lock(s.consumed);
       stock.retire(s.retired);

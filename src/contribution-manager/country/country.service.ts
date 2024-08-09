@@ -1,10 +1,6 @@
 import { Injectable } from '@nestjs/common';
-
 import { Prisma } from '@prisma/client';
 import { Logger } from '@nestjs/common';
-import { BadRequestException } from '@nestjs/common';
-import * as csv from 'csv-parser';
-import { Readable } from 'stream';
 import { PrismaService } from '../../infrastructure/prisma.service';
 import { CsvService } from '../../csv/csv.service';
 
@@ -13,55 +9,31 @@ export type Country = Prisma.CountryGetPayload<{
     projects: false;
   };
 }>;
-export const COUNTRY_MODEL = 'country';
+export const COUNTRY_TABLE = 'country';
 @Injectable()
 export class CountryService {
   logger = new Logger(CountryService.name);
-  constructor(private prisma: PrismaService, private csvService: CsvService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly csv: CsvService,
+  ) {}
 
   async processCsv(fileBuffer: Buffer): Promise<{ message: string }> {
-    const data = await this.parseCSV(fileBuffer);
+    const data = await this.csv.parseCSV<Country>(
+      fileBuffer,
+      this.createCountry.bind(this),
+    );
 
-    await this.prisma.createManyOfType(COUNTRY_MODEL, data);
-
-    return { message: `countrys uploaded successfully` };
+    await this.prisma.createManyOfType(COUNTRY_TABLE, data);
+    return { message: 'Country uploaded successfully' };
   }
 
-  parseCSV(buffer: Buffer): Promise<Country[]> {
-    return new Promise((resolve, reject) => {
-      const results: Country[] = [];
-
-      const stream = Readable.from(buffer);
-      stream
-        .pipe(csv({ strict: true }))
-        .on('data', (data) => {
-          try {
-            const buffer_data = this.csvService.parseJSONSafe(data.data);
-            const country: Country = {
-              id: data.id,
-              name: data.name,
-              code: data.code,
-              data: buffer_data,
-            };
-            results.push(country);
-          } catch (error) {
-            reject(
-              new BadRequestException(
-                'Invalid file format: ' + JSON.stringify(error),
-              ),
-            );
-          }
-        })
-        .on('error', (error) => {
-          reject(
-            new BadRequestException(
-              'Invalid file format: ' + JSON.stringify(error),
-            ),
-          );
-        })
-        .on('end', () => {
-          resolve(results);
-        });
-    });
+  private createCountry(data: any): Country {
+    return {
+      id: this.csv.nonNullString(data, 'id'),
+      name: this.csv.nonNullString(data, 'name'),
+      code: this.csv.nonNullString(data, 'code'),
+      data: this.csv.parseJSONSafe(data.data),
+    };
   }
 }

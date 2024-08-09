@@ -73,8 +73,8 @@ export class PrismaProjectRepository implements ProjectRepositoryInterface {
           v.year,
           v.capacity,
           v.purchased,
-          v.purchased_price,
-          v.issued_price,
+          v.purchasedPrice,
+          v.issuedPrice,
         );
         vintage.lock(v.reserved);
         return vintage;

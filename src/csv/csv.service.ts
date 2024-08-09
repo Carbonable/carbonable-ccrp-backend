@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import * as csv from 'csv-parser';
 import { Readable } from 'stream';
@@ -11,11 +11,57 @@ import {
 
 @Injectable()
 export class CsvService {
+  private readonly logger = new Logger(CsvService.name);
+
+  public parseCSV<T>(
+    buffer: Buffer,
+    createEntityFctn: (data: any) => T,
+  ): Promise<T[]> {
+    return new Promise((resolve, reject) => {
+      const results: T[] = [];
+      const stream = Readable.from(buffer);
+      this.logger.log('Start parse');
+
+      stream
+        .pipe(csv({ strict: true }))
+        .on('data', (data) => {
+          this.logger.log('Star stream parse');
+          this.handleCsvData(data, results, createEntityFctn, reject);
+        })
+        .on('end', () => resolve(results))
+        .on('error', (error) =>
+          reject(new BadRequestException('Invalid file format: ' + error)),
+        );
+    });
+  }
+
+  private handleCsvData<T>(
+    data: any,
+    results: T[],
+    createEntityFctn: (data: any) => T,
+    reject: (reason?: any) => void,
+  ): void {
+    try {
+      this.logger.log('Star create entity with data ', JSON.stringify(data));
+      const carbonCredit = createEntityFctn(data);
+      this.logger.log('ENtity created create entity');
+      results.push(carbonCredit);
+    } catch (error: any) {
+      reject(new BadRequestException('Invalid file format: ' + error));
+    }
+  }
   parseIntSafe = (value: string): number => {
     const parsed = parseInt(value, 10);
     if (isNaN(parsed)) throw new Error(`Invalid number: ${value}`);
     return parsed;
   };
+
+  nonNullString(data: any, str: string): string {
+    if (!data[str]) {
+      this.emptyValueError(str);
+    }
+    return data[str];
+  }
   parseDateSafe = (value: string): Date => {
     const parsed = new Date(value);
     if (parsed.toString().includes('Invalid'))
@@ -90,24 +136,4 @@ export class CsvService {
       throw new Error(`Invalid JSON: ${value}`);
     }
   };
-  async parseCsvToArrayOfStrMap<T extends { [key: string]: string }>(
-    fileBuffer: Buffer,
-  ): Promise<T[]> {
-    return new Promise((resolve, reject) => {
-      const results: T[] = [];
-      const stream = Readable.from(fileBuffer);
-
-      stream
-        .pipe(csv({ strict: true }))
-        .on('data', (data) => {
-          results.push(data as T);
-        })
-        .on('end', () => {
-          resolve(results);
-        })
-        .on('error', (error) => {
-          reject(new BadRequestException(`${error}`));
-        });
-    });
-  }
 }
