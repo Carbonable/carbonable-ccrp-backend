@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { Roles } from '../roles/roles.decorator';
 import { Role } from '../roles/role.enum';
@@ -25,8 +25,6 @@ export class UserController {
   @UseGuards(AuthGuard)
   @ApiResponse({ status: 200 })
   changePassword(@Req() req, @Body() body: ChangePasswordDto) {
-    console.log(' in req');
-    console.table(req.user);
     const { sub: userId } = req.user;
 
     return this.userService.updateUserPassword(
