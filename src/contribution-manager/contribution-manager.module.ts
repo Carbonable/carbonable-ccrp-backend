@@ -12,7 +12,6 @@ import {
   VisualizationResolver,
   StockResolver,
 } from './resolvers';
-
 import {
   GlobalDataService,
   ImpactMetricsService,
