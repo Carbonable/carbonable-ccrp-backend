@@ -41,7 +41,7 @@ import { CarbonCreditController } from './carbon-credits/carbon-credits.controll
 import { ForecastEmissionController } from './forecast/forecast-emission.controller';
 import { ForecastTargetController } from './forecast/forecast-target.controller';
 import { ForecastService } from './forecast/forecast.service';
-import { AllocationController } from './allocations/allocation.controller';
+import { AllocationController } from './allocations/allocations.controller';
 import { AllocationService } from './allocations/allocations.service';
 import { VintageController } from './vintage/vintage.controller';
 import { VintageService } from './vintage/vintage.service';
