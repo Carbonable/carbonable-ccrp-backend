@@ -55,8 +55,6 @@ export class UsersService {
   }
   private async hashPassword(password: string): Promise<string> {
     const CARBONABLE_SALT = parseInt(process.env.CARBONABLE_SALT);
-    console.log(' Carbonable sal :', CARBONABLE_SALT);
-
     return await bcrypt.hash(password, CARBONABLE_SALT);
   }
   async updateUserPassword(
@@ -72,7 +70,6 @@ export class UsersService {
     if (user.name !== name) {
       throw new BadRequestException('Username not matching token holders id');
     }
-    console.log(previousPassword, user.password);
     const isPasswordMatching = await bcrypt.compare(
       previousPassword,
       user.password,
@@ -80,10 +77,8 @@ export class UsersService {
     if (!isPasswordMatching) {
       throw new BadRequestException('Previous password is incorrect');
     }
-    console.log('hashpassword', password);
 
     const hashedPassword = await this.hashPassword(password);
-    console.log('hashedpassword');
 
     const userCreated = await this.prisma.user.update({
       where: {
@@ -93,8 +88,6 @@ export class UsersService {
         password: hashedPassword,
       },
     });
-    console.log('user created ', userCreated);
-
     this.logger.log(
       `User password modified: ${userCreated.name}  id:${userCreated.id}`,
     );
