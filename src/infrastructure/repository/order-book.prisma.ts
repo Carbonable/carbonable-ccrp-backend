@@ -120,7 +120,7 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
           new EffectiveContribution(
             o.vintage.toString(),
             Utils.priceDecimal(
-              o.quantity * o.issued_price + o.purchased * o.purchased_price,
+              o.quantity * o.issuedPrice + o.purchased * o.purchasedPrice,
             ),
           ),
       ),
@@ -181,8 +181,8 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
     return vintages.reduce(
       (acc, v) =>
         acc +
-        v.capacity * Utils.priceDecimal(v.issued_price) +
-        v.purchased * Utils.priceDecimal(v.purchased_price),
+        v.capacity * Utils.priceDecimal(v.issuedPrice) +
+        v.purchased * Utils.priceDecimal(v.purchasedPrice),
       0,
     );
   }
@@ -196,8 +196,8 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
     return allocatedStock.reduce(
       (acc, v) =>
         acc +
-        v.quantity * Utils.priceDecimal(v.issued_price) +
-        v.purchased * Utils.priceDecimal(v.purchased_price),
+        v.quantity * Utils.priceDecimal(v.issuedPrice) +
+        v.purchased * Utils.priceDecimal(v.purchasedPrice),
       0,
     );
   }
@@ -213,8 +213,8 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
     return vintages.reduce(
       (acc, v) =>
         acc +
-        (v.capacity * Utils.priceDecimal(v.issued_price) +
-          v.purchased * Utils.priceDecimal(v.purchased_price)),
+        (v.capacity * Utils.priceDecimal(v.issuedPrice) +
+          v.purchased * Utils.priceDecimal(v.purchasedPrice)),
       0,
     );
   }

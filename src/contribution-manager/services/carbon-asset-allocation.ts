@@ -155,7 +155,7 @@ export class CarbonAssetAllocationService {
 
       const price =
         a.stock.reduce(
-          (acc, curr) => acc + Utils.priceDecimal(curr.issued_price),
+          (acc, curr) => acc + Utils.priceDecimal(curr.issuedPrice),
           0,
         ) / a.stock.length;
 
@@ -214,8 +214,8 @@ export function prismaToVintage(vintages: StockModel[]): Vintage[] {
       v.vintage,
       v.quantity,
       v.purchased,
-      v.purchased_price,
-      v.issued_price,
+      v.purchasedPrice,
+      v.issuedPrice,
     );
     vintage.lock(v.consumed);
     return vintage;

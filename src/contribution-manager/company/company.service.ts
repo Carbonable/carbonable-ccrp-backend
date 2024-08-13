@@ -1,4 +1,4 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/prisma.service';
 import { CsvService } from '../../csv/csv.service';
 import { Prisma } from '@prisma/client';
@@ -20,23 +20,24 @@ export class CompanyService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly csvService: CsvService,
+    private readonly csv: CsvService,
   ) {}
 
   async processCsv(fileBuffer: Buffer): Promise<{ message: string }> {
-    let records: Company[];
+    const data = await this.csv.parseCSV<Company>(
+      fileBuffer,
+      this.createCompany.bind(this),
+    );
 
-    try {
-      records = await this.csvService.parseCsvToArrayOfStrMap<Company>(
-        fileBuffer,
-      );
-      this.logger.debug(`Companies: ${JSON.stringify(records)}`);
-    } catch (error) {
-      this.logger.error(`Error parsing CSV file: ${error}`);
-      throw new BadRequestException('Invalid file format');
-    }
+    await this.prisma.createManyOfType(COMPANY_TABLE, data);
+    return { message: 'Company uploaded successfully' };
+  }
 
-    await this.prisma.createManyOfType(COMPANY_TABLE, records);
-    return { message: 'Companies file uploaded successfully' };
+  private createCompany(data: any): Company {
+    return {
+      id: this.csv.nonNullString(data, 'id'),
+      name: this.csv.nonNullString(data, 'name'),
+      slug: this.csv.nonNullString(data, 'slug'),
+    };
   }
 }

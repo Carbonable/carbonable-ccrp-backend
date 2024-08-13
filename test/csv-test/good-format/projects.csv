@@ -1,0 +1,4 @@
+id,name,slug,description,localization,start_date,end_date,area,type,origin,funding_amount,color,protected_species,protected_forest,risk_analysis,metadata,country_id,company_id
+1,Project A,project-a,Description of Project A,_location A,2020,2025,100,RESTORATION,FORWARD_FINANCE,50000.555,GREEN,10,50,_low,"{""key1"": ""value1""}",01J3DCPTDBETCZY5YQM041T0AZ,01H5739RTVV0JV8M3DAN0C10ME
+2,Project B,project-b,Description of Project B,_location B,2021,2026,200,CONSERVATION,DIRECT_PURCHASE,100000.0,BLUE,20,100,Med,"{""key2"": ""value2""}",01J3DCPTRWVKCSRK89NXVQM6F5,1
+3,Project C,project-c,Description of Project C,_location C,2022,2027,300,REFORESTATION,DIRECT_PURCHASE,75000.0,ORANGE,30,150,High,"{""key3"": ""value3""}",01J3DCPTRZ09HDQ1HW76E00S64,1

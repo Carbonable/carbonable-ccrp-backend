@@ -32,6 +32,19 @@ import { BusinessUnitController } from './business-unit/business-unit.controller
 import { CertifierService } from './certifier/certifier.service';
 import { ProjectSdgsService } from './project-sdgs/project-sdgs.service';
 import { ProjectSdgsController } from './project-sdgs/project-sdgs.controller';
+import { CountryService } from './country/country.service';
+import { CountryController } from './country/country.controller';
+import { ProjectService } from './project/project.service';
+import { ProjectController } from './project/project.controller';
+import { CarbonCreditService } from './carbon-credits/carbon-credits.service';
+import { CarbonCreditController } from './carbon-credits/carbon-credits.controller';
+import { ForecastEmissionController } from './forecast/forecast-emission.controller';
+import { ForecastTargetController } from './forecast/forecast-target.controller';
+import { ForecastService } from './forecast/forecast.service';
+import { AllocationController } from './allocations/allocations.controller';
+import { AllocationService } from './allocations/allocations.service';
+import { VintageController } from './vintage/vintage.controller';
+import { VintageService } from './vintage/vintage.service';
 
 @Module({
   providers: [
@@ -47,6 +60,7 @@ import { ProjectSdgsController } from './project-sdgs/project-sdgs.controller';
     VisualizationResolver,
     AllocationResolver,
     StockResolver,
+    ProjectService,
     GlobalDataService,
     ProjectedDecarbonationService,
     ImpactMetricsService,
@@ -57,13 +71,25 @@ import { ProjectSdgsController } from './project-sdgs/project-sdgs.controller';
     CertifierService,
     CompanyService,
     ProjectSdgsService,
+    CountryService,
     BusinessUnitService,
+    CarbonCreditService,
+    VintageService,
+    AllocationService,
+    ForecastService,
   ],
   controllers: [
+    ProjectController,
     DevelopperController,
     CompanyController,
     BusinessUnitController,
     ProjectSdgsController,
+    CountryController,
+    CarbonCreditController,
+    ForecastEmissionController,
+    ForecastTargetController,
+    VintageController,
+    AllocationController,
   ],
   exports: [
     CertifierResolver,

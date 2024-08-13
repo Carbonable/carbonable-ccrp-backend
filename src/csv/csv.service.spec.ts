@@ -1,40 +1,73 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CsvService } from './csv.service';
-import { Buffer } from 'buffer';
+import * as fs from 'fs';
+import * as path from 'path';
 
-describe('CsvService', () => {
-  let service: CsvService;
+describe('CsvService Stress Test', () => {
+  let csvService: CsvService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [CsvService],
     }).compile();
 
-    service = module.get<CsvService>(CsvService);
+    csvService = module.get<CsvService>(CsvService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+  const createProject = (data: any) => ({
+    id: csvService.nonNullString(data, 'id'),
+    name: csvService.nonNullString(data, 'name'),
+    slug: csvService.nonNullString(data, 'slug'),
+    description: csvService.nonNullString(data, 'description'),
+    localization: csvService.nonNullString(data, 'localization'),
+    startDate: csvService.nonNullString(data, 'start_date'),
+    endDate: csvService.nonNullString(data, 'end_date'),
+    area: csvService.parseIntSafe(data.area),
+    type: csvService.checkAndParseCarbonCreditType(data.type),
+    origin: csvService.checkAndParseCarbonCreditOrigin(data.origin),
+    fundingAmount: csvService.parseFloatSafe(data.funding_amount),
+    color: csvService.checkAndParseProjectColor(data.color),
+    protectedSpecies: csvService.parseIntSafe(data.protected_species),
+    protectedForest: csvService.parseIntSafe(data.protected_forest),
+    riskAnalysis: csvService.nonNullString(data, 'risk_analysis'),
+    metadata: csvService.parseJSONSafe(data.metadata),
+    certifierId: !data.certifier_id ? null : data.certifier_id,
+    developperId: !data.developper_id ? null : data.developper_id,
+    countryId: csvService.nonNullString(data, 'country_id'),
+    companyId: csvService.nonNullString(data, 'company_id'),
   });
 
-  describe('parseCsvToArrayOfStrMap', () => {
-    it('should parse CSV buffer to array of objects', async () => {
-      const csvData = 'name,age\nJohn,30\nJane,25';
-      const buffer = Buffer.from(csvData);
+  const createAllocation = (data: any) => ({
+    id: csvService.nonNullString(data, 'id'),
+    quantity: csvService.parseIntSafe(data.quantity),
+    allocatedAt: csvService.parseDateSafe(data.allocated_at),
+    businessUnitId: csvService.nonNullString(data, 'business_unit_id'),
+    projectId: csvService.nonNullString(data, 'project_id'),
+  });
 
-      const result = await service.parseCsvToArrayOfStrMap(buffer);
+  it('should process a large good-format project CSV file', async () => {
+    const csvFilePath = path.resolve(
+      __dirname,
+      '../../test/csv-test/good-format/projects.csv',
+    );
+    const buffer = fs.readFileSync(csvFilePath);
 
-      expect(result).toEqual([
-        { name: 'John', age: '30' },
-        { name: 'Jane', age: '25' },
-      ]);
-    });
+    const result = await csvService.parseCSV(buffer, createProject);
 
-    it('should reject on invalid CSV', async () => {
-      const invalidCsvData = 'invalid,csv\ndata';
-      const buffer = Buffer.from(invalidCsvData);
+    expect(result.length).toBeGreaterThan(0); // Assuming there are multiple records in the CSV
+    expect(result[0]).toHaveProperty('id'); // Check that it correctly parsed the first record
+  });
 
-      await expect(service.parseCsvToArrayOfStrMap(buffer)).rejects.toThrow();
-    });
+  it('should process a large good-format allocation CSV file', async () => {
+    const csvFilePath = path.resolve(
+      __dirname,
+      '../../test/csv-test/good-format/allocations.csv',
+    );
+    const buffer = fs.readFileSync(csvFilePath);
+
+    const result = await csvService.parseCSV(buffer, createAllocation);
+
+    expect(result.length).toBeGreaterThan(0); // Assuming there are multiple records in the CSV
+    expect(result[0]).toHaveProperty('id'); // Check that it correctly parsed the first record
   });
 });

@@ -227,8 +227,8 @@ model Stock {
   available       Int    @default(0)
   consumed        Int    @default(0)
   purchased       Int    @default(0)
-  purchased_price Int    @default(0)
-  issued_price    Int    @default(0)
+  purchasedPrice  Int    @default(0)@map("purchased_price")
+  issuedPrice     Int    @default(0)@map("issued_price")
   retired         Int    @default(0)
 
   businessUnitId String?       @map("business_unit_id")
@@ -251,8 +251,8 @@ model Vintage {
   reserved        Int    @default(0)
   consumed        Int    @default(0)
   purchased       Int    @default(0)
-  purchased_price Int    @default(0)
-  issued_price    Int    @default(0)
+  purchasedPrice  Int    @default(0) @map("purchased_price")
+  issuedPrice     Int    @default(0) @map("issued_price")
 
   projectId String  @map("project_id")
   project   Project @relation(fields: [projectId], references: [id])

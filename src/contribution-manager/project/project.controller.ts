@@ -7,28 +7,28 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Logger } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ProjectSdgsService } from './project-sdgs.service';
+import { ProjectService } from './project.service';
 import { Roles } from '../../roles/roles.decorator';
 import { Role } from '../../roles/role.enum';
 
-@ApiTags('project-sdgs')
-@Controller('project-sdgs')
-export class ProjectSdgsController {
-  private readonly logger = new Logger(ProjectSdgsController.name);
+@ApiTags('project')
+@Controller('project')
+export class ProjectController {
+  private readonly logger = new Logger(ProjectController.name);
 
-  constructor(private projectsSdgService: ProjectSdgsService) {}
+  constructor(private projectService: ProjectService) {}
 
   @Roles(Role.Admin)
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  @ApiOperation({ summary: 'Upload project_sdgs CSV file' })
+  @ApiOperation({ summary: 'Upload project CSV file' })
   @ApiResponse({ status: 201, description: 'File successfully processed.' })
   @ApiResponse({ status: 400, description: 'Invalid file format.' })
-  async uploadProjectSdgsCSV(
+  async uploadProjectCSV(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<{ message: string }> {
     this.logger.debug(`File uploaded: ${file.originalname}`);
 
-    return await this.projectsSdgService.processCsv(file.buffer);
+    return await this.projectService.processCsv(file.buffer);
   }
 }
