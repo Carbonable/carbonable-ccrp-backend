@@ -17,7 +17,7 @@ import { Role } from '../../roles/role.enum';
 export class ForecastTargetController {
   private readonly logger = new Logger(ForecastTargetController.name);
 
-  constructor(private carbonCreditService: ForecastService) {}
+  constructor(private forecastService: ForecastService) {}
 
   @Roles(Role.Admin)
   @Post('upload')
@@ -29,7 +29,7 @@ export class ForecastTargetController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<{ message: string }> {
     this.logger.debug(`File uploaded: ${file.originalname}`);
-    return await this.carbonCreditService.processCsv(
+    return await this.forecastService.processCsv(
       file.buffer,
       ForecastType.TARGET,
     );

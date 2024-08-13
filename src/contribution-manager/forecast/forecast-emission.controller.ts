@@ -17,7 +17,7 @@ import { ForecastType } from './types';
 export class ForecastEmissionController {
   private readonly logger = new Logger(ForecastEmissionController.name);
 
-  constructor(private carbonCreditService: ForecastService) {}
+  constructor(private forecastService: ForecastService) {}
 
   @Roles(Role.Admin)
   @Post('upload')
@@ -29,7 +29,7 @@ export class ForecastEmissionController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<{ message: string }> {
     this.logger.debug(`File uploaded: ${file.originalname}`);
-    return await this.carbonCreditService.processCsv(
+    return await this.forecastService.processCsv(
       file.buffer,
       ForecastType.EMISSION,
     );
