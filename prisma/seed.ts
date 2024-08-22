@@ -49,7 +49,6 @@ async function seedUsers() {
       await prisma.user.create({
         data,
       });
-    }
   }
 }
 
@@ -108,6 +107,7 @@ async function getAdmin(): Promise<any> {
     name,
     password: hashedPassword,
     roles,
+
     companyId: '1',
   };
 }

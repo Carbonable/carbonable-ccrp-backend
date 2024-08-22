@@ -16,7 +16,6 @@ export class AuthService {
     pass: string,
   ): Promise<{ access_token: string }> {
     const user = await this.usersService.findOneByName(username);
-    this.logger.log(username, ' wants to sign');
     if (!user || !(await bcryptjs.compare(pass, user.password))) {
       throw new UnauthorizedException(
         !user ? `User :${username} not found` : 'Invalid password',
