@@ -26,4 +26,4 @@ COPY --chown=carbonable:carbonable --from=builder /srv/www/prisma ./prisma
 
 EXPOSE 8080
 
-ENTRYPOINT ["npm", "run", "start:prod"]
+CMD ["npm", "run", "start:prod"]

@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../infrastructure/prisma.service';
 import * as request from 'supertest';
 import { Role } from '../roles/role.enum';
-import * as bcrypt from 'bcrypt';
+import * as bcryptjs from 'bcryptjs';
 import { INestApplication } from '@nestjs/common';
 import { AppModule } from '../app.module';
 import { ValidationPipe } from '@nestjs/common';
@@ -32,7 +32,7 @@ describe('AuthController (e2e)', () => {
         data: {
           id: '01J15QSHJBS6GKGXWTPDF1BYSH',
           name: 'admintest',
-          password: await bcrypt.hash('password', CARBONABLE_SALT),
+          password: await bcryptjs.hash('password', CARBONABLE_SALT),
           roles: [Role.User, Role.Admin],
         },
       });
@@ -41,7 +41,7 @@ describe('AuthController (e2e)', () => {
         data: {
           id: '02J15QSHJBS6GKGXWTPDF1BYSH',
           name: 'user',
-          password: await bcrypt.hash('password', CARBONABLE_SALT),
+          password: await bcryptjs.hash('password', CARBONABLE_SALT),
           roles: [Role.User],
         },
       });

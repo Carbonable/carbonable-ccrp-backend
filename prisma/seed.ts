@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 import { PrismaClient } from '@prisma/client';
 import { monotonicFactory } from 'ulid';
-import * as bcrypt from 'bcrypt';
+import * as bcryptjs from 'bcryptjs';
 
 const prisma = new PrismaClient();
 const ulid = monotonicFactory();
@@ -40,9 +40,11 @@ async function seedCountries() {
 
 async function seedUsers() {
   const data = await getAdmin();
-  await prisma.user.create({
-    data,
-  });
+  if (data) {
+    await prisma.user.create({
+      data,
+    });
+  }
 }
 
 async function seedSdgs() {
@@ -61,8 +63,9 @@ async function getAdmin(): Promise<any> {
   const name = process.env.DEFAULT_ADMIN_NAME;
   const password = process.env.DEFAULT_ADMIN_PASSWORD;
   const rolesEnv = process.env.DEFAULT_ADMIN_ROLES;
+  const CARBONABLE_SALT = process.env.CARBONABLE_SALT;
 
-  if (!rolesEnv || !name || !password) {
+  if (!rolesEnv || !name || !password || !CARBONABLE_SALT) {
     throw new Error(
       'DEFAULT_ADMIN_NAME, DEFAULT_ADMIN_PASSWORD, or DEFAULT_ADMIN_ROLES are not defined in the environment variables',
     );
@@ -72,17 +75,24 @@ async function getAdmin(): Promise<any> {
     where: { roles: { has: 'admin' } },
   });
 
-  if (!adminExists) {
-    const roles = rolesEnv.replace(/[\[\]']/g, '').split(',');
-    const CARBONABLE_SALT = parseInt(process.env.CARBONABLE_SALT);
-    const hashedPassword = await bcrypt.hash(password, CARBONABLE_SALT);
-    return {
-      id: ulid().toString(),
-      name,
-      password: hashedPassword,
-      roles,
-    };
+  if (adminExists) {
+    return null; // or return {}; to signify no need to create a new user
   }
+
+  const roles = rolesEnv.replace(/[\[\]']/g, '').split(',');
+
+  const salt = parseInt(CARBONABLE_SALT);
+  if (isNaN(salt)) {
+    throw Error('Carbonable salt is not an int');
+  }
+
+  const hashedPassword = await bcryptjs.hash(password, salt);
+  return {
+    id: ulid().toString(),
+    name,
+    password: hashedPassword,
+    roles,
+  };
 }
 
 async function getCountries(): Promise<any[]> {
