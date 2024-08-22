@@ -3,7 +3,7 @@ import {
   ConflictException,
   BadRequestException,
 } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
+import * as bcryptjs from 'bcryptjs';
 import { PrismaService } from '../infrastructure/prisma.service';
 import { Role } from '../roles/role.enum';
 import { Logger } from '@nestjs/common';
@@ -55,7 +55,7 @@ export class UsersService {
   }
   private async hashPassword(password: string): Promise<string> {
     const CARBONABLE_SALT = parseInt(process.env.CARBONABLE_SALT);
-    return await bcrypt.hash(password, CARBONABLE_SALT);
+    return await bcryptjs.hash(password, CARBONABLE_SALT);
   }
   async updateUserPassword(
     id: string,
@@ -70,7 +70,7 @@ export class UsersService {
     if (user.name !== name) {
       throw new BadRequestException('Username not matching token holders id');
     }
-    const isPasswordMatching = await bcrypt.compare(
+    const isPasswordMatching = await bcryptjs.compare(
       previousPassword,
       user.password,
     );

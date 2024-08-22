@@ -12,7 +12,7 @@ import {
   StockDataFixtures,
   VintageDataFixtures,
 } from './fixtures-data/fixtures-models';
-import * as bcrypt from 'bcrypt';
+import * as bcryptjs from 'bcryptjs';
 
 const ulid = monotonicFactory();
 
@@ -201,7 +201,7 @@ export class BuildFixturesCommand extends CommandRunner {
 
     const roles = rolesEnv.replace(/[\[\]']/g, '').split(',');
     const CARBONABLE_SALT = parseInt(process.env.CARBONABLE_SALT);
-    const hashedPassword = await bcrypt.hash(password, CARBONABLE_SALT);
+    const hashedPassword = await bcryptjs.hash(password, CARBONABLE_SALT);
     return {
       id: ulid().toString(),
       name,
