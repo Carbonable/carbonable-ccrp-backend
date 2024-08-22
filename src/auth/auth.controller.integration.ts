@@ -13,6 +13,8 @@ describe('AuthController (e2e)', () => {
   let server: INestApplication<any>;
   let jwtService: JwtService;
   let prismaService: PrismaService;
+  let adminToken: string;
+  let userToken: string;
   const CARBONABLE_SALT = parseInt(process.env.CARBONABLE_SALT);
   beforeAll(async () => {
     try {
