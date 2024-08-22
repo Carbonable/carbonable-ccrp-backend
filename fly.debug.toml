@@ -13,7 +13,6 @@ primary_region = 'cdg'
 # release_command = 'npx prisma migrate reset --force && npx prisma migrate deploy && npx prisma db seed'
 [env]
 
-
 [http_service]
   internal_port = 8080
   force_https = true
