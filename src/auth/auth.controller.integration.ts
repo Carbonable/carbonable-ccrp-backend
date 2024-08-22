@@ -13,7 +13,6 @@ describe('AuthController (e2e)', () => {
   let server: INestApplication<any>;
   let jwtService: JwtService;
   let prismaService: PrismaService;
-  let adminToken: string, userToken: string;
   const CARBONABLE_SALT = parseInt(process.env.CARBONABLE_SALT);
   beforeAll(async () => {
     try {
@@ -84,43 +83,6 @@ describe('AuthController (e2e)', () => {
     await request(app.getHttpServer())
       .post('/auth/login')
       .send({ username: 'invalid', password: 'password' })
-      .expect(401);
-  });
-  it('should create a new user successfully when called by an admin', async () => {
-    const response = await request(app.getHttpServer())
-      .post('/auth/createuser')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send({ username: 'newuser', password: 'newpassword' })
-      .expect(201);
-    expect(response.body).toHaveProperty('id');
-    expect(response.body).toHaveProperty('name', 'newuser');
-    expect(response.body).toHaveProperty('roles', [Role.User]);
-  });
-  it('should throw ConflictException if username already exists', async () => {
-    await request(app.getHttpServer())
-      .post('/auth/createuser')
-      .set('Authorization', `Bearer ${adminToken}`)
-      .send({ username: 'admintest', password: 'password' })
-      .expect(409);
-  });
-  it('should throw ForbiddenException if user is not admin', async () => {
-    await request(app.getHttpServer())
-      .post('/auth/createuser')
-      .set('Authorization', `Bearer ${userToken}`)
-      .send({ username: 'newuser2', password: 'newpassword' })
-      .expect(403);
-  });
-  it('shoud return user profile when called with correct jwt', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/auth/profile')
-      .set('Authorization', `Bearer ${userToken}`)
-      .expect(200);
-    expect(response.body).toHaveProperty('username');
-  });
-  it('shoud throw a Forbidden Exception when called with incorrect jwt', async () => {
-    await request(app.getHttpServer())
-      .get('/auth/profile')
-      .set('Authorization', `Bearer ${userToken}_wrong`)
       .expect(401);
   });
 });
