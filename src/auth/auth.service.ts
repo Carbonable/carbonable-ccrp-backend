@@ -1,10 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcryptjs from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
+  logger = new Logger(AuthService.name);
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
@@ -15,6 +16,7 @@ export class AuthService {
     pass: string,
   ): Promise<{ access_token: string }> {
     const user = await this.usersService.findOneByName(username);
+    this.logger.log(username, ' wants to sign');
     if (!user || !(await bcryptjs.compare(pass, user.password))) {
       throw new UnauthorizedException(
         !user ? `User :${username} not found` : 'Invalid password',
@@ -27,20 +29,6 @@ export class AuthService {
     };
     return {
       access_token: await this.jwtService.signAsync(payload),
-    };
-  }
-  async createUser(
-    username: string,
-    pass: string,
-  ): Promise<{ id: string; name: string; roles: string[] }> {
-    return this.usersService.createUser(username, pass);
-  }
-
-  async getUserProfile(userId: string) {
-    const user = await this.usersService.findOneById(userId);
-    return {
-      username: user.name,
-      roles: user.roles,
     };
   }
 }

@@ -10,6 +10,7 @@ async function seed() {
   try {
     await seedCountries();
     await seedSdgs();
+    await seedInitCompany();
     await seedUsers();
   } catch (e) {
     console.error(e);
@@ -41,9 +42,14 @@ async function seedCountries() {
 async function seedUsers() {
   const data = await getAdmin();
   if (data) {
-    await prisma.user.create({
-      data,
+    const user = await prisma.user.findFirst({
+      where: { id: '1' },
     });
+    if (!user) {
+      await prisma.user.create({
+        data,
+      });
+    }
   }
 }
 
@@ -59,6 +65,16 @@ async function seedSdgs() {
   }
 }
 
+async function seedInitCompany() {
+  const { id, name, slug } = await getInitCompany();
+  await prisma.company.create({
+    data: {
+      id,
+      name,
+      slug,
+    },
+  });
+}
 async function getAdmin(): Promise<any> {
   const name = process.env.DEFAULT_ADMIN_NAME;
   const password = process.env.DEFAULT_ADMIN_PASSWORD;
@@ -92,6 +108,7 @@ async function getAdmin(): Promise<any> {
     name,
     password: hashedPassword,
     roles,
+    companyId: '1',
   };
 }
 
@@ -122,4 +139,11 @@ async function getSdgs(): Promise<any[]> {
     { number: 16, name: 'Peace and Justice Strong Institutions' },
     { number: 17, name: 'Partnerships to achieve the Goal' },
   ];
+}
+async function getInitCompany(): Promise<any> {
+  return {
+    id: '1',
+    name: 'Company name to change',
+    slug: 'Company-name-to-change',
+  };
 }
