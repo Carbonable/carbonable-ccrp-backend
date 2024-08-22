@@ -49,6 +49,7 @@ async function seedUsers() {
       await prisma.user.create({
         data,
       });
+    }
   }
 }
 
