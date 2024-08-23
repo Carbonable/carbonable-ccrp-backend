@@ -4,9 +4,16 @@ import {
   UseInterceptors,
   UploadedFile,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiConsumes,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Logger } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ForecastService } from './forecast.service';
 import { ForecastType } from './types';
 import { Roles } from '../../roles/roles.decorator';
@@ -21,10 +28,23 @@ export class ForecastTargetController {
 
   @Roles(Role.Admin)
   @Post('upload')
+  @ApiBearerAuth()
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: 'Upload Forecast Target CSV file' })
   @ApiResponse({ status: 201, description: 'File successfully processed.' })
   @ApiResponse({ status: 400, description: 'Invalid file format.' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   async uploadForecastTargetsCsv(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<{ message: string }> {

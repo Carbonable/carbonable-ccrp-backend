@@ -19,12 +19,11 @@ import { Get } from '@nestjs/common';
 export class UserController {
   constructor(private userService: UsersService) {}
 
-  @ApiBearerAuth()
+  @Roles(Role.User)
   @ApiBody({ type: ChangePasswordDto })
   @Post('update-password')
   @ApiOperation({ summary: 'Change password' })
-  @Roles(Role.User)
-  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiResponse({ status: 200 })
   changePassword(@Req() req, @Body() body: ChangePasswordDto) {
     const { sub: userId } = req.user;
