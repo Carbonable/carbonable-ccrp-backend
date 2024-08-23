@@ -35,6 +35,7 @@ describe('AuthController (e2e)', () => {
           name: 'admintest',
           password: await bcryptjs.hash('password', CARBONABLE_SALT),
           roles: [Role.User, Role.Admin],
+          companyId: '1',
         },
       });
       // Insert regular user
@@ -44,6 +45,7 @@ describe('AuthController (e2e)', () => {
           name: 'user',
           password: await bcryptjs.hash('password', CARBONABLE_SALT),
           roles: [Role.User],
+          companyId: '1',
         },
       });
       // Generate tokens
