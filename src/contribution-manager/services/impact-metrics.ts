@@ -21,20 +21,21 @@ export class ImpactMetricsService {
 
   async get(view: VisualizationViewType) {
     const { linkedSdgs, metricsArr } = await this.fetchDataFromViewType(view);
-    const metrics = metricsArr.shift();
+    const { protected_forests, protected_species, absorbed_tons } =
+      metricsArr.shift();
 
     return {
       sdgs: linkedSdgs,
       protected_forest: Utils.formatString({
-        value: metrics.protected_forests.toString(),
+        value: protected_forests ?? '',
         suffix: 'ha',
       }),
       protected_species: Utils.formatString({
-        value: metrics.protected_species.toString(),
+        value: protected_species ?? '',
         prefix: '#',
       }),
       removed_tons: Utils.formatString({
-        value: metrics.absorbed_tons.toString(),
+        value: absorbed_tons ?? '',
         suffix: 't',
       }),
     };
