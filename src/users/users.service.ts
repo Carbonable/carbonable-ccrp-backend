@@ -28,9 +28,19 @@ export class UsersService {
     return this.prisma.user.findMany();
   }
 
+  async getUserProfile(userId: string) {
+    const user = await this.findOneById(userId);
+    return {
+      username: user.name,
+      roles: user.roles,
+      companyId: user.companyId,
+    };
+  }
+
   async createUser(
     name: string,
     password: string,
+    companyId: string,
   ): Promise<{ id: string; name: string; roles: string[] }> {
     const existingUser = await this.findOneByName(name);
     if (existingUser) {
@@ -44,6 +54,7 @@ export class UsersService {
         name,
         password: hashedPassword,
         roles: [Role.User],
+        companyId,
       },
     });
     this.logger.log(`User created: ${userCreated.name}  id:${userCreated.id}`);

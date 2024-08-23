@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
 
-export class UserDto {
+export class AuthDto {
   @ApiProperty({ description: 'The username of the user' })
   @IsString()
   username: string;
@@ -11,10 +11,4 @@ export class UserDto {
   })
   @IsString()
   password: string;
-
-  @ApiProperty({
-    description: 'The company of the user',
-  })
-  @IsString()
-  companyId: string;
 }

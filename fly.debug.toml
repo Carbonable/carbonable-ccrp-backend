@@ -10,7 +10,8 @@ primary_region = 'cdg'
 
 [deploy]
 ####### release command , just in case you want to reset the db. -> "reset db && refactor db && push constants in db (ex: countries,sdg, first admin etc...)" 
-# release_command = 'npx prisma migrate reset --force && npx prisma migrate deploy && npx prisma db seed'
+release_command = 'npx prisma migrate deploy && npx prisma db seed'
+
 [env]
 
 [http_service]
