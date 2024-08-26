@@ -71,11 +71,13 @@ describe('CompanyService - createCompany with CSV files', () => {
       { id: 1, name: 'Company A' },
       { id: 2, name: 'Company B' },
     ];
-    
-    (prismaService.company.findMany as jest.Mock).mockResolvedValue(mockCompanies);
-  
+
+    (prismaService.company.findMany as jest.Mock).mockResolvedValue(
+      mockCompanies,
+    );
+
     const result = await companyService.getCompanies();
-  
+
     expect(result).toEqual(mockCompanies);
     expect(prismaService.company.findMany).toHaveBeenCalledWith({
       include: { configuration: false, projects: false },

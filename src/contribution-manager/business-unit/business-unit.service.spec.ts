@@ -74,8 +74,10 @@ describe('BusinessUnitService - createBusinessUnit with CSV files', () => {
       { id: 2, name: 'Unit2', company: { id: 2, name: 'Company2' } },
     ];
 
-    (prismaService.businessUnit.findMany as jest.Mock).mockResolvedValue(mockBusinessUnits);
-  
+    (prismaService.businessUnit.findMany as jest.Mock).mockResolvedValue(
+      mockBusinessUnits,
+    );
+
     const result = await businessUnitService.getBusinessUnits();
 
     expect(result).toEqual(mockBusinessUnits);

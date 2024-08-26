@@ -53,7 +53,6 @@ export class ProjectController {
     return await this.projectService.processCsv(file.buffer);
   }
 
-  @Roles(Role.User)
   @Get()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get projects' })

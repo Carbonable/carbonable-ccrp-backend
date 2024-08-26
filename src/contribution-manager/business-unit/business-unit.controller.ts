@@ -53,7 +53,6 @@ export class BusinessUnitController {
     return await this.businessUnitService.processCsv(file.buffer);
   }
 
-  @Roles(Role.User)
   @Get()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get business units' })
