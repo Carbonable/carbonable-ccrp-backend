@@ -3,6 +3,7 @@ import {
   Post,
   UseInterceptors,
   UploadedFile,
+  Get,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -44,11 +45,21 @@ export class DevelopperController {
       },
     },
   })
+
   async uploadDevelopperCSV(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<{ message: string }> {
     this.logger.debug(`File uploaded: ${file.originalname}`);
 
     return await this.developperService.processCsv(file.buffer);
+  }
+
+  @Get()
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get all developpers' })
+  @ApiResponse({ status: 200, description: 'Return all developpers' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getAllDeveloppers() {
+    return await this.developperService.getDeveloppers();
   }
 }

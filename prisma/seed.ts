@@ -30,7 +30,7 @@ async function seedCountries() {
   for (const country of countries) {
     await prisma.country.create({
       data: {
-        id: ulid().toString(),
+        id: country.cca2,
         name: country.name.common,
         code: country.cca2,
         data: country,
@@ -58,7 +58,7 @@ async function seedSdgs() {
   for (const sdg of sdgs) {
     await prisma.sdg.create({
       data: {
-        id: ulid().toString(),
+        id: sdg.number.toString(),
         ...sdg,
       },
     });
