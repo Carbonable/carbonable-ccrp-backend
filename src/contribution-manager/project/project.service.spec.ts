@@ -89,8 +89,10 @@ describe('ProjectService - createProject with CSV files', () => {
       },
     ];
 
-    (prismaService.project.findMany as jest.Mock).mockResolvedValue(mockProjects);
-  
+    (prismaService.project.findMany as jest.Mock).mockResolvedValue(
+      mockProjects,
+    );
+
     const result = await projectService.getProjects();
 
     expect(result).toEqual(mockProjects);

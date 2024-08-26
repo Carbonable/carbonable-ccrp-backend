@@ -53,7 +53,6 @@ export class CompanyController {
     return await this.companyService.processCsv(file.buffer);
   }
 
-  @Roles(Role.User)
   @Get()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get companies' })
