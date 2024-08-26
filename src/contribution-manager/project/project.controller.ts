@@ -3,6 +3,7 @@ import {
   Post,
   UseInterceptors,
   UploadedFile,
+  Get,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -50,5 +51,15 @@ export class ProjectController {
     this.logger.debug(`File uploaded: ${file.originalname}`);
 
     return await this.projectService.processCsv(file.buffer);
+  }
+
+  @Roles(Role.User)
+  @Get()
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get projects' })
+  @ApiResponse({ status: 200, description: 'Return projects.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  async getProjects(): Promise<any> {
+    return await this.projectService.getProjects();
   }
 }

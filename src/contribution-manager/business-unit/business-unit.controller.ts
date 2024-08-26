@@ -3,6 +3,7 @@ import {
   Post,
   UseInterceptors,
   UploadedFile,
+  Get,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -50,5 +51,15 @@ export class BusinessUnitController {
     this.logger.debug(`File uploaded: ${file.originalname}`);
 
     return await this.businessUnitService.processCsv(file.buffer);
+  }
+
+  @Roles(Role.User)
+  @Get()
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get business units' })
+  @ApiResponse({ status: 200, description: 'Return business units.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  async getBusinessUnits() {
+    return this.businessUnitService.getBusinessUnits();
   }
 }

@@ -40,4 +40,10 @@ export class CompanyService {
       slug: this.csv.nonNullString(data, 'slug'),
     };
   }
+
+  async getCompanies(): Promise<Company[]> {
+    return this.prisma.company.findMany({
+      include: { configuration: false, projects: false },
+    });
+  }
 }
