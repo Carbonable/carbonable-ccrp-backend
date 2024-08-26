@@ -4,7 +4,6 @@ import { CsvService } from '../../csv/csv.service';
 import { PrismaService } from '../../infrastructure/prisma.service';
 import * as fs from 'fs';
 import * as path from 'path';
-import { de } from '@faker-js/faker';
 
 describe('CompanyService - createCompany with CSV files', () => {
   let companyService: CompanyService;
@@ -61,32 +60,15 @@ describe('CompanyService - createCompany with CSV files', () => {
       ),
     ).rejects.toThrowError('Invalid file format');
   });
-});
-
-describe('CompanyService - getCompanies', () => {
-  let companyService: CompanyService;
-
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        CompanyService,
-        {
-          provide: PrismaService,
-          useValue: {
-            company: {
-              findMany: jest.fn(), // Mock the PrismaService
-            },
-          },
-        },
-      ],
-    }).compile();
-
-    companyService = module.get<CompanyService>(CompanyService);
-  });
 
   it('should return a list of companies when there are companies in the database', async () => {
-    const mockCompanies = [{ id: 1, name: 'Company A' }, { id: 2, name: 'Company B' }];
-    const prismaService = { company: { findMany: jest.fn().mockResolvedValue(mockCompanies) } };
+    const mockCompanies = [
+      { id: 1, name: 'Company A' },
+      { id: 2, name: 'Company B' },
+    ];
+    const prismaService = {
+      company: { findMany: jest.fn().mockResolvedValue(mockCompanies) },
+    };
 
     const result = await companyService.getCompanies();
 
@@ -96,3 +78,4 @@ describe('CompanyService - getCompanies', () => {
     });
   });
 });
+

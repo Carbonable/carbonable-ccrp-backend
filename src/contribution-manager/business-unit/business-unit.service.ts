@@ -35,7 +35,14 @@ export class BusinessUnitService {
 
   async getBusinessUnits(): Promise<BusinessUnit[]> {
     return this.prisma.businessUnit.findMany({
-      include: { forecastEmissions: false, forecastTargets: false, allocations: false, orders: false, company: true, Stock: false },
+      include: {
+        forecastEmissions: false,
+        forecastTargets: false,
+        allocations: false,
+        orders: false,
+        company: true,
+        Stock: false,
+      },
     });
   }
 

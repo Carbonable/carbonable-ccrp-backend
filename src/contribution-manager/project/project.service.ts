@@ -39,7 +39,17 @@ export class ProjectService {
 
   async getProjects(): Promise<Project[]> {
     return this.prisma.project.findMany({
-      include: { carbonCredits: false, certifier: true, developper: true, country: true, company: true, projectsSdgs: true, stock: false, vintages: false, allocations: false },
+      include: {
+        carbonCredits: false,
+        certifier: true,
+        developper: true,
+        country: true,
+        company: true,
+        projectsSdgs: true,
+        stock: false,
+        vintages: false,
+        allocations: false,
+      },
     });
   }
   private createProject(data: any): Project {

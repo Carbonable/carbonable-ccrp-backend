@@ -62,5 +62,4 @@ export class CompanyController {
   async getCompanies(): Promise<any> {
     return await this.companyService.getCompanies();
   }
-
 }
