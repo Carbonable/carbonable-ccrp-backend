@@ -45,7 +45,6 @@ export class DevelopperController {
       },
     },
   })
-
   async uploadDevelopperCSV(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<{ message: string }> {
