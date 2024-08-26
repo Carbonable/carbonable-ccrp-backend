@@ -8,6 +8,7 @@ import * as path from 'path';
 describe('BusinessUnitService - createBusinessUnit with CSV files', () => {
   let businessUnitService: BusinessUnitService;
   let csvService: CsvService;
+  let prismaService: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -18,11 +19,15 @@ describe('BusinessUnitService - createBusinessUnit with CSV files', () => {
           provide: PrismaService,
           useValue: {
             createManyOfType: jest.fn(), // Mock the PrismaService
+            businessUnit: {
+              findMany: jest.fn(),
+            },
           },
         },
       ],
     }).compile();
 
+    prismaService = module.get<PrismaService>(PrismaService);
     businessUnitService = module.get<BusinessUnitService>(BusinessUnitService);
     csvService = module.get<CsvService>(CsvService);
   });
@@ -69,12 +74,8 @@ describe('BusinessUnitService - createBusinessUnit with CSV files', () => {
       { id: 2, name: 'Unit2', company: { id: 2, name: 'Company2' } },
     ];
 
-    const prismaService = {
-      businessUnit: {
-        findMany: jest.fn().mockResolvedValue(mockBusinessUnits),
-      },
-    };
-
+    (prismaService.businessUnit.findMany as jest.Mock).mockResolvedValue(mockBusinessUnits);
+  
     const result = await businessUnitService.getBusinessUnits();
 
     expect(result).toEqual(mockBusinessUnits);
@@ -90,4 +91,3 @@ describe('BusinessUnitService - createBusinessUnit with CSV files', () => {
     });
   });
 });
-

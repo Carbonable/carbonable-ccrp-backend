@@ -8,6 +8,7 @@ import * as path from 'path';
 describe('ProjectService - createProject with CSV files', () => {
   let projectService: ProjectService;
   let csvService: CsvService;
+  let prismaService: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -18,11 +19,15 @@ describe('ProjectService - createProject with CSV files', () => {
           provide: PrismaService,
           useValue: {
             createManyOfType: jest.fn(), // Mock the PrismaService
+            project: {
+              findMany: jest.fn(),
+            },
           },
         },
       ],
     }).compile();
 
+    prismaService = module.get<PrismaService>(PrismaService);
     projectService = module.get<ProjectService>(ProjectService);
     csvService = module.get<CsvService>(CsvService);
   });
@@ -83,9 +88,9 @@ describe('ProjectService - createProject with CSV files', () => {
         projectsSdgs: [],
       },
     ];
-    const prismaService = {
-      project: { findMany: jest.fn().mockResolvedValue(mockProjects) },
-    };
+
+    (prismaService.project.findMany as jest.Mock).mockResolvedValue(mockProjects);
+  
     const result = await projectService.getProjects();
 
     expect(result).toEqual(mockProjects);
