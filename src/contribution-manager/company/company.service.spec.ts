@@ -8,6 +8,7 @@ import * as path from 'path';
 describe('CompanyService - createCompany with CSV files', () => {
   let companyService: CompanyService;
   let csvService: CsvService;
+  let prismaService: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -18,11 +19,15 @@ describe('CompanyService - createCompany with CSV files', () => {
           provide: PrismaService,
           useValue: {
             createManyOfType: jest.fn(), // Mock the PrismaService
+            company: {
+              findMany: jest.fn(),
+            },
           },
         },
       ],
     }).compile();
 
+    prismaService = module.get<PrismaService>(PrismaService);
     companyService = module.get<CompanyService>(CompanyService);
     csvService = module.get<CsvService>(CsvService);
   });
@@ -66,16 +71,14 @@ describe('CompanyService - createCompany with CSV files', () => {
       { id: 1, name: 'Company A' },
       { id: 2, name: 'Company B' },
     ];
-    const prismaService = {
-      company: { findMany: jest.fn().mockResolvedValue(mockCompanies) },
-    };
-
+    
+    (prismaService.company.findMany as jest.Mock).mockResolvedValue(mockCompanies);
+  
     const result = await companyService.getCompanies();
-
+  
     expect(result).toEqual(mockCompanies);
     expect(prismaService.company.findMany).toHaveBeenCalledWith({
       include: { configuration: false, projects: false },
     });
   });
 });
-
