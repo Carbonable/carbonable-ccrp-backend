@@ -33,6 +33,12 @@ export class BusinessUnitService {
     return { message: `BusinessUnits uploaded successfully` };
   }
 
+  async getBusinessUnits(): Promise<BusinessUnit[]> {
+    return this.prisma.businessUnit.findMany({
+      include: { forecastEmissions: false, forecastTargets: false, allocations: false, orders: false, company: true, Stock: false },
+    });
+  }
+
   private createBusinessUnit(data: any): BusinessUnit {
     return {
       id: this.csv.nonNullString(data, 'id'),

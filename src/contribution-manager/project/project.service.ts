@@ -36,6 +36,12 @@ export class ProjectService {
 
     return { message: `Projects uploaded successfully` };
   }
+
+  async getProjects(): Promise<Project[]> {
+    return this.prisma.project.findMany({
+      include: { carbonCredits: false, certifier: true, developper: true, country: true, company: true, projectsSdgs: true, stock: false, vintages: false, allocations: false },
+    });
+  }
   private createProject(data: any): Project {
     return {
       id: this.csv.nonNullString(data, 'id'),

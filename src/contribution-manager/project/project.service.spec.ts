@@ -4,6 +4,7 @@ import { CsvService } from '../../csv/csv.service';
 import { PrismaService } from '../../infrastructure/prisma.service';
 import * as fs from 'fs';
 import * as path from 'path';
+import { de } from '@faker-js/faker';
 
 describe('ProjectService - createProject with CSV files', () => {
   let projectService: ProjectService;
@@ -62,5 +63,41 @@ describe('ProjectService - createProject with CSV files', () => {
         projectService['createProject'].bind(projectService),
       ),
     ).rejects.toThrowError('Invalid file format');
+  });
+});
+
+describe('ProjectService - getProjects', () => {
+  let projectService: ProjectService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        ProjectService,
+        {
+          provide: PrismaService,
+          useValue: {
+            project: {
+              findMany: jest.fn(),
+            },
+          },
+        },
+      ],
+    }).compile();
+
+    projectService = module.get<ProjectService>(ProjectService);
+  });
+
+  it('should retrieve all projects with specified relations included when projects exist', async () => {
+    const mockProjects = [
+      { id: 1, certifier: {}, developper: {}, country: {}, company: {}, projectsSdgs: [] },
+      { id: 2, certifier: {}, developper: {}, country: {}, company: {}, projectsSdgs: [] }
+    ];
+    const prismaService = { project: { findMany: jest.fn().mockResolvedValue(mockProjects) } };
+    const result = await projectService.getProjects();
+
+    expect(result).toEqual(mockProjects);
+    expect(prismaService.project.findMany).toHaveBeenCalledWith({
+      include: { carbonCredits: false, certifier: true, developper: true, country: true, company: true, projectsSdgs: true, stock: false, vintages: false, allocations: false },
+    });
   });
 });

@@ -3,6 +3,7 @@ import {
   Post,
   UseInterceptors,
   UploadedFile,
+  Get,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -51,4 +52,15 @@ export class CompanyController {
 
     return await this.companyService.processCsv(file.buffer);
   }
+
+  @Roles(Role.User)
+  @Get()
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get companies' })
+  @ApiResponse({ status: 200, description: 'Return companies.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  async getCompanies(): Promise<any> {
+    return await this.companyService.getCompanies();
+  }
+
 }

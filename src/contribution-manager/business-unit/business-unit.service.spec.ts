@@ -63,3 +63,41 @@ describe('BusinessUnitService - createBusinessUnit with CSV files', () => {
     ).rejects.toThrowError('Invalid file format');
   });
 });
+
+describe('BusinessUnitService - getBusinessUnits', () => {
+  let businessUnitService: BusinessUnitService;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        BusinessUnitService,
+        {
+          provide: PrismaService,
+          useValue: {
+            businessUnit: {
+              findMany: jest.fn(), // Mock the PrismaService
+            },
+          },
+        },
+      ],
+    }).compile();
+
+    businessUnitService = module.get<BusinessUnitService>(BusinessUnitService);
+  });
+
+  it('should retrieve all business units when database has entries', async () => {
+    const mockBusinessUnits = [
+      { id: 1, name: 'Unit1', company: { id: 1, name: 'Company1' } },
+      { id: 2, name: 'Unit2', company: { id: 2, name: 'Company2' } }
+    ];
+
+    const prismaService = { businessUnit: { findMany: jest.fn().mockResolvedValue(mockBusinessUnits) } };
+
+    const result = await businessUnitService.getBusinessUnits();
+
+    expect(result).toEqual(mockBusinessUnits);
+    expect(prismaService.businessUnit.findMany).toHaveBeenCalledWith({
+      include: { forecastEmissions: false, forecastTargets: false, allocations: false, orders: false, company: true, Stock: false },
+    });
+  });
+});
