@@ -1,52 +1,65 @@
+import { clerkClient } from '@clerk/clerk-sdk-node';
 import {
+  Injectable,
   CanActivate,
   ExecutionContext,
-  Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { jwtConstants } from './constants';
-import { Request } from 'express';
-import { IS_PUBLIC_KEY } from './auth.public.decorator';
 import { Reflector } from '@nestjs/core';
+import { IS_PUBLIC_KEY } from './auth.public.decorator';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
-  constructor(private jwtService: JwtService, private reflector: Reflector) {}
-
+export class ClerkAuthGuard implements CanActivate {
+  private readonly logger = new Logger(ClerkAuthGuard.name);
+  constructor(private reflector: Reflector) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+    const isPublic = this.reflector.get<boolean>(
+      IS_PUBLIC_KEY,
       context.getHandler(),
-      context.getClass(),
-    ]);
+    );
     if (isPublic) {
+      this.logger.log('Public route, bypassing authentication');
       return true;
     }
 
-    const request = this.getRequest(context);
-    const token = this.extractTokenFromHeader(request);
-    if (!token) {
-      throw new UnauthorizedException();
-    }
-    try {
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret: jwtConstants.secret,
-      });
-      request['user'] = payload;
-    } catch {
-      throw new UnauthorizedException();
-    }
-    return true;
-  }
-
-  private getRequest(context: ExecutionContext): Request {
     const ctx = GqlExecutionContext.create(context);
-    return ctx.getContext().req || context.switchToHttp().getRequest();
-  }
+    const request = ctx.getContext().req;
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+    // Extract the Authorization header
+    const authHeader = request.headers.authorization;
+
+    if (!authHeader) {
+      this.logger.warn('No Authorization header found');
+      throw new UnauthorizedException('Authorization header is missing');
+    }
+
+    // Extract the Bearer token from the Authorization header
+    const token = authHeader.split(' ')[1];
+
+    if (!token) {
+      this.logger.warn('No Bearer token found in Authorization header');
+      throw new UnauthorizedException('Bearer token is missing');
+    }
+
+    try {
+      const verifiedToken = await clerkClient.verifyToken(token);
+      this.logger.log(verifiedToken);
+      const role = verifiedToken.organizations[process.env.ORG_ID];
+      if (!role) {
+        throw new UnauthorizedException(
+          'User is not part of the required organization',
+        );
+      }
+
+      request.user = verifiedToken;
+      request.currentRole = role;
+      this.logger.log('Token verified successfully');
+      return true;
+    } catch (err) {
+      this.logger.error('Token verification failed', err);
+      throw new UnauthorizedException('Invalid token');
+    }
   }
 }

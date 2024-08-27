@@ -176,17 +176,6 @@ export class BuildFixturesCommand extends CommandRunner {
     );
     return await res.json();
   }
-  async seedUsers() {
-    const adminExists = await this.prisma.user.findFirst({
-      where: { roles: { has: 'admin' } },
-    });
-    if (!adminExists) {
-      const data = await this.getAdmin();
-      await this.prisma.user.create({
-        data,
-      });
-    }
-  }
 
   async getAdmin(): Promise<any> {
     const name = process.env.DEFAULT_ADMIN_NAME;
@@ -213,7 +202,6 @@ export class BuildFixturesCommand extends CommandRunner {
   async run(): Promise<void> {
     try {
       await this.seedCountries();
-      await this.seedUsers();
       await this.addFixtures({
         connection: this.prisma,
       });
