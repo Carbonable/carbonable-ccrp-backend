@@ -1,7 +1,6 @@
 /// <reference lib="dom" />
 import { PrismaClient } from '@prisma/client';
 import { monotonicFactory } from 'ulid';
-import * as bcryptjs from 'bcryptjs';
 
 const prisma = new PrismaClient();
 const ulid = monotonicFactory();
@@ -37,20 +36,6 @@ async function seedCountries() {
     });
   }
 }
-
-// async function seedUsers() {
-//   const data = await getAdmin();
-//   if (data) {
-//     const user = await prisma.user.findFirst({
-//       where: { id: '1' },
-//     });
-//     if (!user) {
-//       await prisma.user.create({
-//         data,
-//       });
-//     }
-//   }
-// }
 
 async function seedSdgs() {
   const sdgs = await getSdgs();
