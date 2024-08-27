@@ -72,7 +72,7 @@ export class ProjectMetricsService {
         blue: {
           key: 'Coasts & Submarine',
           value: Utils.formatString({
-            value: percentages.green_count,
+            value: percentages.blue_count,
             suffix: '%',
           }),
         },
