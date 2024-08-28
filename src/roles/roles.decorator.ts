@@ -3,11 +3,11 @@ import { Role } from './role.enum';
 import { ApiResponse } from '@nestjs/swagger';
 
 export const ROLES_KEY = 'roles';
-export const Roles = (...roles: Role[]) =>
+export const Roles = (role: Role) =>
   applyDecorators(
     ApiResponse({
       status: 403,
-      description: `Forbidden: Requires: ${roles.join(', ')}`,
+      description: `Forbidden: Requires role ${role}`,
     }),
-    SetMetadata(ROLES_KEY, roles),
+    SetMetadata(ROLES_KEY, role),
   );

@@ -126,7 +126,6 @@ model Company {
   projectionSnapshots          ProjectionSnapshot[]
   HistoricalProjectionSnapshot HistoricalProjectionSnapshot[]
   businessUnits                BusinessUnit[]
-  users                        User[]
 
   @@map("company")
 }
@@ -328,17 +327,6 @@ model Sdg {
   ProjectsSdgs ProjectsSdgs[]
 
   @@map("sdg")
-}
-model User {
-  id           String  @id
-  name         String  @unique
-  password     String
-  roles        String[]
-  company      Company       @relation(fields: [companyId], references: [id])
-  companyId    String       @map("company_id")
-
-  
-  @@map("user")
 }
 
 model ProjectsSdgs {
