@@ -1,7 +1,6 @@
 /// <reference lib="dom" />
 import { PrismaClient } from '@prisma/client';
 import { monotonicFactory } from 'ulid';
-import * as bcryptjs from 'bcryptjs';
 
 const prisma = new PrismaClient();
 const ulid = monotonicFactory();
@@ -11,7 +10,6 @@ async function seed() {
     await seedCountries();
     await seedSdgs();
     await seedInitCompany();
-    await seedUsers();
   } catch (e) {
     console.error(e);
     process.exit(1);
@@ -39,20 +37,6 @@ async function seedCountries() {
   }
 }
 
-async function seedUsers() {
-  const data = await getAdmin();
-  if (data) {
-    const user = await prisma.user.findFirst({
-      where: { id: '1' },
-    });
-    if (!user) {
-      await prisma.user.create({
-        data,
-      });
-    }
-  }
-}
-
 async function seedSdgs() {
   const sdgs = await getSdgs();
   for (const sdg of sdgs) {
@@ -74,43 +58,6 @@ async function seedInitCompany() {
       slug,
     },
   });
-}
-async function getAdmin(): Promise<any> {
-  const name = process.env.DEFAULT_ADMIN_NAME;
-  const password = process.env.DEFAULT_ADMIN_PASSWORD;
-  const rolesEnv = process.env.DEFAULT_ADMIN_ROLES;
-  const CARBONABLE_SALT = process.env.CARBONABLE_SALT;
-
-  if (!rolesEnv || !name || !password || !CARBONABLE_SALT) {
-    throw new Error(
-      'DEFAULT_ADMIN_NAME, DEFAULT_ADMIN_PASSWORD, or DEFAULT_ADMIN_ROLES are not defined in the environment variables',
-    );
-  }
-
-  const adminExists = await prisma.user.findFirst({
-    where: { roles: { has: 'admin' } },
-  });
-
-  if (adminExists) {
-    return null; // or return {}; to signify no need to create a new user
-  }
-
-  const roles = rolesEnv.replace(/[\[\]']/g, '').split(',');
-
-  const salt = parseInt(CARBONABLE_SALT);
-  if (isNaN(salt)) {
-    throw Error('Carbonable salt is not an int');
-  }
-
-  const hashedPassword = await bcryptjs.hash(password, salt);
-  return {
-    id: ulid().toString(),
-    name,
-    password: hashedPassword,
-    roles,
-
-    companyId: '1',
-  };
 }
 
 async function getCountries(): Promise<any[]> {
