@@ -1,4 +1,3 @@
-/// <reference lib="dom" />
 import { PrismaClient } from '@prisma/client';
 import { monotonicFactory } from 'ulid';
 import * as bcryptjs from 'bcryptjs';
