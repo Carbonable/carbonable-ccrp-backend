@@ -1,39 +1,39 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  Logger,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from './roles.decorator';
-import { Role } from './role.enum';
-import { IS_PUBLIC_KEY } from '../auth/auth.public.decorator';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
+  private readonly logger = new Logger(RolesGuard.name);
+
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+    // Get the required role from the route's metadata
+    const requiredRole = this.reflector.getAllAndOverride<string>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
-    if (isPublic) {
-      return true;
-    }
-
-    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-    if (!requiredRoles) {
-      return true;
-    }
-
-    const request = this.getRequest(context);
-    const { user } = request;
-
-    return requiredRoles.some((role) => user.roles?.includes(role));
-  }
-
-  private getRequest(context: ExecutionContext): any {
     const ctx = GqlExecutionContext.create(context);
-    return ctx.getContext().req || context.switchToHttp().getRequest();
+    const request = ctx.getContext().req;
+    const role = request.currentRole;
+    if (!requiredRole) {
+      return true;
+    }
+    if (!role) {
+      this.logger.warn('User roles not found on request');
+      return false;
+    }
+    const hasRole = role === requiredRole;
+    if (!hasRole) {
+      this.logger.warn(`User does not have the required role: ${requiredRole}`);
+    }
+    return hasRole;
   }
 }
