@@ -12,7 +12,6 @@ import {
   StockDataFixtures,
   VintageDataFixtures,
 } from './fixtures-data/fixtures-models';
-import * as bcryptjs from 'bcryptjs';
 
 const ulid = monotonicFactory();
 
@@ -175,28 +174,6 @@ export class BuildFixturesCommand extends CommandRunner {
       'https://raw.githubusercontent.com/mledoze/countries/master/countries.json',
     );
     return await res.json();
-  }
-
-  async getAdmin(): Promise<any> {
-    const name = process.env.DEFAULT_ADMIN_NAME;
-    const password = process.env.DEFAULT_ADMIN_PASSWORD;
-    const rolesEnv = process.env.DEFAULT_ADMIN_ROLES;
-
-    if (!rolesEnv || !name || !password) {
-      throw new Error(
-        'DEFAULT_ADMIN_NAME, DEFAULT_ADMIN_PASSWORD, or DEFAULT_ADMIN_ROLES are not defined in the environment variables',
-      );
-    }
-
-    const roles = rolesEnv.replace(/[\[\]']/g, '').split(',');
-    const CARBONABLE_SALT = parseInt(process.env.CARBONABLE_SALT);
-    const hashedPassword = await bcryptjs.hash(password, CARBONABLE_SALT);
-    return {
-      id: ulid().toString(),
-      name,
-      password: hashedPassword,
-      roles,
-    };
   }
 
   async run(): Promise<void> {
