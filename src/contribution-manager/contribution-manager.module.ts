@@ -44,6 +44,7 @@ import { AllocationController } from './allocations/allocations.controller';
 import { AllocationService } from './allocations/allocations.service';
 import { VintageController } from './vintage/vintage.controller';
 import { VintageService } from './vintage/vintage.service';
+import { CertifierController } from './certifier/certifier.controller';
 
 @Module({
   providers: [
@@ -80,6 +81,7 @@ import { VintageService } from './vintage/vintage.service';
   controllers: [
     ProjectController,
     DevelopperController,
+    CertifierController,
     CompanyController,
     BusinessUnitController,
     ProjectSdgsController,

@@ -32,6 +32,11 @@ export class CertifierService {
     return { message: 'Certifier uploaded successfully' };
   }
 
+  // get all certifiers
+  async getCertifiers(): Promise<Certifier[]> {
+    return this.prisma.certifier.findMany();
+  }
+
   private createCertifier(data: any): Certifier {
     return {
       id: this.csv.nonNullString(data, 'id'),

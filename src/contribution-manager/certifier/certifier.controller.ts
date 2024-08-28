@@ -3,6 +3,7 @@ import {
   Post,
   UseInterceptors,
   UploadedFile,
+  Get,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -50,5 +51,14 @@ export class CertifierController {
     this.logger.debug(`File uploaded: ${file.originalname}`);
 
     return await this.certifierService.processCsv(file.buffer);
+  }
+
+  @Get()
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get all certifiers' })
+  @ApiResponse({ status: 200, description: 'Return all certifiers' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getCertifiers() {
+    return await this.certifierService.getCertifiers();
   }
 }

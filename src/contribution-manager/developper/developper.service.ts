@@ -32,6 +32,10 @@ export class DevelopperService {
     return { message: 'Developper uploaded successfully' };
   }
 
+  async getDeveloppers(): Promise<Developper[]> {
+    return this.prisma.developper.findMany();
+  }
+
   private createDevelopper(data: any): Developper {
     return {
       id: this.csv.nonNullString(data, 'id'),

@@ -27,15 +27,15 @@ export class ImpactMetricsService {
     return {
       sdgs: linkedSdgs,
       protected_forest: Utils.formatString({
-        value: protected_forests ?? '',
+        value: protected_forests ?? '0',
         suffix: 'ha',
       }),
       protected_species: Utils.formatString({
-        value: protected_species ?? '',
+        value: protected_species ?? '0',
         prefix: '#',
       }),
       removed_tons: Utils.formatString({
-        value: absorbed_tons ?? '',
+        value: absorbed_tons ?? '0',
         suffix: 't',
       }),
     };
