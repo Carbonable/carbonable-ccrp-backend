@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/prisma.service';
 import { CsvService } from '../../csv/csv.service';
-import { Vintage } from 'src/domain/portfolio';
+import { Vintage } from '../../domain/portfolio';
 import { UlidIdGenerator } from 'src/domain/common';
 
 type AbsorptionCurveType = {
