@@ -45,6 +45,8 @@ import { AllocationService } from './allocations/allocations.service';
 import { VintageController } from './vintage/vintage.controller';
 import { VintageService } from './vintage/vintage.service';
 import { CertifierController } from './certifier/certifier.controller';
+import { AbsorptionCurveService } from './absorption-curve/absorption-curve.service';
+import { AbsorptionController } from './absorption-curve/absorption-curve.controller';
 
 @Module({
   providers: [
@@ -74,6 +76,7 @@ import { CertifierController } from './certifier/certifier.controller';
     CountryService,
     BusinessUnitService,
     CarbonCreditService,
+    AbsorptionCurveService,
     VintageService,
     AllocationService,
     ForecastService,
@@ -89,6 +92,7 @@ import { CertifierController } from './certifier/certifier.controller';
     CarbonCreditController,
     ForecastEmissionController,
     ForecastTargetController,
+    AbsorptionController,
     VintageController,
     AllocationController,
   ],

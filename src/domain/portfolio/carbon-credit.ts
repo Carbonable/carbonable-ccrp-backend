@@ -16,6 +16,7 @@ export type CurvePoint = {
   absorption: number;
   issuedPrice?: number;
   purchasedPrice?: number;
+  projectId?: string;
 };
 
 export class CarbonCredit {
