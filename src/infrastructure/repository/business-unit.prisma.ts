@@ -12,6 +12,7 @@ import {
 } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { Allocation } from '../../domain/allocation';
+import { Metadata } from 'src/domain/common/metadata-parser';
 
 export const BUSINESS_UNIT_REPOSITORY = 'BUSINESS_UNIT_REPOSITORY';
 
@@ -130,6 +131,12 @@ export class PrismaBusinessUnitRepository
 
 export function prismaToBusinessUnit(bus: BusinessUnitModel[]): BusinessUnit[] {
   return bus.map((b) => {
+    const metadata =
+      typeof b.metadata === 'string' ? JSON.parse(b.metadata) : b.metadata;
+
+    const metadataEntries = Object.entries(metadata || {}).map(
+      ([key, value]) => ({ key, value }),
+    );
     const bu = new BusinessUnit(
       b.id,
       b.name,
@@ -138,7 +145,7 @@ export function prismaToBusinessUnit(bus: BusinessUnitModel[]): BusinessUnit[] {
       b.defaultTarget,
       b.debt,
       b.companyId,
-      JSON.parse(b.metadata.toString()),
+      metadataEntries as Metadata<string, string>[],
     );
     bu.addTargets(
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
