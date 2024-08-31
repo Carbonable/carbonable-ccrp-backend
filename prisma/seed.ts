@@ -1,8 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { monotonicFactory } from 'ulid';
 
 const prisma = new PrismaClient();
-const ulid = monotonicFactory();
 
 async function seed() {
   try {
