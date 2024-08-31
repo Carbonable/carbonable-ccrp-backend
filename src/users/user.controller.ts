@@ -8,17 +8,12 @@ import {
   ApiInternalServerErrorResponse,
 } from '@nestjs/swagger';
 import { Controller, Req } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { Get, Logger } from '@nestjs/common';
+import { Get } from '@nestjs/common';
 import { UserEntity } from './user.entity';
 
 @ApiTags('User Management')
 @Controller('user')
 export class UserController {
-  private readonly logger = new Logger(UserController.name);
-
-  constructor(private userService: UsersService) {}
-
   @Get('profile')
   @ApiOperation({ summary: 'Retrieve the user profile' })
   @ApiBearerAuth()
