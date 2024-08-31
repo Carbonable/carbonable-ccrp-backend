@@ -157,14 +157,13 @@ defineFeature(feature, (test) => {
       expect(response.errors.length).toBe(0);
     });
 
-    // and(/^I should have (\d+) orders created$/, async (orderCount) => {
-    //   const orders = await orderBookRepository.findByBusinessUnitIds([
-    //     businessId,
-    //   ]);
-    //   // TODO ! update the test i hardcoded  8
-    //   const orderCounted = 8; //parseInt(orderCount);
-    //   expect(orders.length).toBe(orderCounted);
-    // });
+    and(/^I should have (\d+) orders created$/, async (orderCount) => {
+      const orders = await orderBookRepository.findByBusinessUnitIds([
+        businessId,
+      ]);
+      const orderCounted = parseInt(orderCount);
+      expect(orders.length).toBe(orderCounted);
+    });
 
     andEventShouldHaveBeenDispatched(and, eventDispatcher);
   });
