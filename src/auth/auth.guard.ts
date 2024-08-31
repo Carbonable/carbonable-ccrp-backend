@@ -27,7 +27,6 @@ export class ClerkAuthGuard implements CanActivate {
     const ctx = GqlExecutionContext.create(context);
     const request = ctx.getContext().req;
 
-    // Extract the Authorization header
     const authHeader = request.headers.authorization;
 
     if (!authHeader) {
@@ -35,9 +34,7 @@ export class ClerkAuthGuard implements CanActivate {
       throw new UnauthorizedException('Authorization header is missing');
     }
 
-    // Extract the Bearer token from the Authorization header
     const token = authHeader.split(' ')[1];
-
     if (!token) {
       this.logger.warn('No Bearer token found in Authorization header');
       throw new UnauthorizedException('Bearer token is missing');
@@ -46,8 +43,9 @@ export class ClerkAuthGuard implements CanActivate {
     try {
       const verifiedToken = await clerkClient.verifyToken(token);
       this.logger.log(verifiedToken);
-      const role = verifiedToken.organizations[process.env.ORG_ID];
+      const role = verifiedToken?.organizations[process.env.ORG_ID];
       if (!role) {
+        this.logger.debug('Verified token :', verifiedToken);
         throw new UnauthorizedException(
           'User is not part of the required organization',
         );

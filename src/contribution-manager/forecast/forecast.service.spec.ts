@@ -4,7 +4,6 @@ import { CsvService } from '../../csv/csv.service';
 import { PrismaService } from '../../infrastructure/prisma.service';
 import * as fs from 'fs';
 import * as path from 'path';
-import { ForecastType } from './types';
 
 describe('ForecastService - createForecast with CSV files', () => {
   let forecastService: ForecastService;
