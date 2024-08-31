@@ -25,13 +25,13 @@ export class VintageService {
       fileBuffer,
       this.createVintage.bind(this),
     );
+    this.logger.log('Creating Vintage', data);
     await this.prisma.createManyOfType(VINTAGE_TABLE, data);
     return { message: 'Vintages uploaded successfully' };
   }
 
   private createVintage(data: any): Vintage {
     const year = data.year ?? this.csv.emptyValueError('year');
-
     if (year.length !== 4) {
       throw new Error(`Wrong year number : ${year}`);
     }

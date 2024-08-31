@@ -26,6 +26,8 @@ export class AllocationService {
       fileBuffer,
       this.createAllocation.bind(this),
     );
+    this.logger.log('Creating Allocations', data);
+
     await this.prisma.createManyOfType(ALLOCATION_TABLE, data);
     return { message: 'Allocations uploaded successfully' };
   }

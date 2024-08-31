@@ -27,6 +27,7 @@ export class DevelopperService {
       fileBuffer,
       this.createDevelopper.bind(this),
     );
+    this.logger.log('Creating Developper', data);
 
     await this.prisma.createManyOfType(DEVELOPPER_TABLE, data);
     return { message: 'Developper uploaded successfully' };

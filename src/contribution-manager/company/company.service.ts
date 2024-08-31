@@ -28,7 +28,7 @@ export class CompanyService {
       fileBuffer,
       this.createCompany.bind(this),
     );
-
+    this.logger.log('Creating Company', data);
     await this.prisma.createManyOfType(COMPANY_TABLE, data);
     return { message: 'Company uploaded successfully' };
   }
