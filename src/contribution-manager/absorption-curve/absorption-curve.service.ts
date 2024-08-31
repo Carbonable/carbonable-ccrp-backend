@@ -25,6 +25,7 @@ export class AbsorptionCurveService {
       fileBuffer,
       this.createAbsorptionCurve.bind(this),
     );
+    this.logger.log('Creating Absorption Curves', data);
 
     await this.createVintageAndStock(data);
 

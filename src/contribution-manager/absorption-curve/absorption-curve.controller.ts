@@ -48,7 +48,6 @@ export class AbsorptionController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<{ message: string }> {
     this.logger.debug(`File uploaded: ${file.originalname}`);
-
     return await this.absorptionCurveService.processCsv(file.buffer);
   }
 }

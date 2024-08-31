@@ -27,7 +27,7 @@ export class BusinessUnitService {
       fileBuffer,
       this.createBusinessUnit.bind(this),
     );
-    this.logger.log(data);
+    this.logger.log('Creating Business Units', data);
     await this.prisma.createManyOfType(BUSINESS_UNIT_TABLE, data);
 
     return { message: `BusinessUnits uploaded successfully` };

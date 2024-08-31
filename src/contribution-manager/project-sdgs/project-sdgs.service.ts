@@ -26,6 +26,7 @@ export class ProjectSdgsService {
       fileBuffer,
       this.createProjectSdgs.bind(this),
     );
+    this.logger.log('Creating ProjectSdg', data);
 
     await this.prisma.createManyOfType(PROJECT_SDGS_TABLE, data);
     return { message: 'ProjectSdgs uploaded successfully' };

@@ -31,7 +31,7 @@ export class ProjectService {
       fileBuffer,
       this.createProject.bind(this),
     );
-
+    this.logger.log('Creating Project', data);
     await this.prisma.createManyOfType(PROJECT_TABLE, data);
 
     return { message: `Projects uploaded successfully` };
