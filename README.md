@@ -1,76 +1,125 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+# Project Name
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+This project is built using the [Nest](https://github.com/nestjs/nest) framework, leveraging TypeScript to create a robust and scalable server-side application.
+This codebase is part of a platform designed to help businesses manage their net-zero strategies by tracking and allocating carbon credits. It allows users to manage carbon credit assets, organize business units, and define strategies for reaching net-zero emissions. The system supports detailed tracking of carbon credits, forecasted emissions, and strategic allocations across various projects and business units, ensuring businesses can effectively meet their net-zero objectives.
 
-### Requirements
-- [ ] - Node.js
-- [ ] - [Just](https://github.com/casey/just#installation)
+## Requirements
+
+- [Node.js](https://nodejs.org/)
+- [Just](https://github.com/casey/just#installation)
+- Docker
+
 ## Installation
 
 ```bash
-$ just install
+just install
 ```
 
-## Running the app
+## Environment Setup
+
+Ensure that the `.env` file is set up correctly:
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+just check_env
 ```
 
-## Test
+### .env.template
+
+```plaintext
+DATABASE_URL="postgresql://test:test@localhost:5432/carbonable_ccpm_test"
+# In Clerk dashboard / Organization
+ORG_ID='org_id_by_clerk'
+# In Clerk dashboard / organizations API keys
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY='pk_test_by_clerk'
+CLERK_SECRET_KEY='sk_test_by_clerk'
+```
+
+## Initialization
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+just init
 ```
 
-## Support
+or
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+just init_test
+```
 
-## Stay in touch
+## Testing
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Integration test scripts
+
+```bash
+just test_integration
+```
+
+Coverage test
+
+```bash
+just test_coverage
+```
+
+## Direct Interaction
+
+Using swagger UI (https://swagger.io/docs/)
+
+```
+http://your.url/api
+```
+
+## Database Management
+
+```bash
+# Initialize Database and seed it
+just db_init
+
+# Reset Database and push fixtures ( or testing purpose)
+just db_fixture
+```
+
+To start and stop db
+
+```bash
+# Start the database
+just start_db
+
+# Stop the database
+just stop_db
+```
+
+or
+
+```bash
+# Start the database
+just start_test_db
+
+# Stop the database
+just stop_test_db
+```
+
+## Prisma Studio
+
+Ui of database (link: http://localhost:5555)
+
+```bash
+just studio
+```
+
+## Deployment
+
+Deployment to fly.
+
+```bash
+# Deploy to Debug Environment
+just deploy_debug
+
+# Deploy to Staging Environment
+just deploy_staging
+```
 
 ## License
 
-Nest is [MIT licensed](LICENSE).
+This project is [MIT licensed](LICENSE).
