@@ -2,8 +2,9 @@ default:
     just --list
 install:
     pnpm install
-    pnpm run build
+    npx prisma generate
     docker compose -f docker-compose.yml up -d
+    pnpm run build
     
 check_env:
   @if [ ! -f .env ]; then \
