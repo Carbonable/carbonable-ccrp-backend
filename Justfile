@@ -51,6 +51,7 @@ db_init:
 test_integration: check_env  start_test_db 
     pnpm test:db:reset
     pnpm test:integration
+    
 test_coverage: 
     pnpm test:cov
 
