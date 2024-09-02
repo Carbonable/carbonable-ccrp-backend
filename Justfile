@@ -9,7 +9,7 @@ install:
 init: install start_db 
     pnpm run build
     
-init_test: install start_test__db 
+init_test: install start_test_db 
     pnpm run build
     
 check_env:
