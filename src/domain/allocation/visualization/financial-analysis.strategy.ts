@@ -32,19 +32,23 @@ export class FinancialAnalysisVisualizationStrategy
     this.visualizationDataExtractor.iterateOverData(
       await this.visualizationDataExtractor.fetchCompanies(allocationIds),
       async (c) =>
-        await this.repository.delete(financialAnalysisKey({ companyId: c.id })),
+        await this.repository.delete(
+          financialAnalysisKey({ companyId: c?.id }),
+        ),
     );
     this.visualizationDataExtractor.iterateOverData(
       await this.visualizationDataExtractor.fetchBusinessUnits(allocationIds),
       async (bu) =>
         await this.repository.delete(
-          financialAnalysisKey({ businessUnitId: bu.id }),
+          financialAnalysisKey({ businessUnitId: bu?.id }),
         ),
     );
     this.visualizationDataExtractor.iterateOverData(
       await this.visualizationDataExtractor.fetchProjects(allocationIds),
       async (p) =>
-        await this.repository.delete(financialAnalysisKey({ projectId: p.id })),
+        await this.repository.delete(
+          financialAnalysisKey({ projectId: p?.id }),
+        ),
     );
   }
 
@@ -62,7 +66,7 @@ export class FinancialAnalysisVisualizationStrategy
     // project wide find stock associated with project id
     this.visualizationDataExtractor.iterateOverData(
       await this.visualizationDataExtractor.fetchProjects(allocationIds),
-      async (p) => await this.hydrateProjectWideData(p.id),
+      async (p) => await this.hydrateProjectWideData(p?.id),
     );
   }
 
@@ -83,18 +87,18 @@ export class FinancialAnalysisVisualizationStrategy
   async hydrateCompanyWideData(company: Company) {
     //eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { stock, reservations } = await this.stockRepository.findCompanyStock(
-      company.id,
+      company?.id,
     );
-    const actuals = await this.orderRepository.getCompanyOrders(company.id);
+    const actuals = await this.orderRepository.getCompanyOrders(company?.id);
 
     const businessUnits = await this.businessUnitRepository.byCompanyId(
-      company.id,
+      company?.id,
     );
     const demands = Company.mergeDemands(businessUnits);
 
     const visualization = this.extractor.extract(stock, demands, actuals);
     await this.repository.put(
-      financialAnalysisKey({ companyId: company.id }),
+      financialAnalysisKey({ companyId: company?.id }),
       JSON.stringify(visualization),
     );
   }
@@ -102,9 +106,9 @@ export class FinancialAnalysisVisualizationStrategy
   async hydrateBusinessWideData(businessUnit: BusinessUnit) {
     //eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { stock, reservations } =
-      await this.stockRepository.findBusinessUnitStock(businessUnit.id);
+      await this.stockRepository.findBusinessUnitStock(businessUnit?.id);
     const orders = await this.orderRepository.findByBusinessUnitIds([
-      businessUnit.id,
+      businessUnit?.id,
     ]);
     const visualization = this.extractor.extract(
       stock,
@@ -112,7 +116,7 @@ export class FinancialAnalysisVisualizationStrategy
       orders,
     );
     await this.repository.put(
-      financialAnalysisKey({ businessUnitId: businessUnit.id }),
+      financialAnalysisKey({ businessUnitId: businessUnit?.id }),
       JSON.stringify(visualization),
     );
   }
