@@ -36,14 +36,16 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY='pk_test_by_clerk'
 CLERK_SECRET_KEY='sk_test_by_clerk'
 ```
 
-## Running the App
+## Initialization
 
 ```bash
-# Start the database
-just start_db
+just init
+```
 
-# Stop the database
-just stop_db
+or
+
+```bash
+just init_test
 ```
 
 ## Testing
@@ -57,7 +59,7 @@ just test_integration
 Coverage test
 
 ```bash
-just test_integration
+just test_coverage
 ```
 
 ## Direct Interaction
@@ -76,6 +78,26 @@ just db_init
 
 # Reset Database and push fixtures ( or testing purpose)
 just db_fixture
+```
+
+To start and stop db
+
+```bash
+# Start the database
+just start_db
+
+# Stop the database
+just stop_db
+```
+
+or
+
+```bash
+# Start the database
+just start_test_db
+
+# Stop the database
+just stop_test_db
 ```
 
 ## Prisma Studio
