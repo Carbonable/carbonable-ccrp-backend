@@ -1,9 +1,15 @@
 default: 
     just --list
+
+
 install:
     pnpm install
     npx prisma generate
-    docker compose -f docker-compose.yml up -d
+
+init: install start_db 
+    pnpm run build
+    
+init_test: install start_test__db 
     pnpm run build
     
 check_env:
@@ -20,15 +26,14 @@ check_env:
   done'
   @echo "All environment variables are set correctly."
 
+
+### DATABASE MANAGEMENT
 start_db: 
     docker compose -f docker-compose.yml up -d
 
+
 stop_db: 
     docker compose -f docker-compose.yml down
-
-test_integration: check_env  start_test_db 
-    pnpm test:db:reset
-    pnpm test:integration
 
 start_test_db: 
     docker compose -f docker-compose.test.yml up -d
@@ -38,14 +43,23 @@ stop_test_db:
 
 db_fixture: 
     pnpm db:reset
-
 db_init: 
     pnpm db:init
 
-studio:
-    npx prisma studio
 
+### TESTING
+test_integration: check_env  start_test_db 
+    pnpm test:db:reset
+    pnpm test:integration
+test_coverage: 
+    pnpm test:cov
+
+### DEPLOYEMENT ON Fly
 deploy_debug:
         fly deploy -c fly.debug.toml 
 deploy_staging:
         fly deploy -c fly.staging.toml 
+
+
+studio:
+    npx prisma studio

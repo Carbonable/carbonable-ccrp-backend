@@ -3,7 +3,7 @@
 ## Description
 
 This project is built using the [Nest](https://github.com/nestjs/nest) framework, leveraging TypeScript to create a robust and scalable server-side application.
-CCRP is used to
+This codebase is part of a platform designed to help businesses manage their net-zero strategies by tracking and allocating carbon credits. It allows users to manage carbon credit assets, organize business units, and define strategies for reaching net-zero emissions. The system supports detailed tracking of carbon credits, forecasted emissions, and strategic allocations across various projects and business units, ensuring businesses can effectively meet their net-zero objectives.
 
 ## Requirements
 
@@ -60,14 +60,22 @@ Coverage test
 just test_integration
 ```
 
+## Direct Interaction
+
+Using swagger UI (https://swagger.io/docs/)
+
+```
+http://your.url/api
+```
+
 ## Database Management
 
 ```bash
-# Reset Database
-just db_fixture
-
-# Initialize Database
+# Initialize Database and seed it
 just db_init
+
+# Reset Database and push fixtures ( or testing purpose)
+just db_fixture
 ```
 
 ## Prisma Studio
