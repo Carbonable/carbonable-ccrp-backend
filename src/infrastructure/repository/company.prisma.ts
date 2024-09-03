@@ -1,3 +1,4 @@
+import { Metadata } from 'src/domain/common/metadata-parser';
 import {
   BusinessUnit,
   Company,
@@ -77,6 +78,12 @@ export class PrismaCompanyRepository implements CompanyRepositoryInterface {
   }
 
   mapPrismaToBusinessUnit(bu: any): BusinessUnit {
+    const metadata =
+      typeof bu.metadata === 'string' ? JSON.parse(bu.metadata) : bu.metadata;
+
+    const metadataEntries = Object.entries(metadata || {}).map(
+      ([key, value]) => ({ key, value }),
+    );
     return new BusinessUnit(
       bu.id,
       bu.name,
@@ -85,7 +92,7 @@ export class PrismaCompanyRepository implements CompanyRepositoryInterface {
       bu.defaultTarget,
       bu.debt,
       bu.companyId,
-      JSON.parse(bu.metadata.toString()),
+      metadataEntries as Metadata<string, string>[],
     );
   }
 
