@@ -81,9 +81,6 @@ export class PrismaCompanyRepository implements CompanyRepositoryInterface {
     const metadata =
       typeof bu.metadata === 'string' ? JSON.parse(bu.metadata) : bu.metadata;
 
-    const metadataEntries = Object.entries(metadata || {}).map(
-      ([key, value]) => ({ key, value }),
-    );
     return new BusinessUnit(
       bu.id,
       bu.name,
@@ -92,7 +89,7 @@ export class PrismaCompanyRepository implements CompanyRepositoryInterface {
       bu.defaultTarget,
       bu.debt,
       bu.companyId,
-      metadataEntries as Metadata<string, string>[],
+      metadata,
     );
   }
 
