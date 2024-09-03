@@ -1,13 +1,13 @@
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { Controller, Delete } from '@nestjs/common';
 
 import { Roles } from '../../roles/roles.decorator';
 import { Role } from '../../roles/role.enum';
 import { AdminService } from './admin.service';
 
-@ApiTags('Critical Operations')
+@ApiBearerAuth()
 @Roles(Role.Admin)
-@Controller('user')
+@Controller('admin')
 export class AdminController {
   constructor(private adminService: AdminService) {}
   @Delete('reset-database')
