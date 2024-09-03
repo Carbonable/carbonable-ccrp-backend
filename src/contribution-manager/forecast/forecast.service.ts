@@ -3,7 +3,7 @@ import { PrismaService } from '../../infrastructure/prisma.service';
 import { CsvService } from '../../csv/csv.service';
 import { Prisma } from '@prisma/client';
 import { ForecastType } from './types';
-import { UlidIdGenerator } from 'src/domain/common';
+import { UlidIdGenerator } from '../../domain/common';
 
 type Forecast = Prisma.ForecastEmissionGetPayload<{
   include: {
