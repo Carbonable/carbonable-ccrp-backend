@@ -1,4 +1,3 @@
-import { Metadata } from 'src/domain/common/metadata-parser';
 import {
   BusinessUnit,
   Company,
