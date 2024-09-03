@@ -7,7 +7,7 @@ import {
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
 } from '@nestjs/swagger';
-import { Controller, Req } from '@nestjs/common';
+import { Controller, Delete, Req } from '@nestjs/common';
 import { Get } from '@nestjs/common';
 import { UserEntity } from './user.entity';
 
