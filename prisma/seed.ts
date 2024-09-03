@@ -6,7 +6,6 @@ async function seed() {
   try {
     await seedCountries();
     await seedSdgs();
-    await seedInitCompany();
   } catch (e) {
     console.error(e);
     process.exit(1);
@@ -46,17 +45,6 @@ async function seedSdgs() {
   }
 }
 
-async function seedInitCompany() {
-  const { id, name, slug } = await getInitCompany();
-  await prisma.company.create({
-    data: {
-      id,
-      name,
-      slug,
-    },
-  });
-}
-
 async function getCountries(): Promise<any[]> {
   const res = await fetch(
     'https://raw.githubusercontent.com/mledoze/countries/master/countries.json',
@@ -84,11 +72,4 @@ async function getSdgs(): Promise<any[]> {
     { number: 16, name: 'Peace and Justice Strong Institutions' },
     { number: 17, name: 'Partnerships to achieve the Goal' },
   ];
-}
-async function getInitCompany(): Promise<any> {
-  return {
-    id: '1',
-    name: 'Company name to change',
-    slug: 'Company-name-to-change',
-  };
 }

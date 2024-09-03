@@ -2,7 +2,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { Controller, Delete } from '@nestjs/common';
 
 import { Roles } from '../../roles/roles.decorator';
-import { Role } from 'src/roles/role.enum';
+import { Role } from '../../roles/role.enum';
 import { AdminService } from './admin.service';
 
 @ApiTags('Critical Operations')
