@@ -19,8 +19,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
     await this.$disconnect();
   }
   async createManyOfType(tableName: string, values: any[]) {
+    const modelName = this.toCamelCase(tableName);
+    console.log('createManyOfType', this[tableName]);
     try {
-      await this[tableName].createMany({ data: values, skipDuplicates: true });
+      await this[modelName].createMany({ data: values, skipDuplicates: true });
     } catch (error) {
       const errorParsed = parsePrismaError(error);
       this.logger.error(
@@ -28,6 +30,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       );
       throw new BadRequestException(errorParsed);
     }
+  }
+
+  private toCamelCase(str: string): string {
+    return str.replace(/([-_][a-z])/gi, (group) =>
+      group.toUpperCase().replace('-', '').replace('_', ''),
+    );
   }
 }
 
