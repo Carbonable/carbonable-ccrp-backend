@@ -11,7 +11,7 @@ import { AdminService } from './admin.service';
 export class AdminController {
   constructor(private adminService: AdminService) {}
   @Delete('reset-database')
-  async profile(): Promise<{ message: string }> {
+  async resetDB(): Promise<{ message: string }> {
     return this.adminService.resetDB();
   }
 }
