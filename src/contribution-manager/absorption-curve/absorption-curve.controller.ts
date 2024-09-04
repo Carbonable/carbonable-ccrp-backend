@@ -44,7 +44,7 @@ export class AbsorptionController {
       },
     },
   })
-  async uploadDevelopperCSV(
+  async uploadAbsorptionCurve(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<{ message: string }> {
     this.logger.debug(`File uploaded: ${file.originalname}`);
