@@ -28,7 +28,7 @@ export class ForecastService {
       fileBuffer,
       this.createForecast.bind(this),
     );
-    this.logger.log('Creating ', type, data);
+    this.logger.debug(`Creating${type} ${data}`);
 
     await this.prisma.createManyOfType(type, data);
     return { message: 'Forecasts uploaded successfully' };

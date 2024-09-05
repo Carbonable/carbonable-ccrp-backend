@@ -25,13 +25,17 @@ export class CsvService {
       stream
         .pipe(csv({ strict: true }))
         .on('data', (data) => {
-          this.logger.log('Star stream parse');
+          this.logger.log('Start stream parse');
           this.handleCsvData(data, results, createEntityFctn, reject);
         })
         .on('end', () => resolve(results))
-        .on('error', (error) =>
-          reject(new BadRequestException('Invalid file format: ' + error)),
-        );
+        .on('error', (error) => {
+          this.logger.error(
+            'Error while parsing csv : ',
+            JSON.stringify(error),
+          );
+          reject(new BadRequestException('Invalid file format: ' + error));
+        });
     });
   }
 
@@ -42,18 +46,32 @@ export class CsvService {
     reject: (reason?: any) => void,
   ): void {
     try {
-      this.logger.log('Star create entity with data ', JSON.stringify(data));
+      this.logger.debug('Start create entity with data ', JSON.stringify(data));
       const carbonCredit = createEntityFctn(data);
-      this.logger.log('ENtity created create entity');
+      this.logger.log('Entity created create entity');
       results.push(carbonCredit);
     } catch (error: any) {
-      reject(new BadRequestException('Invalid file format: ' + error));
+      reject(
+        new BadRequestException(
+          'Invalid file format: ' + JSON.stringify(error),
+        ),
+      );
     }
   }
   parseIntSafe = (value: string): number => {
     const parsed = parseInt(value, 10);
     if (isNaN(parsed)) throw new Error(`Invalid number: ${value}`);
     return parsed;
+  };
+  parseUintSafe = (value: string): number => {
+    const num = this.parseIntSafe(value);
+    if (num < 0) throw new Error(`Negative number: ${value}`);
+    return num;
+  };
+  parseNonNullUint = (value: string): number => {
+    const num = this.parseUintSafe(value);
+    if (!num) throw new Error(`Value cannot be 0`);
+    return num;
   };
 
   nonNullString(data: any, str: string): string {

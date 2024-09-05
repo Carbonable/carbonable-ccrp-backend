@@ -29,7 +29,11 @@ export class CompanyService {
       this.createCompany.bind(this),
     );
     this.logger.log('Creating Company', data);
-    await this.prisma.createManyOfType(COMPANY_TABLE, data);
+    try {
+      await this.prisma.createManyOfType(COMPANY_TABLE, data);
+    } catch (err) {
+      this.logger.error('Error while uploading company :', JSON.stringify(err));
+    }
     return { message: 'Company uploaded successfully' };
   }
 
