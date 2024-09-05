@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadGatewayException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/prisma.service';
 import { CsvService } from '../../csv/csv.service';
 import { Prisma } from '@prisma/client';
@@ -35,7 +35,7 @@ export class AllocationService {
   createAllocation(data: any): Allocation {
     return {
       id: this.csv.nonNullString(data, 'id'),
-      quantity: this.csv.parseIntSafe(data.quantity),
+      quantity: this.csv.parseNonNullUint(data.quantity),
       allocatedAt: this.csv.parseDateSafe(data.allocated_at),
       businessUnitId: this.csv.nonNullString(data, 'business_unit_id'),
       projectId: this.csv.nonNullString(data, 'project_id'),

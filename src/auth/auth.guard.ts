@@ -20,7 +20,7 @@ export class ClerkAuthGuard implements CanActivate {
       context.getHandler(),
     );
     if (isPublic) {
-      this.logger.log('Public route, bypassing authentication');
+      this.logger.debug('Public route, bypassing authentication');
       return true;
     }
 
