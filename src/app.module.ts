@@ -11,8 +11,12 @@ import { ClerkAuthGuard } from './auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './roles/roles.guard';
 import { CsvModule } from './csv/csv.module';
+import { TerminusModule } from '@nestjs/terminus';
+import { HealthController } from './health.controller';
+import { PrismaModule } from './infrastructure/prisma.module';
 
 @Module({
+  controllers: [HealthController],
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -28,6 +32,8 @@ import { CsvModule } from './csv/csv.module';
     ConsoleModule,
     EventEmitterModule.forRoot(),
     UsersModule,
+    TerminusModule,
+    PrismaModule,
   ],
   providers: [
     {

@@ -7,7 +7,6 @@ import {
   BusinessUnitResolver,
   DemandResolver,
   AllocationResolver,
-  VisualizationResolver,
   StockResolver,
 } from './resolvers';
 import {
@@ -55,7 +54,6 @@ import { AbsorptionController } from './absorption-curve/absorption-curve.contro
     BusinessUnitResolver,
     DemandResolver,
     AllocationResolver,
-    VisualizationResolver,
     AllocationResolver,
     StockResolver,
     ProjectService,
@@ -102,7 +100,6 @@ import { AbsorptionController } from './absorption-curve/absorption-curve.contro
     DemandResolver,
     CertifierResolver,
     AllocationResolver,
-    VisualizationResolver,
     StockResolver,
     ProjectedDecarbonationService,
     ImpactMetricsService,
@@ -113,4 +110,4 @@ import { AbsorptionController } from './absorption-curve/absorption-curve.contro
 
   imports: [InfrastructureModule, CsvModule],
 })
-export class ContributionManagerModule {}
+export class ContributionManagerModule { }

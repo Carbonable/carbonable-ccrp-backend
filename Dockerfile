@@ -27,3 +27,19 @@ COPY --chown=carbonable:carbonable --from=builder /srv/www/prisma ./prisma
 EXPOSE 8080
 
 CMD ["npm", "run", "start:prod"]
+
+FROM node:20-alpine3.17 as aws_runtime
+
+WORKDIR /srv/www
+
+COPY --from=builder /srv/www/package.json ./package.json
+COPY --from=builder /srv/www/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=builder /srv/www/node_modules ./node_modules
+COPY --from=builder /srv/www/dist ./dist
+COPY --from=builder /srv/www/src/schemas ./src/schemas
+COPY --from=builder /srv/www/prisma ./prisma
+COPY .ebextensions ./.ebextensions
+
+EXPOSE 8080
+
+CMD ["npm", "run", "start:prod"]

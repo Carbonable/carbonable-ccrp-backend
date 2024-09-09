@@ -10,6 +10,7 @@ type FormatStringArgs = {
   suffix?: string;
   prefix?: string;
 };
+
 export default class Utils {
   static formatString({ value, suffix, prefix }: FormatStringArgs): string {
     if (null === value) {
@@ -19,9 +20,8 @@ export default class Utils {
     if (typeof value === 'string' && value.includes('.')) {
       cbFn = parseFloat;
     }
-    return `${prefix ? prefix + ' ' : ''}${cbFn(value).toLocaleString('fr')}${
-      suffix ? ' ' + suffix : ''
-    }`;
+    return `${prefix ? prefix + ' ' : ''}${cbFn(value).toLocaleString('fr')}${suffix ? ' ' + suffix : ''
+      }`;
   }
 
   static paginate(data: any[], pagination: any) {

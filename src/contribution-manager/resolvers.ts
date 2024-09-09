@@ -5,5 +5,4 @@ export { CarbonCreditResolver } from './carbon-credits/carbon-credits.resolver';
 export { BusinessUnitResolver } from './business-unit/business-unit.resolver';
 export { DemandResolver } from './demand/demand.resolver';
 export { AllocationResolver } from './allocations/allocations.resolver';
-export { VisualizationResolver } from './visualization/visualization';
 export { StockResolver } from './stock/stock.resolver';

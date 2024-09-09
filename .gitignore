@@ -39,3 +39,14 @@ lerna-debug.log*
 .env
 .env.dist
 .env.test
+Dockerrun.aws.json
+etc/infra/aws/.terraform
+etc/infra/aws/Dockerrun.aws.json
+etc/infra/aws/Dockerrun.aws.zip
+Dockerrun.aws.zip
+*.tfvars
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

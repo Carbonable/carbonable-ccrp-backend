@@ -44,18 +44,14 @@ type DataFilter = { filter?: string; page?: number; count?: number };
 export class ProjectedDecarbonationService {
   private readonly logger = new Logger(ProjectedDecarbonationService.name);
 
-  constructor(
-    private readonly prisma: PrismaService,
-    @Inject(VISUALIZATION_REPOSITORY)
-    private readonly visualizationRepository: VisualizationRepositoryInterface,
-  ) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async get(id: string): Promise<ProjectedDecarbonationGraph[]> {
-    const visualizations = await this.visualizationRepository.get(
-      `NET-ZERO#COMPANY#${id}`,
-    );
-
-    return JSON.parse(visualizations);
+    // const visualizations = await this.visualizationRepository.get(
+    //   `NET-ZERO#COMPANY#${id}`,
+    // );
+    //
+    return JSON.parse('[]');
   }
 
   async getTable(
