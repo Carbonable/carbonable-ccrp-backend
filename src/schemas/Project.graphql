@@ -1,14 +1,14 @@
 type Project {
-    id: ID!,
-  name:         String
-  slug:         String
-  description:  String
+  id: ID!
+  name: String
+  slug: String
+  description: String
   localization: String
-  startDate:    String
-  endDate:      String
-  area:         Int
-  type:         CarbonCreditType
-  origin:       CarbonCreditOrigin
+  startDate: String
+  endDate: String
+  area: Int
+  type: CarbonCreditType
+  origin: CarbonCreditOrigin
   vintages: [Vintage!]
   certifier: Certifier!
   developper: Developper
@@ -18,14 +18,14 @@ type Project {
 }
 
 type AllocationAvailability {
-  available_percent: Int
+  available_percent: Float
   available_units: Int
 }
 
 type ProjectGlobalData {
   amount: Int
   source: String
-  rating:  String
+  rating: String
   allocated_units: Int
   available_ex_post: Int
   available_ex_ante: Int
@@ -43,37 +43,37 @@ type Vintage {
 }
 
 type BusinessUnit {
-    id: String
-    name: String
-    description: String
+  id: String
+  name: String
+  description: String
 
-    default_emission: Int
-    default_target: Int
-    metadata: [Metadata]
-    allocations: [Allocation]
-    actual_rate: String
-    yearly_emissions: String
-    yearly_contributions: String
+  default_emission: Int
+  default_target: Int
+  metadata: [Metadata]
+  allocations: [Allocation]
+  actual_rate: String
+  yearly_emissions: String
+  yearly_contributions: String
 }
 
 type Allocation {
-    project: String
-    amount: Int
+  project: String
+  amount: Int
 }
 
 type Metadata {
-    key: String
-    value: String
+  key: String
+  value: String
 }
 
 type ProjectColorRepartition {
-    green: Map!
-    orange: Map!
-    blue: Map!
-    na: Map!
+  green: Map!
+  orange: Map!
+  blue: Map!
+  na: Map!
 }
 
 type ProjectTypeRepartition {
-    removal: String!,
-    avoidance: String!,
+  removal: String!
+  avoidance: String!
 }
