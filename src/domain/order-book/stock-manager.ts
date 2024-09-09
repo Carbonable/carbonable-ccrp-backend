@@ -35,20 +35,21 @@ export class StockManager {
 
       // INFO: keep in mind that the allocation amount is a percentage
       // splitStock is the amount of stock required to fulfill allocation
-      const splitStock = Math.ceil(
+      const splitStock = Math.round(
         (availableStock.available * allocation.amount) / 100,
       );
 
       availableStock.lock(splitStock);
       // After locking stock, we want to get the rest.
-
       const purchasedCount = availableStock.purchased - splitStock;
       const issuedCount = availableStock.quantity - splitStock;
-
+      this.logger.log(
+        `Locked ${splitStock} units for project ${project.id}, vintage ${vintage.year}`,
+      );
       // Checking reserved stock is not negative
       // we can have either a purchased stock or an issued but not both
       const purchased = purchasedCount > 0 ? purchasedCount : 0;
-      const issued = issuedCount > 0 ? issuedCount : 0;
+      const issued = issuedCount > 0 ? splitStock : 0;
 
       const reservedStock = new Stock(
         this.idGenerator.generate(),
