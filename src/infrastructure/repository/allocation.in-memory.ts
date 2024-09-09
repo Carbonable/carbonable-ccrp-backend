@@ -6,7 +6,7 @@ import {
 export class InMemoryAllocationRepository
   implements AllocationRepositoryInterface
 {
-  constructor(private allocations: Array<Allocation> = []) {}
+  constructor(public allocations: Array<Allocation> = []) {}
   async findByIds(ids: string[]): Promise<Allocation[]> {
     return this.allocations.filter((a) => ids.includes(a.id));
   }

@@ -30,8 +30,9 @@ import { InMemoryOrderBookRepository } from '../../infrastructure/repository/ord
 import { Booker, StockManager } from '../../domain/order-book';
 import { InMemoryStockRepository } from '../../infrastructure/repository/stock.in-memory';
 import { InMemoryEventDispatcher } from '../../infrastructure/event-dispatcher.in-memory';
+import { validateStockForAllocation } from './utils';
 
-const feature = loadFeature('src/feature/add-allocations.feature');
+const feature = loadFeature('src/feature/add-allocations-50%.feature');
 const ulid = monotonicFactory();
 
 defineFeature(feature, (test) => {
@@ -92,12 +93,7 @@ defineFeature(feature, (test) => {
     return request;
   }
 
-  test('Add allocation to compensate on business unit consumption', ({
-    given,
-    and,
-    then,
-    when,
-  }) => {
+  test('Allocate 50% of the stock', ({ given, and, then, when }) => {
     givenIHaveAnExistingCompany(given, companyId, company, companyRepository);
     andProjectIsConfigured(
       and,
@@ -129,6 +125,9 @@ defineFeature(feature, (test) => {
         amount: parseInt(r.cc_amount),
       }));
       request = new AddAllocationRequest(inputs);
+
+      // NOTE: hardcoded stock length
+      expect(stockRepository.stock.length).toBe(24);
     });
 
     andIExecuteTheRequest<
@@ -149,6 +148,31 @@ defineFeature(feature, (test) => {
         expect(allocationIds).toStrictEqual(ids);
       },
     );
+
+    and('stocks should properly assigned', async () => {
+      // total stock is 24 + 12 (just created for allocation)
+      expect(stockRepository.stock.length).toBe(36);
+
+      // 12 stock for banegas farm
+      // 12 stock for las delicias
+      // 12 duplicated stock for allocation
+      // duplicated stock should have 50 % or each vintage marked as consumed
+      const businessUnitStock = await stockRepository.findBusinessUnitStock(
+        businessId,
+      );
+      expect(businessUnitStock.stock.length).toBe(12);
+
+      // We dont want here to validate repository interactions. We want to validate what's going into the model
+      // Thus we'll use stockRepository object directly without using repository methods
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      validateStockForAllocation(
+        stockRepository,
+        businessId,
+        allocationRepository.allocations,
+        { total: 24, base: 12, allocated: 12 },
+      );
+    });
 
     and('I should not have any errors', async () => {
       if (response.errors.length > 0) {
