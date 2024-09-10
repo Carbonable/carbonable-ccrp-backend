@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { Stock, StockRepositoryInterface } from '.';
 import { Allocation } from '../allocation';
 import { BusinessUnit } from '../business-unit';
@@ -9,6 +10,7 @@ export class StockManager {
     private readonly stockRepository: StockRepositoryInterface,
     private readonly idGenerator: IdGeneratorInterface,
   ) {}
+  logger = new Logger(StockManager.name);
 
   // in charge of splitting available stock based on allocation amount which is a percentage
   async createStockFor(
@@ -33,10 +35,12 @@ export class StockManager {
 
       // INFO: keep in mind that the allocation amount is a percentage
       // splitStock is the amount of stock required to fulfill allocation
-      const splitStock = Math.ceil(
+      const splitStock = Math.round(
         (availableStock.available * allocation.amount) / 100,
       );
-
+      this.logger.log(
+        `Locked ${splitStock} units for project ${project.id}, vintage ${vintage.year}`,
+      );
       availableStock.lock(splitStock);
       // After locking stock, we want to get the rest.
 
