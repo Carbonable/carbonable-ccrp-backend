@@ -1,4 +1,3 @@
-import { Logger } from '@nestjs/common';
 import { Stock, StockRepositoryInterface } from '.';
 import { Allocation } from '../allocation';
 import { BusinessUnit } from '../business-unit';
@@ -6,7 +5,6 @@ import { IdGeneratorInterface } from '../common';
 import { Project } from '../portfolio';
 
 export class StockManager {
-  private readonly logger = new Logger(StockManager.name);
   constructor(
     private readonly stockRepository: StockRepositoryInterface,
     private readonly idGenerator: IdGeneratorInterface,
@@ -42,13 +40,10 @@ export class StockManager {
       availableStock.lock(splitStock);
       // After locking stock, we want to get the rest.
 
-      const purchasedCount = availableStock.purchased - splitStock;
-      const issuedCount = availableStock.quantity - splitStock;
-
       // Checking reserved stock is not negative
       // we can have either a purchased stock or an issued but not both
-      const purchased = purchasedCount > 0 ? purchasedCount : 0;
-      const issued = issuedCount > 0 ? issuedCount : 0;
+      const purchased = availableStock.purchased > 0 ? splitStock : 0;
+      const issued = availableStock.issued > 0 ? splitStock : 0;
 
       const reservedStock = new Stock(
         this.idGenerator.generate(),
