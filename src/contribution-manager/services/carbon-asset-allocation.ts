@@ -106,24 +106,40 @@ export class CarbonAssetAllocationService {
     });
     const res = [];
     for (const a of allocations) {
-      const businessUnit = await this.businessUnitRepository.byId(
+      const metadata = getMetadata(a.project.metadata);
+      const business_unit = {
+        id: a.businessUnit.id,
+        name: a.businessUnit.name,
+        metadata,
+      };
+
+      const allocated = a.stock.reduce((acc, curr) => acc + curr.quantity, 0);
+      // TODO allocation amount
+      const price =
+        a.stock.reduce(
+          (acc, curr) => acc + Utils.priceDecimal(curr.issuedPrice),
+          0,
+        ) / a.stock.length;
+      const allocation_amount = allocated * price;
+
+      const businessUnitRepository = await this.businessUnitRepository.byId(
         a.businessUnit.id,
       );
       const target =
-        businessUnit.getTargets().find((t) => t.year === now).target ??
-        businessUnit.defaultTarget;
-      const metadata = getMetadata(a.project.metadata);
+        businessUnitRepository.getTargets().find((t) => t.year === now)
+          .target ?? businessUnitRepository.defaultTarget;
+
+      const actual = a.stock.reduce((acc, curr) => acc + curr.consumed, 0);
+
+      const start_date = a.allocatedAt.toLocaleString('fr-FR');
+
       res.push({
-        business_unit: {
-          id: a.businessUnit.id,
-          name: a.businessUnit.name,
-          metadata,
-        },
-        allocated: a.stock.reduce((acc, curr) => acc + curr.quantity, 0),
-        allocation_amount: a.quantity,
+        business_unit,
+        allocated,
+        allocation_amount,
         target,
-        actual: a.stock.reduce((acc, curr) => acc + curr.consumed, 0),
-        start_date: a.allocatedAt.toLocaleString('fr-FR'),
+        actual,
+        start_date,
       });
     }
     return res;
