@@ -27,16 +27,16 @@ export function validateStockForAllocation(
     expect(baseStock.length).toBe(count.base);
     expect(allocatedStock.length).toBe(count.allocated);
 
-    const totalQuantity = baseStock.reduce(
-      (acc, curr) => acc + curr.quantity,
-      0,
-    );
     const totalAllocated = allocatedStock.reduce(
       (acc, curr) => acc + curr.quantity,
       0,
     );
     const totalLocked = baseStock.reduce((acc, curr) => acc + curr.consumed, 0);
-
-    expect(totalQuantity).toBe(totalAllocated + totalLocked);
+    expect(totalAllocated).toBe(totalLocked);
+    for (let i = 0; i < baseStock.length; i++) {
+      const base = baseStock[i];
+      const allocated = allocatedStock[i];
+      expect(base.consumed).toBe(allocated.quantity);
+    }
   }
 }
