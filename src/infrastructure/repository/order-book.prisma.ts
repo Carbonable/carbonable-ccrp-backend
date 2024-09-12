@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import {
   EffectiveCompensation,
   EffectiveContribution,
@@ -13,6 +14,7 @@ import { Order as OrdersModel } from '@prisma/client';
 export const ORDER_BOOK_REPOSITORY = 'ORDER_BOOK_REPOSITORY';
 
 export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
+  logger = new Logger(PrismaOrderBookRepository.name);
   constructor(private readonly prisma: PrismaService) {}
 
   async findByBusinessUnitIds(businessUnitIds: string[]): Promise<Order[]> {
@@ -134,6 +136,7 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
       where: { businessUnit: { companyId } },
       include: { reservations: true, executions: true },
     });
+    this.logger.debug(JSON.stringify(orders));
     return Utils.orderByVintage(
       orders.map(
         (o) => new EffectiveCompensation(o.year.toString(), o.quantity),
