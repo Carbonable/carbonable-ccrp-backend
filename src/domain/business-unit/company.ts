@@ -35,7 +35,8 @@ export class Company {
 
         const target =
           100 -
-          (existingDemandEmissionTarget - currEmissionTarget / totalEmission) *
+          ((existingDemandEmissionTarget - currEmissionTarget) /
+            totalEmission) *
             100;
 
         return [
