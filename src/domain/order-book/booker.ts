@@ -9,7 +9,7 @@ import { ProjectRepositoryInterface } from '../portfolio';
 import { Order, OrderStatus } from './order';
 import { OrderBookRepositoryInterface } from './order-book.repository';
 
-export const TON_IN_GRAM = 1000000;
+export const TON_IN_GRAM = 1e6;
 
 export class Booker {
   constructor(

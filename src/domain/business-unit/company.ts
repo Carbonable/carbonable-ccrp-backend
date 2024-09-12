@@ -25,14 +25,19 @@ export class Company {
       const existingIdx = acc.findIndex((d: Demand) => d.year === curr.year);
       if (existingIdx > -1) {
         const existingDemand = acc[existingIdx];
+
         // calculate target by diff of the two targets
         // 100 - ((emission*target)/100 - (emission*target)/100) * 100
+        const existingDemandEmissionTarget =
+          (existingDemand.emission * existingDemand.target) / 100;
+        const currEmissionTarget = (curr.emission * curr.target) / 100;
+        const totalEmission = existingDemand.emission + curr.emission;
+
         const target =
           100 -
-          (((existingDemand.emission * existingDemand.target) / 100 -
-            (curr.emission * curr.target) / 100) /
-            (existingDemand.emission + curr.emission)) *
+          (existingDemandEmissionTarget - currEmissionTarget / totalEmission) *
             100;
+
         return [
           ...acc.slice(0, existingIdx),
           new Demand(

@@ -10,6 +10,7 @@ import {
 import {
   EffectiveCompensation,
   OrderBookRepositoryInterface,
+  TON_IN_GRAM,
 } from '../../domain/order-book';
 import { BUSINESS_UNIT_REPOSITORY } from '../../infrastructure/repository/business-unit.prisma';
 import { ORDER_BOOK_REPOSITORY } from '../../infrastructure/repository/order-book.prisma';
@@ -50,8 +51,8 @@ export class GlobalDataService {
   ) {}
 
   async get(view: VisualizationViewType): Promise<GlobalData> {
-    const { target, actual, debt, investedAmount, numberOfProjects } =
-      await this.getTarget(view);
+    const data = await this.getTarget(view);
+    const { target, actual, debt, investedAmount, numberOfProjects } = data;
 
     return {
       actual: Utils.formatString({
@@ -63,7 +64,7 @@ export class GlobalDataService {
         suffix: 't',
       }),
       debt: Utils.formatString({
-        value: debt.toString(),
+        value: (debt / TON_IN_GRAM).toString(),
         suffix: 't',
       }),
       invested_amount: Utils.formatString({
@@ -98,27 +99,41 @@ export class GlobalDataService {
     const businessUnits = await this.businessUnitRepository.byCompanyId(
       companyId,
     );
+    this.logger.log(businessUnits);
     const actuals =
       await this.orderRepository.getCompanyYearlyEffectiveCompensation(
         companyId,
       );
 
+    this.logger.log('Actuals');
+    this.logger.log(actuals);
     const demands = Company.mergeDemands(businessUnits);
 
-    const actual =
-      actuals.find((a) => parseInt(a.vintage) === currentYear) ??
-      EffectiveCompensation.default();
+    const actualObj =
+      actuals.find(
+        (a: EffectiveCompensation) => parseInt(a.vintage) === currentYear,
+      ) ?? EffectiveCompensation.default();
+
     const demand =
       demands.find((d) => parseInt(d.year) === currentYear) ?? Demand.default();
 
+    const actual = actualObj ? actualObj.compensation : 0;
+
+    const target = demand ? demand.target : 0;
+
+    const debt = demand.emission - actualObj.compensation;
+
+    const investedAmount =
+      await this.orderRepository.getCompanyTotalInvestedAmount(companyId);
+
+    const numberOfProjects = await this.prisma.project.count();
+
     return {
-      actual: actual ? actual.compensation : 0,
-      target: demand ? demand.target : 0,
-      debt: demand.emission - actual.compensation,
-      investedAmount: await this.orderRepository.getCompanyTotalInvestedAmount(
-        companyId,
-      ),
-      numberOfProjects: await this.prisma.project.count(),
+      actual,
+      target,
+      debt,
+      investedAmount,
+      numberOfProjects,
     };
   }
 

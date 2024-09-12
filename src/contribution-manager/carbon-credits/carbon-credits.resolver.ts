@@ -55,6 +55,7 @@ export class CarbonCreditResolver {
   @Public()
   @Query('getGlobalData')
   async getGlobalData(@Args('view') view: any) {
+    this.logger.log(` View: ${JSON.stringify(view)}`);
     return await this.globalDataService.get(view as VisualizationViewType);
   }
 
