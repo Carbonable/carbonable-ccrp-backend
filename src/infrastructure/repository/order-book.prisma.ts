@@ -136,7 +136,6 @@ export class PrismaOrderBookRepository implements OrderBookRepositoryInterface {
       where: { businessUnit: { companyId } },
       include: { reservations: true, executions: true },
     });
-    this.logger.debug(JSON.stringify(orders));
     return Utils.orderByVintage(
       orders.map(
         (o) => new EffectiveCompensation(o.year.toString(), o.quantity),

@@ -99,14 +99,11 @@ export class GlobalDataService {
     const businessUnits = await this.businessUnitRepository.byCompanyId(
       companyId,
     );
-    this.logger.log(businessUnits);
     const actuals =
       await this.orderRepository.getCompanyYearlyEffectiveCompensation(
         companyId,
       );
 
-    this.logger.log('Actuals');
-    this.logger.log(actuals);
     const demands = Company.mergeDemands(businessUnits);
 
     const actualObj =

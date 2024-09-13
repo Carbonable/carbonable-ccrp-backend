@@ -11,7 +11,10 @@ import { PrismaService } from '../../infrastructure/prisma.service';
 import { prismaToBusinessUnit } from '../../infrastructure/repository/business-unit.prisma';
 import Utils from '../../utils';
 import { ORDER_BOOK_REPOSITORY } from '../../infrastructure/repository/order-book.prisma';
-import { OrderBookRepositoryInterface } from '../../domain/order-book';
+import {
+  OrderBookRepositoryInterface,
+  TON_IN_GRAM,
+} from '../../domain/order-book';
 
 @Resolver('BusinessUnit')
 export class BusinessUnitResolver {
@@ -89,7 +92,7 @@ export class BusinessUnitResolver {
           suffix: '%',
         }),
         yearly_emissions: Utils.formatString({
-          value: bu.getYearlyEmission(now).toString(),
+          value: (bu.getYearlyEmission(now) / TON_IN_GRAM).toString(),
           suffix: 't',
         }),
         yearly_contributions: Utils.formatString({
@@ -162,7 +165,7 @@ export class BusinessUnitResolver {
         suffix: '%',
       }),
       yearly_emissions: Utils.formatString({
-        value: businessUnit.getYearlyEmission(now).toString(),
+        value: (businessUnit.getYearlyEmission(now) / TON_IN_GRAM).toString(),
         suffix: 't',
       }),
       yearly_contributions: Utils.formatString({
