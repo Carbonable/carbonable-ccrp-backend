@@ -20,7 +20,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   }
   async createManyOfType(tableName: string, values: any[]) {
     const modelName = this.toCamelCase(tableName);
-    console.log('createManyOfType', this[tableName]);
+
     try {
       await this[modelName].createMany({ data: values, skipDuplicates: true });
     } catch (error) {

@@ -4,7 +4,7 @@ import {
   VISUALIZATION_REPOSITORY,
   VisualizationRepositoryInterface,
 } from '../../domain/allocation';
-import { Inject } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import {
   VisualizationStrategyKeyInput,
   annualPlanningKey,
@@ -24,6 +24,7 @@ import { Public } from '../../auth/auth.public.decorator';
 
 @Resolver('Visualization')
 export class VisualizationResolver {
+  logger = new Logger(VisualizationResolver.name);
   constructor(
     @Inject(VISUALIZATION_REPOSITORY)
     private readonly repository: VisualizationRepositoryInterface,
