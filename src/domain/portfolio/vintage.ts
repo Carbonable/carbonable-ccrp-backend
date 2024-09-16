@@ -98,25 +98,21 @@ export class Vintage {
     idGenerator: IdGeneratorInterface,
     absorptionCurve: AbsorptionCurve,
   ): Promise<Vintage[]> {
-    let ccs = [];
-    let absDiff = 0;
+    const ccs = [];
     for (const point of absorptionCurve) {
       const date = new Date(point.timestamp * 1000);
       const vintage = date.getFullYear().toString();
-      const toGenerate = Math.ceil((point.absorption - absDiff) / TON_IN_GRAM);
-      ccs = [
-        ...ccs,
+      const units = Math.round(point.absorption / TON_IN_GRAM);
+      ccs.push(
         new Vintage(
           idGenerator.generate(),
           vintage,
-          undefined !== point.issuedPrice ? toGenerate : 0,
-          undefined !== point.purchasedPrice ? toGenerate : 0,
+          undefined !== point.issuedPrice ? units : 0,
+          undefined !== point.purchasedPrice ? units : 0,
           point.purchasedPrice ?? 0,
           point.issuedPrice ?? 0,
         ),
-      ];
-
-      absDiff = point.absorption;
+      );
     }
 
     return ccs;
