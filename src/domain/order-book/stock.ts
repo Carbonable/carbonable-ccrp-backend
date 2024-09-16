@@ -60,7 +60,7 @@ export class Stock {
     this._available = _quantity + _purchased;
     this._consumed = 0;
   }
-
+  ///TODO check consumed
   lock(count: number): void {
     this._available -= count;
     this._consumed += count;
