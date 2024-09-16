@@ -38,9 +38,9 @@ export class AbsorptionCurveService {
   private createAbsorptionCurve(data: any): AbsorptionCurveType {
     return {
       projectId: this.csv.nonNullString(data, 'project_id'),
-      timestamp: this.csv.parseIntSafe(data.timestamp),
-      absorption: this.csv.parseIntSafe(data.absorption),
-      issuedPrice: this.csv.parseIntSafe(data.issued_price),
+      timestamp: this.csv.parseUintSafe(data.timestamp),
+      absorption: this.csv.parseUintSafe(data.absorption),
+      issuedPrice: this.csv.parseUintSafe(data.issued_price),
     };
   }
 
