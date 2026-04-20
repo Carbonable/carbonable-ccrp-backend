@@ -68,6 +68,25 @@ export class Vintage {
     return this._issuedPrice;
   }
 
+  static exPostTotalAt(
+    vintages: Vintage[],
+    year: number = new Date().getFullYear(),
+  ): number {
+    return vintages.reduce(
+      (acc, curr) => acc + (parseInt(curr.year) <= year ? curr.capacity + curr.purchased : 0),
+      0,
+    );
+  }
+  static exAnteTotalAt(
+    vintages: Vintage[],
+    year: number = new Date().getFullYear(),
+  ): number {
+    return vintages.reduce(
+      (acc, curr) => acc + (parseInt(curr.year) > year ? curr.capacity + curr.purchased : 0),
+      0,
+    );
+  }
+
   static exPostStockAt(
     vintages: Vintage[],
     year: number = new Date().getFullYear(),

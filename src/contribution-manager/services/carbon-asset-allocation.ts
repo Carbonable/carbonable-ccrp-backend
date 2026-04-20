@@ -182,6 +182,7 @@ export class CarbonAssetAllocationService {
       const endDate = parseInt(project.endDate);
       res.push({
         project_name: project.name,
+        project_slug: project.slug,
         business_units: businessUnits.map((bu) => ({
           id: bu.id,
           name: bu.name,
@@ -189,8 +190,8 @@ export class CarbonAssetAllocationService {
         })),
         type: project.type,
         total_potential,
-        ex_post_to_date: Vintage.exPostStockAt(prismaToVintage(a.stock)),
-        ex_ante_to_date: Vintage.exAnteStockAt(prismaToVintage(a.stock)),
+        ex_post_to_date: Vintage.exPostTotalAt(prismaToVintage(a.stock)),
+        ex_ante_to_date: Vintage.exAnteTotalAt(prismaToVintage(a.stock)),
         project_completion: Utils.formatString({
           value: ((100 * (now - startDate)) / (endDate - startDate)).toString(),
           suffix: '%',

@@ -69,6 +69,7 @@ type GlobalData {
 
 type CompanyCarbonAssetAllocationData {
     project_name: String
+    project_slug: String
     business_units: [AssetAllocationItem]
     type: String
     total_potential: Int
