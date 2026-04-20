@@ -10,6 +10,7 @@ RUN npx prisma generate && pnpm run build
 
 FROM node:20-slim AS production
 
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 RUN groupadd --system carbonable && useradd --system -g carbonable -m carbonable
 USER carbonable:carbonable
 
