@@ -1,18 +1,16 @@
-FROM node:20-alpine3.17 as builder
+FROM node:20-slim AS builder
 
 WORKDIR /srv/www
 
-#Install pnpm
 RUN npm install -g pnpm
 COPY package*.json pnpm-lock.yaml ./
 RUN pnpm install
 COPY . .
-RUN pnpm run build && pnpm install --production
+RUN npx prisma generate && pnpm run build
 
-FROM node:20-alpine3.17 as production
+FROM node:20-slim AS production
 
-RUN addgroup --system carbonable
-RUN adduser --system carbonable --ingroup carbonable
+RUN groupadd --system carbonable && useradd --system -g carbonable carbonable
 USER carbonable:carbonable
 
 WORKDIR /srv/www
