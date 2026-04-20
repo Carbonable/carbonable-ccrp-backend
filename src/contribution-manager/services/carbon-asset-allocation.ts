@@ -161,13 +161,10 @@ export class CarbonAssetAllocationService {
     const res = [];
     for (const a of allocations) {
       const project = a.project;
-      const projectVintage = await this.projectRepository.findOneByIdentifier(
-        project.id,
-      );
-      const total_potential = projectVintage.vintages.reduce(
-        (acc, curr) => acc + curr.capacity,
-        0,
-      );
+      const stockVintages = prismaToVintage(a.stock);
+      const ex_post_to_date = Vintage.exPostTotalAt(stockVintages);
+      const ex_ante_to_date = Vintage.exAnteTotalAt(stockVintages);
+      const total_potential = ex_post_to_date + ex_ante_to_date;
 
       const price =
         a.stock.reduce(
@@ -190,8 +187,8 @@ export class CarbonAssetAllocationService {
         })),
         type: project.type,
         total_potential,
-        ex_post_to_date: Vintage.exPostTotalAt(prismaToVintage(a.stock)),
-        ex_ante_to_date: Vintage.exAnteTotalAt(prismaToVintage(a.stock)),
+        ex_post_to_date,
+        ex_ante_to_date,
         project_completion: Utils.formatString({
           value: ((100 * (now - startDate)) / (endDate - startDate)).toString(),
           suffix: '%',
