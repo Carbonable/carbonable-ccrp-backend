@@ -1,7 +1,7 @@
 type Query {
     countries: [Country]
-    projects: [Project]
-    businessUnits: [BusinessUnit]
+    projects(view: VisualizationViewType): [Project]
+    businessUnits(view: VisualizationViewType): [BusinessUnit]
     businessUnitDetails(id: String!): BusinessUnit
     countryBy(field: String!, value: String!): Country
     businessUnitsBy(field: String!, value: String!): [BusinessUnit]

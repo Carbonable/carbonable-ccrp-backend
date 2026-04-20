@@ -24,8 +24,10 @@ export class ProjectResolver {
 
   @Public()
   @Query('projects')
-  async getProjects() {
-    return await this.prisma.project.findMany();
+  async getProjects(@Args('view') view?: any) {
+    const where: any = {};
+    if (view?.company_id) where.companyId = view.company_id;
+    return await this.prisma.project.findMany({ where });
   }
 
   @Public()

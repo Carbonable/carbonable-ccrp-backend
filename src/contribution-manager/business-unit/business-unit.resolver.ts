@@ -52,9 +52,12 @@ export class BusinessUnitResolver {
 
   @Public()
   @Query('businessUnits')
-  async getBusinessUnits() {
+  async getBusinessUnits(@Args('view') view?: any) {
     const now = new Date().getFullYear();
+    const where: any = {};
+    if (view?.company_id) where.companyId = view.company_id;
     const bu = await this.prisma.businessUnit.findMany({
+      where,
       include: {
         forecastTargets: true,
         forecastEmissions: true,
