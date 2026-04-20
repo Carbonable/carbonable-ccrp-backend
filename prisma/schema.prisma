@@ -118,8 +118,9 @@ model Project {
 model Company {
   id String @id
 
-  name String
-  slug String @unique
+  name       String
+  slug       String  @unique
+  clerkOrgId String? @map("clerk_org_id")
 
   configuration                CompanyConfiguration[]
   projects                     Project[]

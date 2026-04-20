@@ -20,6 +20,7 @@ type Query {
     businessUnitCarbonAssetAllocation(id: String!, pagination: Pagination): BusinessUnitCarbonAssetAllocation
 
 
+    companyByClerkOrg(clerkOrgId: String!): CompanyInfo
     netZeroPlanning(view: VisualizationViewType): [NetZeroPlanning]!
     annual(view: VisualizationViewType!, pagination: Pagination): Annual!
     cumulative(view: VisualizationViewType!, pagination: Pagination): Cumulative!
@@ -36,6 +37,12 @@ type Mutation {
 type DomainResponse {
     id: String!
     errors: [String]
+}
+
+type CompanyInfo {
+    id: String!
+    name: String!
+    slug: String!
 }
 
 type Map {

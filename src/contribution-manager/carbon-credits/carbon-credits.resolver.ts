@@ -114,4 +114,10 @@ export class CarbonCreditResolver {
       (pagination as PaginationDTO) || new PaginationDTO(),
     );
   }
+
+  @Public()
+  @Query('companyByClerkOrg')
+  async companyByClerkOrg(@Args('clerkOrgId') clerkOrgId: string) {
+    return this.prisma.company.findFirst({ where: { clerkOrgId } });
+  }
 }
