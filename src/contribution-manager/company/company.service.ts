@@ -42,6 +42,7 @@ export class CompanyService {
       id: this.csv.nonNullString(data, 'id'),
       name: this.csv.nonNullString(data, 'name'),
       slug: this.csv.nonNullString(data, 'slug'),
+      clerkOrgId: null,
     };
   }
 
